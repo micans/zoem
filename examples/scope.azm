@@ -1,0 +1,16 @@
+
+\set{level}{10}
+
+\setx{i}{0}
+\while{\let{\i<\level}}{
+   \defx{num}{\i}
+   \setx{i}{\let{\i+1}}
+   \push{user}
+}
+
+\while{\let{\i>0}}{
+   \pop{user}
+   num is \num
+   \setx{i}{\let{\i-1}}
+}
+

@@ -1,0 +1,77 @@
+
+\: It's possible to do repeated looping using apply. Using named macros
+\: it is not so bad. When using anonymous macros only it's kind of
+\: awkard due to how and when stuff is
+\:    a) evaluated
+\:    b) interpolated.
+
+\: A basic problem (with nested use of anonymous macros) is how to
+\: achieve use of the placeholders \1, \2 etc as local variables. Right
+\: now, this is done by using the feature that apply evaluates its first
+\: argument (the key/anon macro) before use. A second-level nested
+\: placeholder has to be written as \!1, and during this evaluation
+\: it will be rewritten to \1. It needs to be enclosed by other delay
+\: scopes (i.e. either \!!1 or \!{..\!1 ..}) because the first-level
+\: apply also evaluates its first argument (of which the nested apply is
+\: part).
+
+\: So, one zoem implementation challenge might be to create an alternative
+\: way of achieving this for which the syntax is less hideous.
+\: A related issue is e.g. how to recurse over grape data (currently
+\: not possible).
+
+\@{\P}
+nested application of apply using anonymous macros.
+
+\apply{_#1{[ \!apply{_#1{\!{ (\!let{\!1*\!1}) }}}{\1} ]\@{\N}}}{
+   {{1}{2}{3}{4}{5}}
+   {{4}{5}{6}}
+   {{7}{8}{9}}
+}
+
+\: First apply evaluates its first argument.
+\: 
+\:    _#1{[ \!apply{_#1{\!{ (\!let{\!1*\!1}) }}}{\1} ]\@{\N}}
+\: 
+\: giving
+\: 
+\:    _#1{[ \apply{_#1{ (\!let{\!1*\!1}) }}{\1} ]\@{\N}}
+\: 
+\: This anon key is then iterated, and first presented with {{1}{2}{3}{4}{5}}.
+\: So we get
+\: 
+\:    \apply{_#1{ (\!let{\!1*\!1}) }}{{1}{2}{3}{4}{5}}
+\: 
+\: This apply evaluates its first argument, giving
+\: 
+\:    _#1{ (\let{\1*\1}) }
+\: 
+\: and the rest is easy.
+
+
+\@{\P}
+nested application of apply using normal macros.
+
+\set{do1#1}{[ \apply{do2#1}{\1} ]\@{\N}}
+\set{do2#1}{ (\let{\1*\1}) }
+
+\apply{do1#1}{
+   {{1}{2}{3}{4}{5}}
+   {{4}{5}{6}}
+   {{7}{8}{9}}
+}
+
+
+
+\import{reverse.azm}
+
+\@{\P}
+reversing successive varargs
+
+\apply{_#1{\!reverse{\1}\@{\N}}}{
+   {{1}{2}{3}{4}{5}}
+   {{4}{5}{6}}
+   {{7}{8}{9}}
+}
+
+

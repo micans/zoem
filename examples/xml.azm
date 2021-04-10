@@ -1,0 +1,21 @@
+
+\set{opts}{a=b c=d}
+\setx{tmp}{\<foo>\<bar>\<zut>}
+
+\<foo \opts>
+asdlfj daklfj
+adskfjladj dsfjaldsfjkl
+\>
+
+the quick brown etc
+\<humtidum>{hum ha ho}
+   
+\<bar>
+   the quick brown etc
+   \<humtidum>
+      bleech
+   \>
+   \<bazooshka/>
+\>
+
+

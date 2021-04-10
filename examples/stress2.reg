@@ -1,0 +1,381 @@
+
+@@@ eval [\eval{\!{\foo}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ $#2 [\${zut}{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ <>#1 [\<\foo>]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ <>#2 [\<foo>{\bar}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <bar>
+___ [expand] no definition found for key <bar>
+
+@@@ <>#2 [\<\foo>{bar}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ alpha#1 [\alpha{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <alpha#1>
+___ [expand] no definition found for key <alpha#1>
+
+@@@ apply#2 [\apply{}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <apply#2>
+___ [\apply#2] key part not ok
+
+@@@ apply#2 [\apply{}{{\foo}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ apply#2 [\appy{\foo#2}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <appy#2>
+___ [expand] no definition found for key <appy#2>
+
+@@@ begin#2 [\begin{\foo}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <begin#2>
+___ [\begin#2] env <\foo> does not exist
+
+@@@ begin#2 [\begin{foo}{{\foo}{}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <begin#2>
+___ [\begin#2] env <foo> does not exist
+
+@@@ begin#2 [\begin{void}{{\foo}{}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <begin#2>
+___ [\begin#2] env <void> does not exist
+
+@@@ begin#2 [\begin{void}{{foo}{\foo}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <begin#2>
+___ [\begin#2] env <void> does not exist
+
+@@@ branch#1 [\branch{{\foo}{}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ FALL THROUGH CLAUSE branch#1 [\branch{{}{\foo}}]
+***
+
+@@@ catch#2 [\catch{foo}{}]
+___ [\catch#2] cannot catch <foo>
+
+@@@ catch#2 [\catch{error}{zut,bar,\foo,tim}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+zut,bar, ***
+
+@@@ catch#2 [\catch{error}{\eval{zut,bar,\foo,tim}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+zut,bar, ***
+
+@@@ catch#2 [\catch{}{\foo}]
+___ [\catch#2] cannot catch <>
+
+@@@ cmp#3 [\cmp{foo}{}{}]
+___ [cmp#3] unknown mode <foo>
+
+@@@ cmp#3 [\cmp{eq}{\foo}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ def#2 [\def{&foo}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <def#2>
+___ [\def#2] not a valid key signature: <&foo>
+
+@@@ defx#2 [\defx{foo}{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [\defx#2] argument did not parse
+
+@@@ defined#2 [\defined{foo}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <defined#2>
+___ [\defined#2] invalid type <foo>
+
+@@@ defined#2 [\defined{key}{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [\defined#2] access string does not eval
+
+@@@ defined#2 [\defined{key}{&foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <defined#2>
+___ [\defined#2] argument <key> is not a valid key signature
+
+@@@ dofile#2 [\dofile{\foo}{!+}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ dofile#2 [\dofile{foo}{!}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <dofile#2>
+___ [\dofile#2] Second arg <!> not in {!?}x{+-}
+
+@@@ dowhile#2 [\dowhile{\foo}{0}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ FEATURE ?- note no stars dowhile#2 [\dowhile{0}{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+0
+
+@@@ end#1 [\end{foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <end#1>
+___ [\end#2] env <foo> not found
+
+@@@ end#1 [\end{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <end#1>
+___ [\end#2] env <\foo> not found
+
+@@@ eqt#3 [\eqt{foo}{}{}]
+___ [eqt#3] unknown mode <foo>
+
+@@@ eqt#3 [\eqt{eq}{\foo}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ eval#1 [\eval{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ f#1 [\f{foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <f#1>
+___ [expand] no definition found for key <f#1>
+
+@@@ f#1 [\f{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <f#1>
+___ [expand] no definition found for key <f#1>
+
+@@@ finsert#1 [\finsert{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ format#2 [\format{foo}{{}}]
+foo ***
+
+@@@ format#2 [\format{}{{\foo}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ formatted#1 [\formatted{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ fv#2 [\fv{foo}{{}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <fv#2>
+___ [\fv#2] unknown mode <foo>
+
+@@@ fv#2 [\fv{sum}{{\foo}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ if#3 [\if{\foo}{}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [\if#3] condition does not parse
+
+@@@ if#3 [\if{1}{\foo}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ inspect#4 [\inspect{}{}{}{}]
+***
+
+@@@ length#1 [\length{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ let#1 [\let{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [\let#1] arithmetic error occurred
+
+@@@ pop#1 [\pop{foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <pop#1>
+___ [dictStackPop] cannot pop last <user> scope!
+
+@@@ pop#1 [\pop{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <pop#1>
+___ [dictStackPop] cannot pop last <user> scope!
+
+@@@ push#1 [\push{\foo}]
+***
+
+@@@ ref#2 [\ref{foo}{n}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <ref#2>
+___ [expand] no definition found for key <ref#2>
+
+@@@ ref#2 [\ref{misc}{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <ref#2>
+___ [expand] no definition found for key <ref#2>
+
+@@@ ALWAYS WORKS refload#5 [\refload{\foo&!}{}{}{}{}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <refload#6>
+___ [expand] no definition found for key <refload#6>
+
+@@@ roman#1 [\roman{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <roman#1>
+___ [expand] no definition found for key <roman#1>
+
+@@@ NO CHECKS YET ON KEYS special#1 [\special{{foo}{}}]
+***
+
+@@@ special#1 [\special{10}{{\foo}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <special#2>
+___ [expand] no definition found for key <special#2>
+
+@@@ switch#2 [\switch{\foo}{{}{}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ switch#2 [\switch{foo}{{\foo}{}}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ ERROR MSGS GO INTO LOST PIPE system#3 [\system{ls}{{-!}}]
+
+@@@ table#5 [\table{\foo}{\foo}{\foo}{\foo}{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ throw#2 [\throw{foo}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <throw#2>
+___ [throw#2] <foo> is unthrowable, throwing error instead
+
+@@@ throw#2 [\throw{error}{\foo ka-ching}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [error :: ]
+
+@@@ tr#4 [\tr{}{}{}{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <tr#4>
+___ [expand] no definition found for key <tr#4>
+
+@@@ tr#4 [\tr{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <tr#1>
+___ [expand] no definition found for key <tr#1>
+
+@@@ OF COURSE try#1 [\try{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+***
+
+@@@ ucase#1 [\ucase{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <ucase#1>
+___ [expand] no definition found for key <ucase#1>
+
+@@@ undef#1 [\undef{foof}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <undef#1>
+___ [\undef#1] key <foof> not defined in target scope
+
+@@@ undef#1 [\undef{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <undef#1>
+___ [\undef#1] not a valid key signature: <\foo>
+
+@@@ vanish#1 [\vanish{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ while#2 [\while{\foo}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ while#2 [\while{1}{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ write#3 [\write{\foo}{}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <write#3>
+___ [\write#3] unknown filter <>
+
+@@@ write#3 [\write{/etc/foobar}{}{}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <write#3>
+___ [\write#3] unknown filter <>
+
+@@@ write#3 [\write{/dev/null}{copy}{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+
+@@@ writeto#1 [\writeto{\foo}]
+___ [zoem] error around input line <88> in <stress2.azm>
+___ last key seen is <foo>
+___ [expand] no definition found for key <foo>
+___ [zoem] error occurred
+___ last key seen is <foo>
+___ [dictStackFree] user dictionary <\foo> not closed in output file <->

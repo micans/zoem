@@ -1,0 +1,88 @@
+\if{\defined{key}{get_it_on}}{}{
+   \write{-}{device}{Process this file with
+   ../src/zoem -i stress2 --system-honor --unsafe-silent --err-out -s get_it_on=1 -o - > stress2.ozm\@{\N}
+   }
+   \done
+}
+\set{__device__}{zut}
+\apply{_#2{\@{\P}
+   @@@ \1 [\!protect{\2}] \@{\N}
+   \!catch{error}{\2 ***}
+}}{\!{
+{eval}{\eval{\!{\foo}}}
+{$#2}{\${zut}{\foo}}
+{<>#1}{\<\foo>}
+{<>#2}{\<foo>{\bar}}
+{<>#2}{\<\foo>{bar}}
+{alpha#1}{\alpha{\foo}}
+{apply#2}{\apply{}{}}
+{apply#2}{\apply{}{{\foo}}}
+{apply#2}{\appy{\foo#2}{}}
+{begin#2}{\begin{\foo}{}}
+{begin#2}{\begin{foo}{{\foo}{}}}
+{begin#2}{\begin{void}{{\foo}{}}}
+{begin#2}{\begin{void}{{foo}{\foo}}}
+{branch#1}{\branch{{\foo}{}}}
+{FALL THROUGH CLAUSE branch#1}{\branch{{}{\foo}}}
+{catch#2}{\catch{foo}{}}
+{catch#2}{\catch{error}{zut,bar,\foo,tim}}
+{catch#2}{\catch{error}{\eval{zut,bar,\foo,tim}}}
+{catch#2}{\catch{}{\foo}}
+{cmp#3}{\cmp{foo}{}{}}
+{cmp#3}{\cmp{eq}{\foo}{}}
+{def#2}{\def{&foo}{}}
+{defx#2}{\defx{foo}{\foo}}
+{defined#2}{\defined{foo}{}}
+{defined#2}{\defined{key}{\foo}}
+{defined#2}{\defined{key}{&foo}}
+{dofile#2}{\dofile{\foo}{!+}}
+{dofile#2}{\dofile{foo}{!}}
+{dowhile#2}{\dowhile{\foo}{0}}
+{FEATURE ?- note no stars  dowhile#2}{\dowhile{0}{\foo}}
+{end#1}{\end{foo}}
+{end#1}{\end{\foo}}
+{eqt#3}{\eqt{foo}{}{}}
+{eqt#3}{\eqt{eq}{\foo}{}}
+{eval#1}{\eval{\foo}}
+{f#1}{\f{foo}}
+{f#1}{\f{\foo}}
+{finsert#1}{\finsert{\foo}}
+{format#2}{\format{foo}{{}}}
+{format#2}{\format{}{{\foo}}}
+{formatted#1}{\formatted{\foo}}
+{fv#2}{\fv{foo}{{}}}
+{fv#2}{\fv{sum}{{\foo}}}
+{if#3}{\if{\foo}{}{}}
+{if#3}{\if{1}{\foo}{}}
+{inspect#4}{\inspect{}{}{}{}}
+{length#1}{\length{\foo}}
+{let#1}{\let{\foo}}
+{pop#1}{\pop{foo}}
+{pop#1}{\pop{\foo}}
+{push#1}{\push{\foo}}
+{ref#2}{\ref{foo}{n}}
+{ref#2}{\ref{misc}{\foo}}
+{ALWAYS WORKS refload#5}{\refload{\foo&!}{}{}{}{}{}}
+{roman#1}{\roman{\foo}}
+{NO CHECKS YET ON KEYS special#1}{\special{{foo}{}}}
+{special#1}{\special{10}{{\foo}}}
+{switch#2}{\switch{\foo}{{}{}}}
+{switch#2}{\switch{foo}{{\foo}{}}}
+{ERROR MSGS GO INTO LOST PIPE system#3}{\system{ls}{{-!}}}
+{table#5}{\table{\foo}{\foo}{\foo}{\foo}{\foo}}
+{throw#2}{\throw{foo}{}}
+{throw#2}{\throw{error}{\foo ka-ching}}
+{tr#4}{\tr{}{}{}{\foo}}
+{tr#4}{\tr{\foo}}
+{OF COURSE try#1}{\try{\foo}}
+{ucase#1}{\ucase{\foo}}
+{undef#1}{\undef{foof}}
+{undef#1}{\undef{\foo}}
+{vanish#1}{\vanish{\foo}}
+{while#2}{\while{\foo}{}}
+{while#2}{\while{1}{\foo}}
+{write#3}{\write{\foo}{}{}}
+{write#3}{\write{/etc/foobar}{}{}}
+{write#3}{\write{/dev/null}{copy}{\foo}}
+{writeto#1}{\writeto{\foo}}
+}}

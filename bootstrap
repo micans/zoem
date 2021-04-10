@@ -1,0 +1,40 @@
+#!/bin/sh -e
+
+# $Id: bootstrap,v 1.9 2003/07/17 08:45:50 flux Exp $
+
+#
+# bootstrap - script to bootstrap the distribution rolling engine
+#
+# to build a tarball, ready for distribution, from fresh checked out
+# cvs sources, do
+#
+#     automake --add-missing && ./bootstrap && ./configure && make distcheck
+#
+# this will yield a tarball, e.g. zoem-20020109.tar.gz .  Once this has been
+# run, one can, after e.g. editing sources, run just
+#
+#     make distcheck
+#
+# to generate a new tarball.  (No need to run ./bootstrap again in this case.)
+# After downloading, users do
+#
+#    tar zxf mcl-20020109.tar.gz
+#    cd mcl-20020109
+#    ./configure && make
+#    make install
+#
+
+set -x
+
+if test ! -f VERSION
+then
+    ./setversion
+fi
+
+aclocal \
+    && autoheader \
+    && automake --verbose --gnu --add-missing \
+    && autoconf
+
+
+

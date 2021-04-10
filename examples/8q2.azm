@@ -1,0 +1,79 @@
+
+
+\if{\let{!\defined{key}{N} || \N < 1}}{
+   \write{stderr}{device}{Use e.g. zoem -i 8q2 -s N=9 to solve the 9-queen problem\@{\N}}
+   \set{N}{8}
+}{}
+\setx{N}{\let{floor(\N)}}
+
+\def{pp#1}{\%{ass}{\1}}
+
+\set{ptr}{0}
+\set{%{ass}{-1}}{0}
+
+\setx{row_odd}{\seq{n}{0}{\N}{\if{\let{\n%2}}{.}{-} }}
+\setx{row_even}{\seq{n}{0}{\N}{\if{\let{\n%2}}{-}{.} }}
+
+\set{n}{0}
+\while{\let{\n<=\N}}{
+   \set{%{ass}{\n}}{0}
+   \setx{n}{\let{\n+1}}
+}
+
+\set{id}{0}
+
+\while{\let{\ptr>=0}}{
+   \set{i}{0}
+   \while{\let{
+         \i<\ptr
+         && \%{ass}{\i} != \%{ass}{\ptr}
+         && \%{ass}{\i} - \%{ass}{\ptr} != \ptr - \i
+         && \%{ass}{\i} - \%{ass}{\ptr} != \i - \ptr
+      }
+   }{\setx{i}{\let{\i+1}}}
+   \branch{
+      {\let{\i==\N-1}}
+      {  \set{t}{0}
+         \while{\let{\t<\N}}{
+            \setx{t2}{\if{\let{\t % 2}}{\row_odd}{\row_even}}
+            \set{{start}{\let{2*\pp{\t}}}{width}{1}}{t2}{W}
+            \write{\__fnout__}{device}{\t2\@{\n}}
+            \setx{t}{\let{\t+1}}
+         }
+         \setx{id}{\let{\id+1}}
+         \write{\__fnout__}{device}{(\id)\@{\P}}
+      }
+                  \:  below, we came all the way up to ptr without conflict.
+                  \:  That means we can extend our current solution.
+      {\let{\i==\ptr}}
+      {  \setx{ptr}{\let{\ptr+1}}
+         \set{%{ass}{\ptr}}{-1}
+      }
+   }
+                  \:  below, we have reached the maximal position
+                  \:  at position ptr. That means we reset its position
+                  \:  to zero, and any predecessor pointers in the same state.
+                  \:  after that ...
+   \while{\let{\ptr>=0 && \%{ass}{\ptr} == \N-1}}{
+      \set{%{ass}{\ptr}}{0}
+      \setx{ptr}{\let{\ptr-1}}
+   }
+                  \:  ... we can increment the current pointer position.
+   \setx{%{ass}{\ptr}}{\let{\%{ass}{\ptr}+1}}
+}
+
+                  \:
+                  \:
+                  \:     5 |  .  .  .  .  .  .         
+                  \:     4 |  .  .  *  .  .  .
+                  \:     3 |  .  .  .  .  ?  .
+                  \:     2 |  .  *  .  .  .  .
+                  \:     1 |  .  .  .  *  .  .
+                  \:     0 |  *  .  .  .  .  .
+                  \:       |________________________
+                  \: col:  |              ptr
+                  \: c:       0  1  2  3
+
+
+
+

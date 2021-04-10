@@ -1,0 +1,17 @@
+
+\: Some more anon/nesting/delay arithmetic, not very exciting.
+\: See also loop.azm.
+\: Note that inspect#4 is a beta-stage primitive.
+
+\'set{data}{{a-b}{c-d}{e-f}}
+
+\'apply{
+   _#1{
+      \!{\'inspect{posix}{(.)-(.)}{_#2\!{{\2#\1\@{\N}}}}}{\1}
+   }
+}{
+   \data
+}
+
+\'inspect{posix,vararg}{(.)-(.)}{_#2\!{{\2#\1\@{\N}}}}{\data}
+

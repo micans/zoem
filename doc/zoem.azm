@@ -1,0 +1,730 @@
+
+\'import{pud/man.zmm}
+\'import{zoem.shared}
+
+\begin{pud::man}{
+
+   {name}{zoem}
+   {html_title}{zoem}
+   {author}{Stijn van Dongen}
+   {section}{1}
+   {synstyle}{long}
+   {defstyle}{long}
+
+   \man_share
+}
+
+\"pud::man::maketoc"
+
+
+\'def{z#1}{\bf{\\\1}}
+\'def{zoem}{\bf{zoem}}
+
+\sec{name}{NAME}
+\NAME{zoem}{macro processor for the Zoem macro/programming language.}
+
+\sec{synopsis}{SYNOPSIS}
+
+\par{
+\zoem
+   \synoptopt{-i}{<file name>[.azm]}{entry file name}
+   \synoptopt{-I}{<file name>}{entry file name}
+   \synoptopt{-o}{<file name>}{output file name}
+   \synoptopt{-d}{<device>}{set device key}}
+
+\par{
+\zoem\|
+   (enter interactive mode - happens when none of \genopt{-i},
+   \genopt{-I}, \genopt{-o} is given)}
+
+\par{
+\zoem
+   \synreqopt{-i}{<file name>[.azm]}{entry file name}
+   \synreqopt{-I}{<file name>}{entry file name}
+   \synoptopt{-o}{<file name>}{output file name}
+   \synoptopt{-d}{<device>}{set device key}
+   \synoptopt{-x}{enter interactive mode on error}
+   \synoptopt{-s}{<key>[=<val>]}{set key to val}
+   \synoptopt{-e}{<any>}{evaluate any, exit}
+   \synoptopt{-E}{<any>}{evaluate any, proceed}
+   \synoptopt{-chunk-size}{<num>}{process chunks of size num}
+   \synoptopt{--trace}{trace mode, default}
+   \synoptopt{--trace-all-long}{long trace mode}
+   \synoptopt{--trace-all-short}{short trace mode}
+   \synoptopt{--trace-regex}{trace regexes}
+   \synoptopt{-trace}{k}{trace mode, explicit}
+   \synoptopt{--stats}{show symbol table stats after run}
+   \synoptopt{--split}{assume \\writeto usage, set \\__split__}
+   \synoptopt{--stress-write}{make \\write#3 recover}
+   \synoptopt{--unsafe}{prompt for \\system#3}
+   \synoptopt{--unsafe-silent}{simply allow \\system#3}
+   \synoptopt{-allow}{cmd1[:cmdx]+}{allowable commands}
+   \synoptopt{--system-honor}{require \\system#3 to succeed}
+   \synoptopt{-nuser}{k}{user dict stack size}
+   \synoptopt{-nenv}{k}{environment dict stack size}
+   \synoptopt{-nsegment}{k}{maximum simple nesting depth}
+   \synoptopt{-nstack}{k}{maximum eval nesting depth}
+   \synoptopt{-buser}{initial user dict capacity}
+   \synoptopt{-bzoem}{initial zoem dict capacity}
+   \synoptopt{-tl}{k}{tab length}
+   \synoptopt{-l}{<str>}{list items}
+   \synoptopt{-h}{show options}
+   \synoptopt{--apropos}{show options}}
+
+\sec{description}{DESCRIPTION}
+
+\par{
+   Zoem is a macro/programming language.  It is fully described in the
+   \lref{zum.html}{Zoem User Manual} \'${roff}{(zum.html)}, currently available
+   in HTML only. This manual page documents the zoem processor, not the
+   zoem language.}
+
+\par{
+   If the input file is specified using the \optref{-i}{\genopt{-i} option} and
+   is a regular file (i.e. not STDIN - which is specified by using a single
+   hyphen), it must have the extension \v{.azm}.  This extension can but need
+   not be specified.  The zoem key \z{__fnbase__} will be set to the file base
+   name stripped of the \v{.azm} extension and any leading path components.
+   If the input file is specified
+   using the \optref{-I}{\genopt{-I} option}, no extension is assumed, and
+   \z{__fnbase__} is set to the file base name, period.  The file base name is
+   the file name with any leading path components stripped away.}
+
+\par{
+   If neither \useopt{-i} nor \useopt{-o} is specified, zoem enters interactive
+   mode. Zoem should fully recover from any error it encounters in the input.
+   If you find an exception to this rule, consider filing a bug report.  In
+   interactive mode, zoem start interpreting once it encounters a line
+   containing a single dot. Zoem's input behaviour can be modified by setting
+   the key \z{__parmode__}.  See the section \secref{session} for the details.
+
+   In interactive mode, zoem does \it{not} preprocess the interactive
+   input, implying that it does not accept inline files and it does not
+   recognize comments. Both types of sequence will generate syntax errors.
+   Finally, readline editing and history retrieval can be used in interactive
+   mode provided that they are available on the system. This means
+   that the input lines can be retrieved, edited, and discarded with
+   a wide range of cursor positioning and text manipulation commands.
+   }
+
+\par{
+   From within the entry file and included files it is possible to open and
+   write to arbitrary files using the \z{write#3} primitive.  Arbitrary files
+   can be read in various modes using the \z{dofile#2} macro (providing four
+   different modes with respect to file existence and output), \z{finsert#1},
+   and \z{zinsert#1}.
+   Zoem will write the default output to a single file, the name of which is
+   either specified by the \genopt{-o} option, or constructed as described
+   below.  Zoem can split the default output among multiple files.  This is
+   governed from within the input files by issuing \z{writeto#1} calls. Refer
+   to the \optref{--split}{\genopt{--split} option} and the
+   \lref{zum.html}{Zoem User Manual}.}
+
+\par{
+   If none of \genopt{-i} or \genopt{-o} is given, then zoem will enter
+   interactive mode. In this mode, zoem interprets by default chunks of
+   text that are ended by a single dot on a line of its own.  This can be
+   useful for testing or debugging.  In interactive mode, zoem should recover
+   from any failure it encounters. Interactive mode can also be accessed from
+   within a file  by issuing \mc{zinsert{stdia}}, and it can be triggered as
+   the mode to enter should an error occur (by adding the
+   \optref{-x}{\genopt{-x} option} to the command line).}
+
+
+\par{
+   If \genopt{-o} is given and \genopt{-i} is not,
+   zoem reads input from STDIN.}
+
+\par{
+   If \genopt{-i} is given and \genopt{-o} is not, zoem will construct an
+   output file name as follows.  If the \genopt{-d} option was used with
+   argument \v{<dev>}, zoem will write to the file which results from
+   expanding \z{__fnbase__.<dev>}.  Otherwise, zoem writes to (the expansion
+   of) \z{__fnbase__.ozm}.}
+
+\par{
+   For \genopt{-i} and \genopt{-o}, the argument \v{-}
+   is interpreted as respectively \v{stdin} and \v{stdout}.}
+
+\sec{options}{OPTIONS}
+
+\'begin{itemize}{{interitem}{1}}
+
+\item{\defopt{-i}{<file name>[.azm]}{entry file name}}
+\car{
+   Specify the entry file name. The file must have the \v{.azm}
+   extension, but it need not be specified.}
+
+\item{\defopt{-I}{<file name>[.azm]}{entry file name}}
+\car{
+   Specify the entry file name, without restrictions on the file name.}
+
+\item{\defopt{-o}{<file name>}{output file name}}
+\car{
+   Specify the output file name.}
+
+\item{\defopt{-d}{<device>}{set key \\__device__}}
+\car{
+   Set the key \z{__device__} to \v{<device>}.}
+
+\item{\defopt{-x}{enter interactive mode on error}}
+\car{
+   The afterlife option. If zoem encounters an error during
+   regular processing, it will emit error messages as usual,
+   and then enter interactive mode. This allows you e.g.
+   to inspect the values of keys used or defined within
+   the problematic area.}
+
+\item{\defopt{-s}{<key>[=<val>]}{set key to val}}
+\car{
+   Set the key \z{key} to \bf{val} if present, \bf{1} otherwise.
+   Any type of key can be set, including keys taking arguments and keys
+   surrounded in quotes.  Beware of the shell's quote and backslash
+   interpolation.
+   Currently \bf{val} is not evaluated, so appending or prepending
+   to a key is not possible.
+   }
+
+\item{\defopt{-e}{<any>}{evaluate any, exit}}
+\car{
+   This causes zoem to evaluate \v{<any>},
+   write any result text to stdout, and exit.}
+
+\item{\defopt{-E}{<any>}{evaluate any, proceed}}
+\car{
+   This causes zoem to evaluate \v{<any>},
+   write any result text to stdout, and proceed e.g. with
+   the entry file or an interactive session.}
+
+\item{\defopt{-chunk-size}{<num>}{process chunks of size num}}
+\car{
+   Zoem reads its input in chunks. It fully processes a chunk before moving on
+   with the next one.  This option defines the
+   (minimum) size of the chunks.  The size or count of the
+   chunks does not at all affect zoem's output. The default minimum
+   chunk size equals one megabyte.}
+
+\par{
+   Zoem will read files in their entirety before further processsing
+   if \useopt{-chunk-size}{0} is specified.}
+
+\par{
+   Zoem does not chunk input files arbitrarily. It will append to
+   a chunk until it is in the outermost scope (not contained within
+   any block) and the chunk will end with a line that was fully read.}
+
+\par{
+   Consequently, if e.g. a file contains a block (delimited by
+   balanced curlies) spanning the entire file then zoem is forced
+   to read it in its entirety.}
+
+\item{\defopt{--trace}{trace mode, default}}
+\car{
+   Trace in default mode.}
+
+\item{\defopt{--trace-all-long}{long trace mode}}
+\car{
+   Sets on \it{most} trace options in long mode.
+   Trace options \v{xxx} not set
+   have their own \genopt{--trace-xxx} entry (see below).}
+
+\item{\defopt{--trace-all-short}{short trace mode}}
+\car{
+   Sets on \it{most} trace options in short mode.
+   Trace options \v{xxx} not set
+   have their own \genopt{--trace-xxx} entry (see below).}
+
+\item{\defopt{--trace-keys}{trace keys}}
+\car{
+   Trace keys.}
+
+\item{\defopt{--trace-regex}{trace regexes}}
+\car{
+   Trace regexes (i.e. the \z{inspect#4} primitive).}
+
+\item{\defopt{-trace}{k}{trace mode, explicit}}
+\car{
+   Set trace options by adding their representing bits.}
+
+\item{\defopt{--stress-write}{stress test using write}}
+\car{
+   This makes \z{write#3} recover from errors.
+   It is a special purpose option used for creating zoem
+   stress test suites, such as \v{stress.azm}
+   in the zoem distribution \v{/examples} subdirectory.}
+
+\items{
+   {\defopt{--unsafe}{prompt for \\system#3}}
+   {\defopt{--unsafe-silent}{simply allow \\system#3}}
+   {\defopt{-allow}{cmd1[:cmdx]+}{allowable commands}}
+}
+\car{
+   With \useopt{--unsafe} system calls are allowed but the user
+   is prompted for each invocation. The command and its arguments (if any)
+   are shown, but the STDIN information (if any) is withheld.
+   With \useopt{--unsafe-silent} system calls are allowed and
+   the user is never prompted.}
+
+\par{Use \genopt{-allow}{str} or \genkvp{--allow}{str} to
+   specify a list of allowable commands, as a string
+   in which the commands are separated by colons.}
+
+\item{\defopt{--system-honor}{require \\system#3 to succeed}}
+\car{
+   With this option any \mc{system#3} failure (for whatever reason,
+   including safe behaviour) is regarded as a zoem failure.
+   By default, failing system calls are ignored under either
+   safe mode, unsafe mode (--unsafe), or silent unsafe mode
+   (--unsafe-silent).}
+
+\item{\defopt{--split}{assume split output}}
+\car{
+   This assumes zoem input that allows output to multiple files (e.g.
+   chapters).  It sets the default output stream to \v{stdout} (anticipating
+   custom output redirection with \z{writeto#1}) and sets the session macro
+   \z{__split__} to \v{1}.}
+
+\item{\defopt{--stats}{show symbol table stats after run}}
+\car{
+   Show symbol table chacteristics. Symbol tables are
+   maintained as hashes.}
+
+\item{\defopt{-tl}{k}{set tab length}}
+\car{
+   Set the tab length. HTML output can be indented according
+   to nesting structure, using tabs which are expanded
+   to simple spaces. By default, the tab length is zero,
+   meaning that no indent is shown.
+   The maximum value the tab length can be set to is four.}
+
+\items{
+   {\defopt{-nsegment}{k}{level of macro nesting allowed}}
+   {\defopt{-nstack}{k}{stack count}}
+   {\defopt{-nuser}{k}{user dictionary stack size}}
+   {\defopt{-nenv}{k}{environment dictionary stack size}}
+   {\defopt{-buser}{k}{initial user dict capacity}}
+   {\defopt{-bzoem}{k}{initial zoem dict capacity}}
+}
+\car{
+   Probably needed only if you have some obscure and extreme use
+   for zoem. The segment limit applies to simple nesting of macros. The
+   stack limit applies to nesting of macros that evaluate an argument before
+   use. Each such evaluation creates a new stack.  The user limit applies to
+   \z{push{user}}, the env limit applies to the nesting level of environments
+   (started with \mc{begin#2}). The user
+   dict capacity pertains to the initial number of buckets allocated for
+   user and environment dictionaries, and the zoem dict capacity pertains to the
+   dictionary containing the zoem primitives.}
+
+\item{\defopt{-l}{<str>}{list items}}
+\car{
+   List items identified by \v{<str>}. It can be any of
+   \bf{all},
+   \bf{filter}.
+   \bf{legend},
+   \bf{builtin},
+   \bf{session},
+   \bf{trace}, or
+   \bf{zoem},
+
+   Multiple identifiers
+   can be joined in a string, e.g.  \v{-l legendzoem} prints a legend
+   followed by a listing of zoem primitives.}
+
+\item{\defopt{-h}{show options}}
+\car{
+   Show short synopsis of options.}
+
+\'end{itemize}
+
+
+\sec{session}{SESSION MACROS}
+
+\'begin{itemize}
+\item{\z{__parmode__}}
+   This macro affects zoem's read behaviour in interactive mode.
+   It can be set on the command line using the \genopt{-s} option.
+   Bits that can be set:
+
+\verbatim{\
+1    chomp newlines (remove the newline character)
+2    skip empty newlines
+4    read paragraphs (an empty line triggers input read)
+8    newlines can be escaped using a backslash
+16   read large paragraphs (a single dot on a line
+     triggers input read)}
+
+\item{\z{__device__}}
+\car{
+   The current output device, set by \optref{-d}{the command line option
+   \genopt{-d}}.  The \bf{man} and \bf{faq} packages support \bf{html} and
+   \bf{roff} as its values.}
+
+\item{\z{__fnbase__}}
+\car{
+   The base name of the input file name. Leading path components are stripped
+   away.  If the \genopt{-i} option is used the input file is required to have
+   the \v{.azm} suffix. In that case the suffix is also stripped to obtain the
+   base name.}
+
+\item{\z{__fnentry__}}
+\car{
+   The name of the entry file.}
+
+\item{\z{__fnin__}}
+\car{
+   The file currently being processed.}
+
+\item{\z{__fnout__}}
+\car{
+   The name of the default output file.}
+
+\item{\z{__fnpath__}}
+\car{
+   The leading component of the input file name, possibly empty.}
+
+\item{\z{__fnup__}}
+\car{
+   The file that included the current file, if applicable.}
+
+\item{\z{__fnwrite__}}
+\car{
+   This key is set by \mc{write#3} to its first argument. It can be used by
+   macros that are expanded during evaluation of the third argument. Possible
+   usage is to branch on the name of the \it{write} output stream. For example
+   a file called \it{index.html} may be treated differently from other files.
+   The key is deleted afterwards. Nested invocations of \mc{write#3} may
+   corrupt the status of this key.}
+
+\item{\z{__ia__}}
+\car{
+   The input/output separator used in interactive mode.}
+
+\item{\z{__line__}}
+\car{
+   The line number in the file currently being processed.
+   This number will be correct for any invocation outside the scope
+   of a macro. For any invocation within a macro the result will be
+   the line number of the closing curly of the outermost containing
+   macro. The following}
+
+\verbatim{\protect{\:/
+   \__line__
+   \__line__
+   \__line__
+   \group{
+   \__line__
+   \group{\__line__}
+   \__line__}}}
+
+\par{Results in}
+
+\verbatim{\:/
+   1
+   2
+   3
+   7
+   7
+   7}
+
+\item{\z{__searchpath__}}
+\car{
+   A vararg containing a list of paths to search when a file is to be
+   included/imported/read/loaded.  When you start zoem, this key should
+   contain the location of the \bf{man.zmm} and \bf{faq.zmm} package files.
+   It is advisable not to overwrite this key but to append to it instead.}
+
+\item{\z{__zoemstat__}}
+\car{
+   Set to one of \v{ok}, \v{towel} (that one is a bit lame),
+   or \v{error} by either the interpreter, an occurrence of \mc{catch#2},
+   or \mc{try#1}.}
+
+\item{\z{__zoemput__}}
+\car{
+   Set by \mc{try#1} to the possibly truncated result of processing
+   its argument.}
+
+\item{\z{__lc__}}
+\car{
+   Expands to a left curly. It is hard to find a need for this \- the zoem
+   stress suite uses it to generate a particular syntax error at a deeper
+   interpretation level.}
+
+\item{\z{__rc__}}
+\car{
+   Expands to a right curly.}
+
+\'end{itemize}
+
+
+\sec{set}{THE SET MODIFIERS}
+
+\par{The \mc{set#3} primitive allows a \v{{modes}{<modifiers>}}
+   directive in its first argument. Here \genarg{<modifiers>}
+   can be a combination of single-letter modifiers, each
+   described below.
+
+   }
+
+\itemize_set3_modifiers
+
+\sec{inspect}{THE INSPECT SUBLANGUAGE}
+
+\par{
+   The \mc{inspect#4} primitive takes four arguments. The languages
+   accepted by the first two arguments are described below. The third
+   argument is a replacement string or a replacement macro accepting
+   back-references (supplied as an anonymous macro). The fourth
+   argument is the data to be processed.}
+
+\cpar{arg 1}{
+   Is a vararg. Currently it accepts a single key
+   \it{mods} for which the value should be a comma-separated list over the words
+      \it{posix},
+      \it{icase},
+      \it{dotall},
+      \it{iter-lines}
+      \it{iter-args},
+      \it{match-once},
+      \it{discard-nmp},
+      \it{discard-nil-out},
+      \it{discard-miss},
+      \it{count-matches}.
+   Alternatively repeated use of \it{mods} is allowed.}
+
+\cpar{arg 2}{
+   Is a regular expression. Tilde patterns
+   are expanded according to all of the ZOEM, UNIX, and REGEX schemes.
+   Refer to \secref{tildexp} for these.}
+
+\par{
+   The third argument is a constant string or an anonymous key,
+   the fourth argument is data.}
+
+\sec{tr}{THE TR SUBLANGUAGE}
+
+\par{
+   The \mc{tr#2} primitive takes two arguments. The first argument contains
+   key-value pairs. The accepted keys are \it{from} and \it{to} which must
+   always occur together, and \it{delete} and \it{squash}.
+   The values of these keys must be valid \it{translation} specifications.
+   This primitive transforms the data in the second argument by successively
+   applying translation, deletion and squashing in that order. Only the
+   transformations that are needed need be specified.}
+
+\par{
+   Translation specifications are subjected to UNIX tilde expansion as
+   described below.}
+
+\par{
+   The syntax accepted by translation specifications is almost
+   fully compliant with the syntax accepted by \bf{tr}(1), with
+   three exceptions. First, repeats are introduced as
+   \v{[*a*20]} rather than \v{[a*20]}. Second, ranges can (for
+   now) only be entered as \v{X-Y}, not as \v{[X-Y]}.
+   \v{X} and \v{Y} \it{can} be entered in either octal or
+   hexadecimal notation (see further below).
+
+   As an additional feature, the magic repeat operator \v{[*a#]} stops on both
+   class and range boundaries.  Character specifications can be
+   complemented by preceding them with the caret \v{^}.
+   }
+
+\par{
+   Specifications may contain ranges of characters such as \v{a-z} and \v{0-9}.
+   Posix character classes are allowed. The available classes are}
+
+\verbatim{\:{/}
+   [:alnum:]
+   [:alpha:]
+   [:cntrl:]
+   [:digit:]
+   [:graph:]
+   [:lower:]
+   [:print:]
+   [:punct:]
+   [:space:]
+   [:upper:]
+   [:xdigit:]}
+
+\par{
+   Characters can be specified using octal notation, e.g.
+   \mc{012} encodes the newline. Use \mc{173} for the opening curly,
+   \mc{175} for the closing curly, \mc{134} for the backslash, and \mc{036} for
+   the caret if it is the first character in a specification.  \it{DON'T} use
+   \mc{\\}, \mc{\{}, or\~\mc{\}} in this case!  Hexadecimal notation is written
+   as \mc{x7b} (the left curly in this instance).}
+
+\par{
+   See \secref{examples} for an example of \v{tr#2} usage.}
+
+\sec{tildexp}{TILDE EXPANSION}
+
+\par{
+   Some primitives interface with UNIX libraries that require backslash escape
+   sequences to encode certain tokens or characters.  The backslash is special
+   in zoem too and without further measures it can become very cumbersome to
+   encode the correct escape sequences as it is not always clear which tokens
+   should be escaped or unprotected at what point. It is especially difficult
+   to handle the zoem characters with special meaning, \v{\{}, \v{\}} and
+   \mc{}.}
+
+\par{
+   The two primitives under consideration are \z{inspect#4} and \z{tr#2}.
+   Both treat the tilde as an additional escape character for certain arguments
+   (as documented in the user manual). These arguments are subjected to tilde
+   expansion, where the tilde and the character it proceeds are translated to a
+   new character or character sequence. There are three different sets of tilde
+   escapes, ZOEM, UNIX and REGEX escapes. \z{tr#2} only accepts UNIX escapes,
+   \z{inspect#4} accepts all.  Tilde expansion is always the last processing
+   step before strings are passed on to external libraries.}
+
+\par{The ZOEM scheme contains some convenience escapes, such
+as \v{~E} to encode a double backslash.}
+
+
+\par{\bf{ZOEM tilde expansion}}
+
+\verbatix{\bf{\'protect{\:/
+ meta sequence   replacement
+.-----------------------------.
+|     ~~       |      ~       |
+|     ~E       |      \\      |
+|     ~e       |      \       |
+|     ~I       |      \{      |
+|     ~J       |      \}      |
+|     ~x       |      \x      |
+|     ~i       |      {       |
+|     ~j       |      }       |
+`-----------------------------'}}}
+
+\car{The zoem tr specification language accepts \mc{x**} as hexadecimal
+notation, e.g. \mc{x0a} denotes a newline in the ASCII character set}.
+
+\par{\bf{UNIX tilde expansion}}
+
+\verbatix{\bf{\'protect{\:/
+ meta sequence   replacement
+.-----------------------------.
+|     ~a       |      \a      |
+|     ~b       |      \b      |
+|     ~f       |      \f      |
+|     ~n       |      \n      |
+|     ~r       |      \r      |
+|     ~t       |      \t      |
+|     ~v       |      \v      |
+|     ~0       |      \0      |
+|     ~1       |      \1      |
+|     ~2       |      \2      |
+|     ~3       |      \3      |
+`-----------------------------'}}}
+
+\par{\bf{REGEX tilde expansion}}
+
+\verbatix{\bf{\'protect{\:/
+ meta sequence   replacement
+.-----------------------------.
+|     ~^       |      \^      |
+|     ~.       |      \.      |
+|     ~[       |      \[      |
+|     ~$       |      \$      |
+|     ~(       |      \(      |
+|     ~)       |      \)      |
+|     ~|       |      \|      |
+|     ~*       |      \*      |
+|     ~+       |      \+      |
+|     ~?       |      \?      |
+`-----------------------------'}}}
+
+
+\sec{environment}{ENVIRONMENT}
+\par{
+   The environment variable ZOEMSEARCHPATH may contain a colon and/or
+   whitespace separated list of paths. It will be used when searching
+   for files included via one of the \v{dofile} aliases
+   \mc{input}, \mc{import}, \mc{read}, and \mc{load}.
+   Note that the zoem macro \mc{__searchpath__} contains the location where
+   the zoem macro files were copied at the time of installation of zoem.}
+
+\sec{diagnostics}{DIAGNOSTICS}
+\par{
+   On error, Zoem prints a file name and a line number to which it was able to
+   trace the error.  The number reported is the same as the one stored in the
+   session macro \mc{__line__}.  For an error-trigering macro which is not
+   nested within another macro the line number should be correct. For a macro
+   that does occur nested within another macro the line number will be the line
+   number of the closing curly in the outermost containing macro.}
+
+\par{
+   If in despair, use one of the tracing modes, \bf{--trace-keys} is one of the
+   first to come to mind. Another possibility is to supply the
+   \optref{-x}{\genopt{-x} option}.}
+
+\sec{bugs}{BUGS}
+\par{
+   No known bugs. \z{inspect#4} has not received thorough stress-testing,
+   and the more esoteric parts of its interface will probably change.}
+
+
+\sec{seealso}{SEE ALSO}
+\par{
+   \aref{http://micans.org/aephea/}{Aephea}
+   is a document authoring framework largely for HTML documents.
+   }
+
+\par{
+   \aref{http://micans.org/pud/}{Portable Unix Documentation}
+   provides two mini-languages for authoring in the unix environment. These
+   languages, pud-man and pud-faq are both written in zoem.}
+
+
+\sec{examples}{EXAMPLES}
+\par{
+   This is a relatively new section, aimed at assembling useful or explanatory snippets.
+   }
+
+\par{
+   Create a vararg containing file names matching a pattern (\v{png} in
+   this example).}
+
+\verbatim{\protect{\:{/}
+\setx{images}{
+   \inspect{
+      {mods}{iter-lines,discard-miss}
+   }{(.*~.png)}{_#1{{\1}}}{\system{ls}}
+}}}
+
+\par{
+   Use magic boundary stops with \v{tr#2}.}
+
+\verbatim{\:{/}
+\\tr{
+   {from}{[:lower:][:upper:][:digit:][:space:][:punct:]}
+   {to}{[*L#][*U#][*D#][*S#][*P#]}}{
+ !"#$%&'()*+,-./0123456789:;<=>?@
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+[\\\\]^_`
+abcdefghijklmnopqrstuvwxyz
+\\{|\\}~]}}
+
+
+\sec{author}{AUTHOR}
+\par{
+   Stijn van Dongen.}
+
+\={eekzoo}
+\'write{stderr}{device}{In file eekzoo at line count \__line__\@{\N}}
+\'write{stderr}{device}{In file eekzoo at line count \__line__\@{\N}}
+\==
+
+\={foobar}
+\'write{stderr}{device}{In file foobar at line count \__line__\@{\N}}
+\'write{stderr}{device}{In file foobar at line count \__line__\@{\N}}
+\==
+
+\'input{eekzoo}
+\'input{foobar}
+
+\end{pud::man}
+

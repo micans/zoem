@@ -1,0 +1,15 @@
+
+\formatted{
+\def{reverse#1}{
+   \push{user}    \: being paranoid.
+   \set{_a}{}
+   \apply{_#1{\!setx{_a}{{\!1}\!_a}}}{\1}
+   \: apply creates _#1{\setx{_a}{{\1}\_a}}
+   \_a
+   \pop{user}
+}}
+
+\set{list}{{1}{2}{3}{\!reverse{{a}{b}{c}}}{4}{5}{6}}
+before: \apply{protect#1}{{\list}}
+after : \reverse{\eval{\list}}
+

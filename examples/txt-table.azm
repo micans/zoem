@@ -1,0 +1,149 @@
+
+\: Primitive txt-table formatting; no line wraps possible yet.
+\:
+\: This is dense stuff. It can be made more legible by exercising \formatted#1.
+\: The formatted result looks better.
+\: The first example inputs look quite horrid, because they use apply as well.
+
+\: The main thing of the goo below is that formatting and content have
+\: been largely/completely separated. Note that we must specify \@{\w}
+\: or zoem will gobble up the carefully prepared white-space formatting.
+
+
+
+\set{lrule}{.--------------------.--------------------.--------------------.}
+\set{rule}{^--------------------^--------------------^--------------------^}
+
+\@{\w}\lrule
+\apply{_#3{\!{\format{|%{{align}{center}{padding}{{()}}{delimit}{'}{width}{20}}|  %{{align}{left}{width}{18}}|%{{align}{right}{width}{18}}  |}{{(\1)}{[\2]}{\3}}}
+\rule
+}}{ {aap} {noot} {mies}
+   {snoep} {bal} {vork}
+   {tafel} {boom} {ma}
+}
+\@{\W\P}
+
+\@{\w}\apply{_#2{\!{\format{ |%{
+   {align}{right}
+   {width}{6}
+} %{
+   {align}{right}
+   {padding}{{.}}
+   {delimit}{{  }}
+   {width}{30}
+}}{
+   {\1}{\2}}
+}}}{
+   {1}{The first line}
+   {2}{The second line}
+   {3}{boo}
+}
+\@{\W\P}
+
+\@{\w}\apply{_#1{\!{\format{%{{align}{center}{padding}{{.-'''-}}{delimit}{  }{width}{60}}.}{{\1}}}
+}}{ {The first line}{The second line}{boo}}
+\@{\W\P}
+
+\: 
+
+\@{\w}\apply{_#1{\!{\format{%{{align}{center}{padding}{{-}}{delimit}{'}{alignat}{{.}{10}}{width}{20}}}{{\1}}}
+}}{ 
+   {12.1239}
+   {234.23}
+   {0.33}
+   {.0004}
+   {103482390483029.23094830}
+   {foo}
+}
+\@{\W\P}
+
+\set{width}{50}
+\set{offset}{26}
+\@{\w}\apply{_#2{\!{\format{%{{align}{center}{padding}{{-+H+}}{delimit}{  }{alignat}{{^_^}{\offset}}{width}{\width}}\""-}{{\1 ^_^ \2}}}
+}}{ {big_tree}{small_mouse}{long_road}{short_visit}{warm_sun}{cold_beer}{free_speech}{stay_put} }
+\@{\W\P}
+
+\set{circumstances}{
+   {There has grown up in the minds of certain groups}
+   {in this country the notion that because a man or corporation}
+   {has made a profit out of the public for a number of years,}
+   {the government and the courts are charged with the duty}
+   {of guaranteeing such profit in the future, even}
+   {in the face of changing circumstances and contrary to public interest.}
+   {This strange doctrine is not supported by statute or common law.}
+   {Neither individuals nor corporations have any right}
+   {to come into court}
+   {and ask that the clock of history be stopped, or turned back.}
+}
+
+\@{\w}
+\format{%{
+   {align}{center}
+   {padding}{{'}}
+   {delimit}{{)  }{  (}}
+   {width}{80}
+   {reuse}{*}
+   {border}{{[ }{ ]\@{\n}}}
+}}{
+   \circumstances
+}
+\@{\W\P}
+
+\@{\w}
+\format{%{
+   {length}{{length}}
+   {align}{center}
+   {padding}{{\\  /}}
+   {delimit}{{)  }{  (}}
+   {width}{80}
+   {reuse}{*}
+   {border}{{[ }{ ]\@{\n}}}
+}}{
+   \circumstances
+}
+\@{\W\P}
+
+\def{mylength#2}{\length{\1}}
+
+\@{\w}
+\format{%{
+   {align}{left}
+   {padding}{{\\  /}}
+   {delimit}{{)  }{  (}}
+   {length}{{mylength}{boo}}
+   {width}{80}
+   {reuse}{*}
+   {border}{{[ }{ ]\@{\n}}}
+}}{
+   \circumstances
+}
+\@{\W\P}
+
+
+\@{\w}
+\format{%{
+   {align}{right}
+   {padding}{{\\  /}}
+   {delimit}{{)  }{  (}}
+   {width}{80}
+   {reuse}{*}
+   {border}{{[ }{ ]\@{\n}}}
+}}{
+   {There has grown up in the minds of certain groups}
+   {in this country the notion that because a man or corporation}
+   {has made a profit out of the public for a number of years,}
+   {the government and the courts are charged with the duty}
+   {of guaranteeing such profit in the future, even}
+   {in the face of changing circumstances and contrary to public interest.}
+   {This strange doctrine is not supported by statute or common law.}
+   {Neither individuals nor corporations have any right}
+   {to come into court}
+   {and ask that the clock of history be stopped, or turned back.}
+}
+\@{\W\P}
+
+\format{%{{align}{right}{width}{10}{reuse}{*}{padding}{'}}}{
+{beauty}{lies}{in}{the}{eye}{of}{the}{beholder}
+}
+\textmap{{repeat}{8}}{1234567890}
+

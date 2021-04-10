@@ -1,0 +1,28 @@
+
+the  unprotect part in inspect (wrt pat that is passed to regex engine).
+
+store
+icmp
+iclc
+ifdef
+ifeq
+ifdefl
+
+finsert
+zinsert
+cmp
+icmp
+iclc (and, or, bit ops)
+defined
+if
+inspect
+tr
+macros (and, not)
+
+apply, inspect, - evaluation
+
+o  general: make headings look better in troff (PS output) by
+   making the font larger and perhaps some more fidding.
+
+o  zoemtut: \N etc in \@{..} scope.
+

@@ -1,0 +1,693 @@
+DEFINITIONS USED:
+\set{recurse_segment}{\recurse_segment}
+\set{recurse_stack}{\eval{\recurse_stack}}
+\set{overflow_user}{\push{user}\overflow_user}
+\set{underflow_user}{\pop{user}\underflow_user}
+\set{foo}{foo_start\@{ foo_at }foo_end}
+\set{__device__}{stress}
+\set{one}{1}
+\set{zero}{0}
+\set{abc}{abc}
+\set{def}{def}
+\set{ct}{0}
+\env{myenv}{myenv_start}{myenv_end}
+\env{myenv2}{myenv2_start}{myenv2_end}
+\begin{myenv}
+\begin{myenv2}
+myenv_start
+myenv2_start
+
+||| undef in plain scope:
+||| \nsk
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| undef in at scope:
+||| \@{\nsk}
+abc[
+sk]def
+
+||| undef at deeper level:
+||| \eval{\textmap{{word}{ucase}{number}{roman}}{\nsk}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| undef in and scope:
+||| \write{\__fnout__}{device}{\@{\&{\nsk}}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [filterAt] AND scope did not parse
+abc[]def
+
+||| recurse segment:
+||| \recurse_segment
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <recurse_segment>
+___ [yamSegPush] exceeding maximum segment depth <200>
+abc[
+
+||| recurse stack:
+||| \recurse_stack
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <eval#1>
+___ [yamStackPush] exceeding maximum stack depth <100>
+abc[
+
+||| overflow user dictionary stack:
+||| \overflow_user
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <push#1>
+___ [dictStackPush] no more than <100> dicts allowed in stack
+abc[
+
+||| underflow user dictionary stack (requires nuser>nsegment):
+||| \underflow_user
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <pop#1>
+___ [dictStackPop] cannot pop last <user> scope!
+abc[
+
+||| inserting spurious left curly:
+||| \eval{\!""\__lc__}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <"">
+___ [yamParseKey] no closing scope
+abc[
+
+||| and scope in plain scope:
+||| \&{\foo}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <abc>
+___ [yamFindKey] illegal escape sequence <\&>
+abc
+
+||| at scope in and scope:
+||| \@{\&{\foo}}
+abc[foo_start___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <foo>
+___ [filterAt] unknown escape <@>
+{ foo_at }foo_end]def
+
+||| incorrect anonymous key:
+||| \_#1{\1}{bar}{foo}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <_>
+___ [yamParseKey] found anon _#1{\1} with 2 arguments
+abc[
+
+||| and scope in plain scope:
+||| \&{\foo}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <abc>
+___ [yamFindKey] illegal escape sequence <\&>
+abc
+
+||| incorrect anonymous key:
+||| \_#1{\1}{bar}{foo}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <_>
+___ [yamParseKey] found anon _#1{\1} with 2 arguments
+abc[
+
+||| some broken XML syntactic sugar:
+||| \write{\__fnout__}{device}{\<foo>\<bar>\</bar>\</zut>}
+<foo>
+<bar>
+</bar>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <<>#1>
+___ [\<>#1] tag </zut> closes <foo>
+abc[
+
+||| XML syntactic sugar underflow:
+||| \write{\__fnout__}{device}{\<foo>\<bar>\<>\<>\<>}
+<foo>
+<bar>
+</bar>
+</foo>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <<>#1>
+___ [\<>#1] XML syntactic sugar stack underflow at file <-> tag </>
+abc[
+
+||| XML content syntax error:
+||| \<foo>{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| error in $#2:
+||| \${stress}{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| absent grape node, fetched:
+||| \%{nsg}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <%#1>
+___ [\%#1] no value associated with <{nsg}>
+abc[]def
+
+||| absent grape node, freed:
+||| \%free{nsg}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <%free#1>
+___ [\free#1] no value associated with <{nsg}>
+abc[]def
+
+||| absent grape node, dumped:
+||| \%dump{nsg}
+# printing node <ROOT>___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <%dump#1>
+___ [\dump#1] no value associated with <{nsg}>
+abc[]def
+
+||| no such key:
+||| \apply{nsk#2}{{a}{b}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk#2>
+___ [expand] no definition found for key <nsk#2>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk#2>
+___ [\apply#2] key <nsk#2> does not expand
+abc[
+
+||| wrong anonymous key:
+||| \apply{_#a{\1}}{{a}{b}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <apply#2>
+___ [\apply#2] key part not ok
+abc[
+
+||| trailing arguments:
+||| \apply{_#2{[\1\2]}}{{a}}
+___ [\apply#2] (ignoring) trailing arguments
+abc[]def
+
+||| argument does not parse:
+||| \apply{_#2{[\1\2]}}{{a}{b}{c}{\nsk}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| label does not exist:
+||| \begin{nsl}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <begin#2>
+___ [\begin#2] env <nsl> does not exist
+abc[
+
+||| argument does not parse:
+||| \begin{myenv}{{\nsk}{\nsk}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [\begin#2] arguments in env <myenv> did not parse
+abc[
+
+||| parse error:
+||| \branch{{\let{0<}}{}}
+___ [getatom] unexpected token <EOF>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <let#1>
+___ [\let#1] expression did not parse
+abc[
+
+||| uncaught catch:
+||| \catch{towel}{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| uncaught (delayed) error:
+||| \catch{error}{\!{\nsk}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| catch towel at 6:
+||| \set{foo}{0}
+\catch{towel}{\while{\let{\foo<10}}{
+foo \foo bar\@{\N}
+\if{\let{\foo==6}}{\throw{towel}}{}
+\setx{foo}{\let{\foo+1}}
+}
+}
+abc[
+foo 0 bar
+foo 1 bar
+foo 2 bar
+foo 3 bar
+foo 4 bar
+foo 5 bar
+foo 6 bar
+]def
+
+||| argument does not parse:
+||| \cmp{eq}{\nsk}{foo}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| no such mode:
+||| \cmp{__}{bar}{foo}
+___ [cmp#3] unknown mode <__>
+abc[
+
+||| parse error (not fatal, trailing element):
+||| \constant{{(c)} boo {}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <constant#1>
+___ [\constant#1] spurious element
+abc[]def
+
+||| wrong key signature:
+||| \def{^zut}{foo}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <def#2>
+___ [\def#2] not a valid key signature: <^zut>
+abc[
+
+||| wrong mode:
+||| \defined{__}{__}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <defined#2>
+___ [\defined#2] invalid type <__>
+abc[
+
+||| wrong key signature:
+||| \defx{^zut}{foo}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <defx#2>
+___ [\defx#2] not a valid key signature: <^zut>
+abc[
+
+||| parse error:
+||| \defx{zut}{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [\defx#2] argument did not parse
+abc[
+
+||| no such file:
+||| \dofile{no-such-file}{!+}
+___ [\dofile#2] failed to open file <no-such-file>
+abc[
+
+||| parse error:
+||| \dowhile{\nsk}{1}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| parse error:
+||| \dowhile{1}{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[1
+
+||| no such env:
+||| \end{nse}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <end#1>
+___ [\end#2] env <nse> not found
+abc[
+
+||| cannot close myenv:
+||| \end{myenv}
+abc[myenv_end]def
+
+||| can close myenv2:
+||| \end{myenv2}
+abc[myenv2_end]def
+
+||| cannot define env while in environment:
+||| \env{myenv3}{foo}{bar}
+abc[]def
+
+||| argument does not parse:
+||| \eqt{eq}{\nsk}{1}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| no such mode:
+||| \eqt{__}{1}{1}
+___ [eqt#3] unknown mode <__>
+abc[
+
+||| argument not numeric I:
+||| \eqt{eq}{aap}{\one}
+abc[0]def
+
+||| argument not numeric II:
+||| \eqt{eq}{aap}{\zero}
+abc[1]def
+
+||| parse error:
+||| \eval{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| no such mode:
+||| \f{nsm}{2.5}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <f#2>
+___ [\f#2] unknown mode <nsm>
+abc[
+
+||| overflow I ?:
+||| \f{sign}{111111111111111111111111111111}
+abc[1]def
+
+||| overflow II ?:
+||| \f{sign}{3e100000}
+abc[1]def
+
+||| parse error:
+||| \f{sign}{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| parse error:
+||| \finsert{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| no such mode:
+||| \fv{nsm}{{1}{2}{3}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <fv#2>
+___ [\fv#2] unknown mode <nsm>
+abc[
+
+||| parse error:
+||| \fv{sum}{{\zero}{\one}{\nsk}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| this should work:
+||| \fv{max}{{\zero}{\one}{2}}
+abc[2]def
+
+||| parse error condition:
+||| \if{\nsk}{}{}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [\if#3] condition does not parse
+abc[
+
+||| parse error if:
+||| \if{1}{\nsk}{}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| parse error else:
+||| \if{0}{}{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| arithmetic exception in f:
+||| \f{div}{1}{0}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <f#3>
+___ [\f#3] arithmetic exception for operator <div>
+abc[0]def
+
+||| syntax error in let:
+||| \let{1+}
+___ [getatom] unexpected token <EOF>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <let#1>
+___ [\let#1] expression did not parse
+abc[
+
+||| another syntax error in let:
+||| \let{1+sin(1,)}
+___ [getatom] empty group not allowed
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <let#1>
+___ [\let#1] expression did not parse
+abc[
+
+||| callback error in let:
+||| \let{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [\let#1] arithmetic error occurred
+abc[
+
+||| nested callback error in let:
+||| \let{\let{\nsk}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [\let#1] arithmetic error occurred
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [\let#1] arithmetic error occurred
+abc[
+
+||| arithmetic exception in let:
+||| \let{1/0}
+___ [flatten] arithmetic exception for op </>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <let#1>
+___ [\let#1] arithmetic error occurred
+abc[
+
+||| overflow in let:
+||| \let{300**300}
+abc[inf]def
+
+||| complicated and correct let expression, including redundant callbacks:
+||| \let{\let{sin(\let{\one})}**2+\let{cos(\let{\one})}**2}
+abc[1]def
+
+||| complicated and failing let expression:
+||| \let{\let{sin(\let{\one})}**2+\let{cos(\let{1/0})}**2}
+___ [flatten] arithmetic exception for op </>
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <let#1>
+___ [\let#1] arithmetic error occurred
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <let#1>
+___ [\let#1] arithmetic error occurred
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <let#1>
+___ [\let#1] arithmetic error occurred
+abc[
+
+||| parse error:
+||| \length{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| no such dictionary stack:
+||| \pop{nsds}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <pop#1>
+___ [dictStackPop] cannot pop last <user> scope!
+abc[
+
+||| no such dictionary stack:
+||| \push{nsds}
+abc[]def
+
+||| parse error:
+||| \roman{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <roman#1>
+___ [expand] no definition found for key <roman#1>
+abc[
+
+||| convert error:
+||| \roman{abc}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <roman#1>
+___ [expand] no definition found for key <roman#1>
+abc[
+
+||| absent system call:
+||| \system{#}
+abc[
+
+||| failing system call:
+||| \system{ls}{{-#}}
+abc[
+
+||| finally a systemcall that should succeed:
+||| \system{true}
+abc[]def
+
+||| should close myenv:
+||| \end{myenv}
+abc[myenv_end]def
+
+||| parse error in pivot:
+||| \switch{\nsk}{{}{}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| parse error in clause:
+||| \switch{foo}{{\nsk}{A}{b}{B}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| parse error in case:
+||| \switch{foo}{{foo}{\nsk}{b}{B}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| this should work:
+||| \tr{{from}{a-z}{to}{A-Z}{squash}{A-Z}}{squash the bookkeeper}
+abc[SQUASH THE BOKEPER]def
+
+||| parse error:
+||| \trace{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[]
+
+||| parse error:
+||| \textmap{{word}{ucase}}{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| wrong signature:
+||| \undef{!}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <undef#1>
+___ [\undef#1] key <!> not defined in target scope
+abc[
+
+||| parse error:
+||| \vanish{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| parse error condition:
+||| \while{\nsk}{}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| parse error body:
+||| \while{1}{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| open error:
+||| \write{/no/such/file}{copy}{foo}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <write#3>
+___ [yamOutputNew] can not open file </no/such/file> for writing
+
+abc[
+
+||| no such filter:
+||| \write{/dev/null}{nsf}{foo}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <write#3>
+___ [\write#3] unknown filter <nsf>
+abc[
+
+||| parse error:
+||| \write{/dev/null}{copy}{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| throw:
+||| \write{/dev/null}{copy}{\throw{towel}}
+abc[
+
+||| inline file should work:
+||| \zinsert{monkey}
+abc[0 1 monkey see monkey do
+]def
+
+||| parse error:
+||| \zinsert{\nsk}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[
+
+||| inline file with parse error:
+||| \eval{\zinsert{fox}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <nsk>
+___ [expand] no definition found for key <nsk>
+abc[0 1
+
+||| delay parse error:
+||| \write{\__fnout__}{device}{\!{\nsk}}
+___ [zoem] error around input line <474> in <stress.azm>
+___ last key seen is <!#2>
+___ [filterDevice] ignoring escape <\n>
+\nskabc[]def
+
+Done with 96 error tests.
+___ [zoem] error occurred
+___ last key seen is <ct>
+___ [dictStackFree] user dictionary <nsds> not closed in output file <->

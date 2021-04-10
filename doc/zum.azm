@@ -1,0 +1,4209 @@
+\: thoughts/todo
+\:----------------------------------------------------------------------
+\: o  mention 9-arg limit.
+\: o  ref point for white space munge rules.
+\: ?  let maketoc have an argument which is the reference for the toc.
+
+\: NOTE
+\: To find where a primitive is described search for im{<name>
+\: e.g. im{format to search for format#2 (and formatted#1).
+
+\""{ TODO
+
+   zum.azm: introduce class for \pr macro; use css_add slot.
+
+/""}
+
+\if{\defined{key}{__device__}}{}{\def{__device__}{html}}
+\import{aephea/simpledocument2.zmm}
+\import{zoem.shared}
+
+\begin{simpledocument2}{
+   {$html_title}{Zoem User's Manual}
+   {$title}{Zoem User's Manual}
+   {$author}{Stijn van Dongen}
+   {$day}{\system{date}{{+%e}}}
+   {$month}{\system{date}{{+%B}}}
+   {$toc_date}{\!$month \!$day, \!$year}
+   {$year}{\system{date}{{+%Y}}}
+   {$toc_anchor}{Table of Contents}
+\: {css_file_in}{zum.css}
+\: {css_import}{{foo}{bar}}
+   {$css_append}{
+      body { font-family: "Garamond", "Gill Sans", "Verdana", sans-serif; }
+      body
+         {  text-align: justify;
+            margin-left: 8%;
+            margin-right: 8%;
+            font-size: 14pt;
+         }
+      .toc_and_date_DATE { text-decoration: none; }
+      .zpr { text-decoration: none; }
+\: example of using asd_cpar_caption
+\: p.asd_ccar_caption, p.asd_cpar_caption { color: red }
+      acronym.ucase { font-size: smaller; text-transform: uppercase }
+      abbr.ucase { font-size: smaller; text-transform: uppercase }
+
+      #asd_document_outer { position: relative; }
+      #asd_document { position: relative; }
+      #asd_title { text-align: center; font-size: 30pt; margin-top: 40pt; }
+      #asd_subtitle { text-align: center; font-size: 18pt; margin-top: 10pt; margin-bottom: 40pt; }
+
+      #asd_date { position: absolute; left: 0pt; top: 10pt; }
+      #asd_version { position: absolute; right: 0pt; top: 10pt; }
+
+   }
+   {keywords}{macro processing, programming, template expansion, mark-up, character filtering}
+}
+
+\def{builtins}{\mc{\\}, \mc{\{}, \mc{\}}, \mc{,},
+\mc{~}, \mc{|}, and \mc{-}}
+
+\: need to be mapped because used as \html identifiers.
+\set{%strangers}{{!}{excl}{!#1}{excl#1}{$#2}{dollar#2}{$}{dollar}}
+
+\def{pr#1}{\iref{\tr{
+   {from}{#}
+   {to}{_}
+}{\if{\defined{data}{{strangers}{\1}}}{\%{strangers}{\1}}{\1}}}{\<span class="zpr">{\\\1}}}
+
+\def{xmlpr1ref}{\iref{xmlpr1}{\v{\\<>#1}}}
+\def{xmlpr2ref}{\iref{xmlpr2}{\v{\\<>#2}}}
+\def{capref#1}{\iref{\1}{\ref{\1}{cap}}}
+\def{refto#2}{\@{<a href="#\1">}\2\@{</a>}}
+
+\def{ssion#1}{\iref{session}{\v{\\\1}}}
+
+
+
+\<div id=asd_document_outer>{
+
+\"asd::add-toc-start"{Start}
+
+\<div id=asd_document>{
+
+\@e{nbsp}
+
+   \<div id="asd_date">{\$toc_date}
+   \<div id="asd_version">{zoem-\finsert{stamp.stamp}}
+
+   \<div id="asd_title">{\$title}
+   \<div id="asd_subtitle">{\$subtitle}
+
+
+\sec1{intro}{Introduction}
+
+\par{
+\bf{Zoem:} <Dutch> The sound made by electrical devices and flying bugs.
+Pronounced: \it{zoom} or \it{zum}; the vowel is short.
+}
+
+\par{
+   Zoem is a general macro/programming language with filtering capabilities.
+   It transforms text in two stages.}
+
+\par{
+   In the first stage the text is scanned for macro escape sequences.
+   The core zoem language consists of so-called primitive macros.
+   They provide a wide spectre of functional behaviour, including
+         data storage,
+         arithmetic evaluation,
+         \io facilities,
+         iteration and flow control,
+         dictionary stacks,
+         system interaction,
+        and
+         regular expressions.
+   As with any macro/programming language, the real power comes from
+   the ability to create new user-defined macros in terms of primitives
+   and other user-defined macros.
+   Macro expansion can be arbitrarily delayed, and inside-out evaluation is
+   supported.}
+
+\par{
+   A useful feature is the combination of anonymous macros, lists, and the
+   \pr{apply#2} primitive, constituting a callback mechanism in zoem.
+   Another feature is the automatic popping and pushing of dictionaries with
+   the begin/end environment, providing shadowing and localization.}
+
+\par{
+   In the optional second stage, the text is filtered.  Two filter scopes are
+   distinguished.  The first is called \it{device scope} and is always enclosed
+   in a filter escape sequence.  The second, \it{plain scope}, is everything
+   else.  Filtering mechanisms are provided for both.  The filtering language
+   is useful when the output is meant to be in an external format with
+   device-specific escape sequences, such as \html or troff.  Conversions are
+   specified in device specific filtering rules that are applied in plain scope,
+   so that the zoem input is device agnostic.  By setting up different
+   filtering rules the same input can be used to generate different outputs.}
+
+\par{
+   This manual covers the whole zoem language. A large part of it is only
+   interesting for someone writing a reusable macro package. A smaller part is
+   still interesting for someone who is just using such a package, but might
+   want to add some utilities and shortcuts of his own. The part where file
+   inclusion, macro definitions, and macro expansions are explained is required
+   reading for anyone considering or planning to use zoem.}
+
+\sec2{}{Other documentation}
+
+
+\par{
+   \sibref{zoem}{The manual page of the zoem interpreter}.
+   }
+
+\par{
+   Zoem is used by 
+   \aref{http://micans.org/pud}{Portable Unix Documentation} (\pud)
+      and
+   \aref{http://micans.org/aephea}{Aephea}.
+
+   The latter is a general authoring tool for writing \html documents and provides both useful
+   abstractions and a framework for creating new abstractions.  It uses and
+   promotes the use of \css.
+
+   A small core of Aephea has been ported to the typesetting language \em{troff}.
+   This core is used in \pud, which provides
+   mini-languages for \faq documents and \unix manual pages.
+   Documents written in \pud can be output to troff and html,
+   and further to plain text, PostScript, and \pdf.
+   }
+
+
+\sec2{click}{About this document}
+\par{
+ Clicking on the number next to a section title (e.g.
+ the \ref{click}{num} to the right of the title \bf{About this document} of
+ this section) will get you to the corresponding section of the table of
+ contents.
+ }
+
+\par{
+ Zoem input and zoem output are \it{both} generally shown in a typeface
+ font, \v{like this}.
+ }
+
+\par{
+\enref{colours}{}
+ Links that point to locations within this document are shown in
+ \iref{colours}{blueish colors}.  Links that point to documents originating
+ from the same package (project) or perhaps the same site are shown in in
+ \lref{zum.html}{greenish colors}.  Links that point to other stations on the
+ internet or perhaps other packages on the same site are shown in in
+ \aref{http://www.google.com}{reddish colors}.
+ }
+
+\sec1{toc}{Table of Contents}
+
+\"asd::maketoc"
+
+\sec1{nutshell}{Zoem in a nutshell}
+
+\par{
+ Zoem supports several programming constructs, immediate and postponed
+ expansions, stream character filtering, easy \io facilities, integer
+ arithmetic, and a whole lot more.
+ Its main aims are:}
+
+\begin{itemize}{
+   {flow}{compact}
+   {interitem}{0}
+   {align}{right}
+}
+\item
+\car{
+   Providing the building blocks for a structural and programmable approach.
+   \iref{features}{Section \ref{features}{num}}
+   contains an overview of the zoem primitives and their use.}
+
+\item
+\car{
+   Accepting a pleasant syntax that does not require much thinking,
+   favouring simplicity and rigor over looseness and context dependent
+   rules.}
+
+\item
+\car{
+   Creation from the keyboard while minimizing on key-strokes.}
+
+\item
+\car{
+   Few meta characters. Zoem achieves this by having a single
+   special character and a reasonably restricted syntax.}
+
+\item
+\car{
+   Adding filtering capabilities so that multiple devices can be
+   addressed.}
+
+\end{itemize}
+
+\sec2{features}{Features}
+
+\par{
+   Listed below are some features of the zoem primitives. In practice there are
+   two kinds of zoem files. The first is a zoem macro file, which should
+   contain macros defined in terms of lower-level macros, with zoem primitives
+   at the lowest level. The second is a zoem document file, which should import
+   such a macro file and only use the high-level macros defined in that macro
+   file.  Additionally, a document file can define some high-level macros of
+   its own, in terms of low-level macros, zoem primitives, or a mixture of
+   both.
+   }
+
+\begin{itemize}{
+   {flow}{compact}
+   {interitem}{0}
+   {align}{right}
+}
+\item
+\car{
+   Macros with arguments, overloading of key names allowed (i.e. different
+   keys with the same name are distinguished by the number of arguments they
+   take). (\pr{def#2}, \pr{set#2}, and \pr{setx#2}).
+   Zoem primitives look like regular macros, but
+   usually they expand their arguments before use. User macros
+   can be equipped with this behaviour by wrapping them in \pr{apply#2}.}
+
+\item
+\car{
+   Support for variable number of arguments - see the
+   \iref{vararg}{vararg} section.}
+
+\item
+\car{
+   Easy file, \stdin, \stdout, and \stderr  input/output,
+   nested file inclusion (\pr{dofile#2}, \pr{write#3}, \pr{finsert#1},
+   and \pr{zinsert#1}).}
+
+\item
+\car{
+   Extensive support for arithmetic with the primitives \pr{let#1}, \pr{f#2},
+   \pr{f#3},  \pr{fv#2}, and \pr{eqt#3}.}
+
+\item
+\car{
+   Operators returning booleans (\pr{defined#2}, \pr{cmp#3}, \pr{eqt#3}),
+   control operators acting on those (\pr{while#2}, \pr{if#3}).}
+
+\item
+\car{
+   The \it{for}-like primitives \pr{apply#2} and \pr{table#5}.}
+
+\item
+\car{
+   Match and substitution capabilities using \posix regexes (\pr{inspect#4}).}
+
+\item
+\car{
+   Register macros with \pr{register#2} to be processed after regular
+   processing (e.g. to output counters or warnings).}
+   
+\item
+\car{
+   The switch primitive \pr{switch#2}, employing the \iref{vararg}{vararg
+   construct}.}
+
+\item
+\car{
+   Localized expansions (\pr{eval#1})
+   and meta-zoem (\pr{!} and \pr{!#1}).}
+
+\item
+\car{
+   A user dictionary stack that can be manipulated using \pr{push#1} and
+   \pr{pop#1}.  An environment environment for doing \mc{begin{stuff}} \v{..}
+   \mc{end{stuff}} stuff (see \pr{env#4}).  This environment creates name
+   scopes by pushing and popping to/from the \iref{dictionary}{dollar
+   dictionary stack}. Environments may take arguments,
+   one particular useful application is that local variables (e.g. local
+   to an \it{itemize} environment) can thus be specified by the user.}
+
+\item
+\car{
+   Storage of data by multiple string indexing \- arbitrary data can be stored
+   in a tree by indexing nodes with (arbitrary) strings.
+   Refer to the \secref{grape} section.}
+
+\item
+\car{
+   The ability to nicely format macros (see \pr{formatted#1}).}
+
+\item
+\car{
+   \iref{xmlsugar}{Syntactic sugar}
+   for writing \sgml-style mark-up and having it checked.}
+
+\item
+\car{
+   Executing system commands, possibly sending data to \stdin and
+   receiving data from \stdout \- \pr{system#3}.}
+
+\item
+\car{
+   And more.}
+
+\end{itemize}
+
+\sec1{cline}{Invoking zoem from the command line}
+
+\par{
+   You use zoem by invoking it from the command line. The normal mode of
+   operation is that you specify a file for zoem to chew up and spit out.  This
+   is called the \it{entry file}, and its name usually has the extension
+   \v{.azm}. A common invocation looks as follows:}
+
+\verbatim{zoem -i mcl.azm}
+
+\car{
+   The \v{-i} flag specifies the entry file.  It is not necessary to write the
+   \v{.azm} extension, zoem will append it for you. The preceding could also
+   have been entered as}
+
+\verbatim{zoem -i mcl}
+
+\car{
+   In either case, zoem will set the session key \ssion{__fnbase__} to the base
+   name of the entry file, i.e. the name stripped of its \v{.azm} suffix and
+   any leading path components. In this example, the key \ssion{__fnbase__} will
+   get the value \v{mcl}.  If you have an input file without the \v{.azm}
+   extension, you need to use the \v{-I} option.}
+
+\par{
+   Zoem writes its output to a default output file which is named according to
+   three rules.  The rules are:}
+
+\begin{itemize}{
+   {flow}{compact}
+   {interitem}{0}
+   {align}{right}
+}
+\item
+\car{
+   If the \v{-o} flag was given the value say \v{somestr},
+   zoem will write to the file named \v{somestr}.}
+
+\item
+\car{
+   If \v{-o} was not supplied but the \v{-d} flag was used with argument say
+   \v{zyx}, zoem will write to the file named \ssion{__fnbase__.zyx}.
+   The -d flag also results in the macro \ssion{__device__} being set
+   to \v{xyz}.}
+
+\item
+\car{
+   If neither \v{-d} nor \v{-o} was given, zoem will write to the
+   file named \ssion{__fnbase__.ozm}.}
+
+\end{itemize}
+
+\par{
+   It is possible to change the default output file from within the document;
+   this is achieved with the \pr{writeto#1} primitive.  Zoem can mingle default
+   output with output to other files, use the \pr{write#3} primitive for that.}
+
+\par{
+   Both the \v{-i} and \v{-o} flag accept a hyphen as argument,
+   meaning respectively that zoem will read from \stdin and write
+   to \stdout.}
+
+\par{
+   Specifying just zoem and entering a return will cause zoem
+   to enter interactive mode, in which it reads from \stdin and writes to \stdout.
+   Interactive mode currently should catch any errors occurring,
+   so it is a good way of experimenting and testing.
+   By default, interactive mode reads chunks that are ended by a single
+   dot on a line by itself. This behaviour can be changed by setting
+   the session variable \ssion{__parmode__} using the \v{-s} option.
+   Using \v{zoem -l parmode} shows the bits that can be set in this variable.
+   It is for example possible to make zoem read paragraphs (ended by two
+   or more consecutive newlines).}
+
+\cpar{Note}{
+   There is a difference between specifying \it{no} output stream
+   (i.e. not using the \v{-o} option) and explicitly specifying \v{-o -}.
+   In the latter case, zoem will never enter interactive mode. Should
+   you need to insert zoem into some pipe sequence, then you need to
+   use \v{-o -}.}
+
+\cpar{Tracing errors}{
+   If your document contains erroneous input (e.g. using a macro that was never
+   defined), zoem will by default print the approximate corresponding line
+   number of the current input file and the last key it saw, and then exit.  If
+   that does not suffice in tracking down the error, you have a choice of
+   options. One possibility is to use one of the various tracing modes
+   described below and in the zoem interpreter manual. Another possibility is
+   to specify the \v{-x} option which says to enter interactive mode should an
+   error occur. This enables you to inspect the values of keys defined or used
+   in the problematic area.
+
+   A selection of other options is given below. For the full story,
+   consult \sibref{zoem}{the manual page of the zoem interpreter}.}
+
+\: mq
+\begin{itemize}{
+   {flow}{cascade}
+   {interitem}{1}
+}
+
+
+\item{\v{-h}}
+\car{
+   lists all flags accepted by zoem with a short description for each.}
+
+
+\item{\v{-s foo=bar}}
+\car{
+   Sets key \mc{foo} to \v{bar}.}
+
+
+\item{\v{-e <any>}}
+\car{
+   Zoem will evaluate \v{<any>}, writing any result text to \stdout,
+   and then exit.}
+
+
+\item{\v{-E <any>}}
+\car{
+   Zoem will evaluate \v{<any>}, writing any result text to \stdout,
+   and then proceed.}
+
+\item{\v{-x}}
+\car{
+   If an error occurs, zoem stops processing and enters interactive mode.}
+
+\item{\v{-l <str>}}
+\car{
+   lists all entities specified by \v{<str>}. It can be any of
+   \v{all},
+   \v{filter},
+   \v{legend},
+   \v{alias},
+   \v{session},
+   \v{trace}, or
+   \v{zoem}.
+
+   Repeated use is allowed. In fact, zoem will only check whether
+   the target is present as a substring, so}
+
+\verbatim{zoem -l legendzoem}
+
+\car{
+   will print the legend and the list of zoem primitives. }
+
+\item{\v{--trace}}
+\car{
+   This traces (prints) all keys encountered, and  prints
+   possibly truncated arguments.
+   Zoem has several other tracing flags, use the \v{-h} flag
+   or refer to the zoem manual page for more information.}
+
+\par{
+   Tracing can be set from within the document using the
+   \pr{trace#1} primitive. Part or whole of the data tree
+   can be output from within the document using the \mc{%dump} primitive
+   (refer to the \secref{grape} section).}
+
+
+\item{\v{--stats}}
+\car{
+   When zoem is done, it prints statistics about the primitive name
+   table and about the user name table.}
+
+\end{itemize}
+
+\sec1{syntax}{Zoem syntax and parsing}
+
+\sec2{nomenclature}{Syntax and nomenclature}
+\par{
+   Zoem parses text which may contain zoem \bf{escape sequences}, these are
+   sequences that have special meaning and cause zoem to do special
+   processing. Each and every escape sequences starts with a backslash, no
+   exceptions.  There are three kinds of sequences that are \it{macros}, which
+   may or may not take arguments.  These are zoem primitives, user keys, and
+   dollar keys.}
+
+\par{
+   There are currently about sixty zoem primitives, these are listed in the
+   \capref{language} section. Sixty is quite a lot; it includes
+   convenience sibling sets such as \pr{set#2}, \pr{setx#2}, \pr{def#2}, and
+   \pr{def#2}, and entries covering a variety of areas such as \io, arithmetic,
+   testing, control, string conversions, formatting, shadowing (scopes),
+   and all the other stuff listed in the \secref{topicindex} section.}
+
+\par{
+   Additionally there are a number of zoem built-ins that are defined
+   in terms of primitives. Built-ins live in the same dictionary as
+   primitives and behave the same in all aspects.
+   The next section has some further remarks on the differences
+   and resemblances between primitives/built-ins on the one hand
+   and user macros on the other hand.}
+
+
+\par{
+   User keys and dollar keys are discussed in the
+   \capref{macro} section. Arguments are shipped by delimiting them with curly
+   braces, as in}
+
+\verbatim{\mc{thiskey{takes}{\\bf{two}\\it{arguments}}}.}
+
+\car{
+   No characters are allowed inbetween (the delimiting curlies of) two
+   arguments (but take note of the handy \pr{formatted#1} primitive).  See the
+   \capref{macro} section for more information.
+
+   Zoem is very strict in the syntax it accepts, but it \it{garantuees} to
+   accept a text in which each backslash \mc{} is escaped as \mc{\\} (i.e. a
+   text in which all consecutive runs of backslashes have even length).}
+
+\par{
+   An \bf{active backslash} is any backslash that is not made inactive by an
+   active backslash immediately preceding it. The first backslash seen by zoem
+   (proceeding sequentially through the text) is active.  This is one
+   incomprehensible way of stating the obvious, and I bet you know what I mean
+   anyway.  An active backslash must always have a meaning known to zoem.  If
+   zoem does not get it, it will complain and exit.  The meaning (i.e. class)
+   of the escape sequence introduced by an active backslash is determined by
+   the character immediately following it. A list is given below.}
+
+\par{
+   Within arguments, curlies not functioning as argument delimiters must also
+   be escaped if they are not balanced. It is best practice to escape all
+   non-argument-delimiting curlies, but I never do so myself unless they are
+   not balanced.
+
+   An \bf{escaped curly} is a curly preceded by an active
+   backslash.
+
+   An \bf{active curly} is a curly that is not escaped.
+
+   A pair of
+   \bf{balanced curlies} consists of an active left curly that matches an active
+   right curly, where inbetween all escaped curlies are disregarded.
+
+   A \bf{block} is anything delimited by balanced curlies.
+
+   The word \bf{scope} is most often used to distinguish between \bf{device
+   scope} and \bf{plain scope}, these are the two kinds of \bf{parse scopes}.
+
+   An \bf{environment scope} refers to the stuff enclosed by instances of the
+   \pr{begin#2} and \pr{end#1} primitives.
+
+   So called \bf{name scopes} are entered and exited by \pr{push#1} and \pr{pop#1}.}
+
+\: \par
+\: A macro invocation is started with an active backslash, followed by an
+\: admissible macro name. This can be either a zoem primitive, or a
+\: user defined macro. The next section defines which names are
+\: admissible. This macro invocation (the active backslash followed
+\: by the macro name) can be followed by one or more blocks.
+
+
+\sec2{namespaces}{Primitives, built-ins and user macros}
+
+\par{
+   Zoem distinguishes between primitives and built-ins  and user macros
+   on the other hand. Consider
+   the following slightly contrived example.}
+
+\verbatim{\protect{\:{/}
+\def{fib#1}{
+   \push{fibonacci}
+   \set{a}{1}
+   \set{b}{1}
+   \set{c}{0}
+   \while{\let{\a <= \1}}{
+      \setx{c}{\a}
+      \setx{a}{\let{\a + \b}}
+      \write{-}{txt}{\c\|}
+      \setx{b}{\c}
+   }
+   \pop{fibonacci}
+}}}
+
+\car{
+   The example is contrived in that zoem is not the most appropriate
+   language to compute Fibonacci numbers. The reason for using
+   it is that extracts from existing macro packages require more context
+   and are simply more boring.}
+
+\par{
+   In the example, the following macros are primitives:
+   \bf{\pr{push#1}}, \bf{\pr{pop#1}},
+   \bf{\pr{def#2}}, \bf{\pr{set#2}}, \bf{\pr{while#2}}, \bf{\pr{let#1}},
+   \bf{\pr{setx#2}}, and \bf{\pr{write#3}}.
+   The example defines a user macro \bf{\v{\\fib#1}}, which can be
+   invoked e.g. as \v{\\fib{100}}. Doing this either from a file
+   or from interactive mode should give the output below.}
+
+\verbatim{1
+2
+3
+5
+8
+13
+21
+34
+55
+89}
+
+\par{
+   From the above it can be seen that a macro (primitive or user-defined)
+   is in this text often referenced by its signature. The signature
+   contains both the name of the macro and the number of arguments it takes,
+   separated by the \v{#} (octothorpe) character. The octothorpe
+   and ensuing integer are omitted if a macro does not take
+   arguments. A new macro is defined
+   by specifying the required signature (without the leading backslash)
+   as the first argument of one of the definition macros.
+   In this text a signature is usually prefixed
+   with the backslash.}
+
+\par{
+   The example above also defines user macros \v{a}, \v{b}, and \v{c}.
+   The \pr{set#2} primitive will not warn when a previous definition
+   exists. The \pr{setx#2} acts similarly but will also first evaluate
+   the value assigned to the macro. Finally, \pr{push#1} and \pr{pop#1}
+   temporarily create a new dictionary in which the definitions are stored.
+   This is one easy way to ensure that no other definitions are
+   overwritten. This level of care is generally not required though.}
+
+\par{
+   The following are useful to know about primitives, built-ins
+   and user macros.}
+
+\begin{itemize}{{align}{right}{flow}{compact}{mark}{\@{&bull;}}}
+
+\item
+\car{
+   Primitives and built-ins live in one namespace (or dictionary),
+   user macros live in another.}
+
+\item
+\car{
+   A built-in is a special macro provided by zoem.
+   It is defined in terms of one or more primitives, but its definition
+   lives in the same dictionary as primitives do. It is called
+   a built-in because its definition is built into the zoem interpreter.
+   Example: \v{begin#1} is defined as \v{\\begin{\\1}{}} (cf \pr{begin#2}).
+   The full list can be obtained by issuing \v{zoem -l alias}.}
+
+\item
+\car{
+   Primitives and built-ins can be shadowed by user-macros, but a warning will
+   be issued. You can test this by issuing e.g.
+   \v{\\def{def#2}{\\set{\\1}{\\2}}}.  This particular piece of code redefines
+   \pr{def#2} as \pr{set#2} by shadowing the primitive \mc{def#2} as a user
+   macro, losing the property of \pr{def#2} that it warns if a key already
+   exists.}
+
+\item
+\car{
+   Primitives and built-ins can \it{always} be accessed by prefixing
+   the name with a right quote, as in \v{\\'def{foo}{bar}}.
+   The prefixed primitive syntax also has the advantage that
+   it is slightly faster, although zoem speed is likely not something
+   one should worry about.}
+
+\item
+\car{
+   It is impossible to access a user macro with the quote prefix syntax.}
+
+\end{itemize}
+
+\par{
+   It is probably a good idea in macro packages that
+   export functionality to use the primitive quote prefix syntax.
+   This protects the package from user redefinitions. At the same
+   time, the ability to shadow zoem primitives implies that user
+   macros (also those exported by macro packages themselves)
+   are protected against potential clashes with zoem primitives
+   that may be introduced in later versions of the language.
+   The Fibonacci example looks as follows using the quote prefix syntax.}
+
+\verbatim{\protect{\:{/}
+\'def{fib#1}{
+   \'push{fibonacci}
+   \'set{a}{1}
+   \'set{b}{1}
+   \'set{c}{0}
+   \'while{\'let{\a <= \1}}{
+      \'setx{c}{\a}
+      \'setx{a}{\'let{\a + \b}}
+      \'write{-}{txt}{\c\|}
+      \'setx{b}{\c}
+   }
+   \'pop{fibonacci}
+}}}
+
+\par{
+   The quote mechanism only works for zoem primitives and built-ins that follow
+   the syntax of user macros. This includes names starting with a dollar \v{$}
+   or with a double quote \v{"}. The primitive \pr{$#2} and the built-ins
+   \v{\\""} and \v{\\""#1} are the only examples in this category.
+   The quote mechanism does not work for special zoem primitives
+   such as data keys (\secref{grape}), delay keys (\pr{!#1}),
+   or \xml syntactic sugar (\secref{xmlsugar}).}
+
+
+\sec2{escape}{List of escape sequence classes}
+\par{
+   This is a list of escape sequence classes recognized by zoem, indexed
+   by the (set of) character(s) triggering the class(es) \- this assumes
+   that the character in question is preceded by an active backslash.}
+
+\begin{itemize}{
+   {flow}{cascade}
+   {interitem}{1}
+}
+
+\item{\v{$[_a-zA-Z]*}}
+\car{
+   [dollar key]
+   A sequence starting with a dollar sign possibly continued with
+   underscores and alphanumeric characters.  Introduces a dollar key. No
+   dollar signs are allowed in the remainder, and the first non-alphanumeric
+   non-underscore character terminates the sequence.  The primary use of dollar
+   keys is that they are set by \pr{begin#2} and \pr{end#1}.  Dollar keys live
+   in the dollar dictionary stack, which is pushed and popped by \pr{begin#2}
+   and \pr{end#1}.  Nested \v{begin/end} scopes can thus safely associate
+   different values with the same key name.  Refer also to the \capref{macro}
+   section, the \capref{language} section, and the \capref{dictionary} section.}
+
+\par{
+   Note: \pr{$#2} is the only zoem primitive starting with a dollar.}
+
+
+\item{\v{[_a-zA-Z][_a-zA-Z0-9]*}}
+\car{
+   [user key/zoem primitive]
+   A sequence starting with an underscore or an alphabetic character, with
+   only underscores and alphanumeric characters in the remainder.  Introduces a
+   user key or a zoem primitive.  The first non-alphanumeric non-underscore
+   character terminates the sequence.  These keys live in the \it{user
+   dictionary stack}, which the user can control with the \pr{push#1} and
+   \pr{pop#1} primitives. Refer also to the \capref{macro}, \capref{language},
+   and \capref{dictionary} sections.}
+
+\par{
+   A sequence consisting of a single underscore (i.e. not followed
+   by an alphanumeric character) introduces an
+   \iref{anonymous}{anonymous key}.}
+
+\item{\v{"}}
+\car{
+   [user key or zoem built-in]
+   Starts a user key, which is only different from the user keys mentioned
+   above in that it looks different. The sequence is terminated by
+   a closing\~\v{"}. Inbetween, anything is allowed except
+   a backslash or curly. This is used for creating mnemonic names such as }
+
+\verbatim{\
+   \\"man::author"
+   \\"man::section"
+   \\"man::version"
+   \\"html::title"
+   \\"html::charset"}
+
+\car{
+   These keys live in the \it{user dictionary stack}.
+   See the \capref{macro} section and the \capref{dictionary} section.}
+
+\par{
+   There are two zoem built-ins that take this particular form.  These are
+   \mc{""} and \mc{""#1}. Both expand to nothing.  The first can be used to
+   temporarily separate two pieces of text, as they will be joined after
+   expansion.  The second can be used to quickly outcomment sections of text.}
+
+\item{\v{'}}
+\car{
+   [primitive quote prefix]
+   As seen above, primitives and user keys largely live in the
+   same syntactic namespace. It is possible to unambiguously
+   invoke a primitive by inserting a right quote to the left
+   of the primitive key or built-in.
+   Refer to section \secref{namespaces}.}
+
+\par{
+   The user keys live in a stack of dictionaries. Dictionaries
+   can be pushed and popped using \pr{push#1} and \pr{pop#1}.
+   The default user dictionary is always present and acts
+   as a global namespace. It is possible to retrieve a key \mc{foo}
+   directly from the global namespace using the syntax \mc{''foo},
+   even if it is shadowed in stacked dictionaries. It is possible
+   to set a key in the global namespace using \pr{set#3}.
+   }
+
+\item{\v{%}}
+\car{
+   [data key]
+   A sequence starting with a percent sign. The percent sign is
+   followed by a number of scopes. This is used to access multi-dimensional
+   data storage. Such data is stored using the \pr{def#2}  primitive or one
+   of its siblings. Refer also to section\~\secref{grape}.}
+
+\item{\v{[1-9]}}
+\car{
+   [positional parameter]
+   A single (character encoding a) positive digit. The sequence
+   backslash followed by digit is called a \it{positional parameter}.
+   It is only interpreted in the second argument of \pr{set#2}, \pr{setx#2},
+   \pr{def#2}, and \pr{defx#2}, and in the definition part of an
+   \iref{anonymous}{anonymous key} (which can be an argument to \pr{apply#2}
+   and \pr{inspect#4}). In all these instances, the sequence denotes a
+   positional parameter into which the corresponding argument will be
+   interpolated when a key with arguments is used. It is allowed in other
+   places though, as it is possible in zoem to create key definitions
+   dynamically (see e.g.  the \pr{setx#2} primitive).
+   \bf{Note} during interpolation, positional parameters that are enclosed by
+   the \it{delay scope} \v{\\!{..}} will not be interpolated (see \pr{!#1}).
+   The status of this feature is not entirely clear.}
+
+\item{\v{<newline>}}
+\car{
+   [strip newline] The newline will be stripped during the
+   interpretation stage. If you want the newline to be stripped during
+   the file-read preprocessing stage use the sequence \v{\\:{/}},
+   which is a special case of the comment sequence (see below).}
+
+\item{\v{:}}
+\car{
+   [preprocessing sequence]
+   There are a few preprocessing sequences, which are evaluated during file
+   read (cf the \capref{fileread} section).
+   The most important preprocessing sequence is simply the sequence \mc{:}
+   followed by whitespace, an alphanumeric character, or a backslash. It
+   introduces a comment up till and excluding the next newline, which is
+   stripped.}
+
+\item{\v{|}}
+\car{
+   [zoem glyph]
+   Comprises a special two-character sequence that can be given a
+   device-specific meaning. It is customarily used to encode a line break. To
+   zoem, this sequence is more or less the same as a 'normal' character. See
+   the \pr{special#1} primitive.}
+
+\item{\v{~}}
+\car{
+   [zoem glyph]
+   It is customarily used to encode a non-breaking space. See the entry above.}
+
+\item{\v{-}}
+\car{
+   [zoem glyph]
+   It is customarily used to encode a long dash. See two entries back.}
+
+\item{\mc{}}
+\car{
+   [backslash] Denotes a literal backslash.}
+
+\item{\v{\{}}
+\car{
+   [left curly] Denotes a literal left curly.}
+
+\item{\v{\}}}
+\car{
+   [right curly] Denotes a literal right curly.}
+
+\item{\v{*}}
+\car{
+   [glyph sequence] Starts a glyph sequence or constant sequence.
+   Refer to the \capref{dscope} section and to the \pr{constant#1} primitive.}
+
+\item{\v{<}}
+\car{
+   [syntactic sugar]
+   This introduces syntactic sugar for directly writing \sgml-style mark-up,
+   such as \html and \xml (e.g. DocBook).
+   Refer to the \iref{xmlsugar}{anchor section} for that topic.}
+
+\item{\v{@}}
+\car{
+   [at scope] \it{Typically seen in macro package files only}.
+   Starts a special instance of device scope called \it{at scope}.  The
+   sequence\~\mc{@} \it{must} immediately be followed by a pair of balanced
+   curlies, so at scope always appears as \mc{@{..}}.  Refer to the
+   \capref{dichotomy} and \capref{dscope} sections for more information.}
+
+\item{\v{@e}}
+\car{
+   [at \html entity]
+   \v{\\@e{ent}} will expand to the \html character entity &ent; \-
+   it is equivalent to, somewhat easier to type and minimally shorter than
+   \v{\\@{&ent;}}.
+   }
+
+\item{\v{&}}
+\car{
+   [and scope] \it{Typically seen in macro package files only}.
+   May only be used within device scope, and implements a limited
+   form of macro expansion within that scope.
+   The sequence\~\mc{&} \it{must} immediately be followed by a pair of balanced
+   curlies. so and scope always appears as \mc{&{..}}.  Refer to the
+   \capref{dichotomy} and \capref{dscope} sections for more information.}
+
+\item{\v{`}}
+\car{
+   [back quote - formatting escape]
+   \it{Typically seen in macro package files only}.
+   Must be followed by a pair of balanced curlies enclosing a formatting
+   sequence.  This is only recognized within the \pr{formatted#1} primitive.
+   This primitive removes all literal whitespace it encounters in its argument;
+   the formatting sequences are transformed to the whitespace characters encoded
+   by them.}
+
+\item{\v{,}}
+\car{
+   [comma - atomic separator] \it{Typically seen in macro package files only}.
+   This is interpreted during filter time, and is
+   always mapped to nothing. Use it for glueing things as in \mc{foo\\,1},
+   which will result in \v{theresultoffoo1}.}
+
+\item{\v{!}}
+\car{
+   [delay sequence] \it{Typically seen in macro package files only}.
+   Introduces a zoem meta sequence.  Such a sequence consists of a maximal run
+   of consecutive backslashes, possibly followed by a single block.  It can be
+   used to delay interpretation during any number of interpretation stages, and
+   is useful to delay interpretation, perhaps even in a nested fashion, for
+   arguments in keys such as \pr{apply#2} that expand one or more of their
+   arguments before use.  The run of exclamation marks (or 'bangs' as they are
+   internally called) actually comprises an argument to the underlying
+   primitive, so the two primitives (one taking a single block argument)
+   internally have respective signatures \v{!#1} and \v{!#2}.  Externally
+   though, they are just refered to as \pr{!} and \pr{!#1}.}
+
+\item{\v{=}}
+\car{
+   [inline files] \it{Rarely used feature}.
+   Starts either a sequence of the form \mc{={fname}}, which begins a so called
+   inline file named \v{fname}, or a sequence of the form \mc{==}, which
+   ends such an inline file. Refer to the \capref{fileread} section.}
+
+\end{itemize}
+
+\par{
+   This leaves \v{0>()[]?^#/.;} for future use, hopefully
+   very few of these will ever acquire meaning.
+   If the sequence\~\mc{#} acquires meaning, it will probably be for encoding
+   Unicode scalar values.}
+
+\sec2{stages}{Parsing stages}
+
+\par{
+   Parsing is separated into three stages, conceptually.
+   Zoem knows two different parse scopes, plain scope and device scope.
+   These are mentioned below, and explained in the \secref{dichotomy}
+   section. The three stages are:}
+
+\begin{itemize}{
+   {flow}{compact}
+   {interitem}{0}
+   {align}{right}
+}
+\item
+   File read
+
+\item
+   Macro expansion / file inclusion - only plain scope is seen.
+
+\item
+         Filtering - both plain scope and device scope are filtered.
+            Device directives that lay hidden in device scope
+            are interpreted during output.
+\end{itemize}
+
+\par{
+   A file is read in chunks, if possible. The requirement is that chunks must
+   end on lines and be in the outermost scope. The default minimum chunk size
+   is approximately one megabyte.  Chunks are processed by recursively
+   chunking them into smaller chunks as dictated by macro expansion.  As soon
+   as a chunk is no longer subject to macro expansion it is immediately
+   filtered and output.}
+
+\par{
+   Macro expansion is done recursively. Whenever a macro is encountered, it is
+   replaced by its expansion, and the result is again fed to the parser.
+   Evaluatation is not necessarily lazy, that is, during macro expansion the
+   expander may expand arguments before they are interpolated and substituted in
+   the macro definition. This inside-out evaluation can recurse if necessary.
+   Many zoem primitives evaluate one or more of their arguments before use. The
+   default behaviour for user macros is lazy evaluation. This can be changed
+   however by wrapping both the macro and its arguments in \pr{apply#2}.
+   Expansion can be delayed using \pr{!} and \pr{!#1}, so different arguments
+   can be treated differently.}
+
+\par{
+   Important is that the result from the second stage is still
+   valid zoem input.
+
+   If you re-feed it to zoem, file read and macro expansion are usually no-ops
+   (unless some interpretation delay-magic was used), and the syntax is
+   garantueed to be acceptable to zoem.  This is because device scope is not
+   touched during the first two stages, and device specific text (which is most
+   likely not conforming to zoem syntax) lies always hidden in that scope. There
+   are three kinds of escape sequences introducing device scope; these are
+   described in the \secref{dscope} section.}
+
+\par{
+   This is used for example when creating a table of contents; you can write
+   expanded but unfiltered content to a file and read it in during the
+   following run. It is important that such content is fully expanded,
+   because you want things like index numbers and references as
+   they are at the time of macro invocation. It is equally important that what
+   you read back in is still valid zoem  input; this is simply achieved by
+   witholding filtering. When the table of contents is read in, it can be
+   subjected to filtering, and this is the right way to do toc stuff in Zoem.}
+
+
+\sec2{fileread}{File read}
+\par{
+   File read - stripping comments, reading inline files.}
+
+\par{
+   Zoem searches for files included via
+   \pr{dofile#2} or one of its built-in aliases in a number of places if
+   it cannot find the file in the current directory.
+   The precise way of searching is documented in section \secref{searchpath}.}
+
+\begin{itemize}{
+   {flow}{compact}
+   {interitem}{1}
+}
+
+\item{\mc{:}}
+\car{
+   In most cases, this sequence introduces a comment, namely
+   where it is followed by whitespace, an alphanumeric character, or a
+   backslash. It introduces a comment up until and excluding the next newline,
+   which is stripped.}
+
+\par{
+   The sequence  \v{\\:{/}} introduces a comment up till and including
+   the newline. This feature can be
+   useful within the \pr{protect#1} primitive, as it is the only way to delete
+   actual newlines within the argument of that primitive.}
+
+\par{
+   The sequence  \v{\\:{!}} is replaced by a backslash. The single
+   use currently known is to make it easy to quote zoem input containing
+   comment sequences. This}
+
+\verbatim{\\protect{\\foo
+   \\bar  
+   \\zut     \:{!}\:{!}:  this will end up as a comment.
+}}
+
+\car{
+   will result in the following}
+
+\verbatim{\\foo
+   \\bar  
+   \\zut     \:{!}\:  this will end up as a comment.}
+
+\set{{dict}{itemize}}{$flow}{cascade}
+\item{\mc{={fname}}}
+\car{
+   starts inline file named fname at the next line, removes remainder of line
+   after the \mc{={fname}} sequence.  When using the \pr{dofile#2} primitive or
+   one of its four built-in aliases, an inline file takes precedence over
+   regular files in the file system, whether it is present (as a regular file)
+   or not. See below. This feature can be used to ship zoem input in one piece
+   while putting the macro parts at the end.  \pr{zinsert#1} can address inline
+   files as well, but \pr{finsert#1} cannot. The reason for this is that inline
+   files have to satisfy zoem syntax, whereas \pr{finsert#1} can be used to
+   read arbitrary data.}
+
+\par{
+   The future will probably bring a zoem option that creates
+   such a self-contained file automatically from the zoem
+   entry file.}
+
+\set{{dict}{itemize}}{$flow}{compact}
+
+\item{\mc{==}}
+\car{
+   ends inline file, removes remainder of line.}
+\end{itemize}
+
+\par{
+ The above applies to any file read at any stage.  Inline files may occur in
+ any file included at any time, but they do not nest.}
+
+\par{
+ The \it{zoem entry file} is the single file that is specified
+ on the command line. This is the main file, from which other
+ files can be included if desired.}
+
+\par{
+ Zoem entry files usually have the extension \v{.azm}, which is memnonic
+ for \bf{A ZoeM} file.  This is required if the \v{-i} option is used.
+ Arbitrary entry file names can be specified using the \v{-I} option.
+ It is not uncommon to generate sibling files with
+ \v{.roff}, \v{.html}, \v{.zmt} (zoem table of contents), and
+ \v{.zmr} (zoem references) extensions \- however, this is all configurable
+ in user space and not part of zoem itself.  There are no restrictions on
+ names of files that are included from the entry file. Inclusion is done
+ recursively.}
+
+\par{
+ The future will probably bring a second extension that is allowed,
+ namely \v{.ezm} for \bf{Expanded ZoeM} file, which is a self-contained
+ file in which every included file is present as an inline file.}
+
+\sec2{searchpath}{File search path}
+
+\par{
+   If zoem cannot find a file in the current directory, it attempts
+   to find the file in one of three different ways. These are,
+   in the order  in which they are attempted:}
+
+\begin{itemize}{{align}{right}{flow}{compact}}
+\item
+\car{
+   The environment variable \v{$ZOEMSEARCHPATH} is checked. It may
+   contain a listing of paths separated by whitespace or colons.}
+
+\item
+\car{
+   The zoem variable \ssion{__searchpath__} is checked. It must contain a listing
+   of paths stored as a vararg, i.e. a sequence of paths where each path is
+   delimited by curly brackets.  \bf{DO NOT} overwrite this variable, but
+   rather append or prepend to it. Most likely zoem was configured and compiled
+   locally on your system, in which case \ssion{__searchpath__} contains the path
+   necessary to find the macro packages \v{man.zmm}, \v{faq.zmm}, and
+   \v{ref.zmm}.}
+
+\item
+\car{
+   The path of the file currently being parsed is used.
+   Assume that file \v{foo} contains \mc{import{/a/b/c/bar}}.
+   If file \v{bar} wants to include file \v{zut}, which is in
+   the same \v{/a/b/c/} directory, it need not prepend a path
+   but can just issue \mc{import{zut}}. Should the
+   previous search mechanisms fail to find zut, then zoem will
+   as a last resort deduce the path from \v{/a/b/c/bar}.
+   This feature is probably rarely needed, if ever at all.}
+
+\end{itemize}
+
+
+\sec2{macro}{Macro expansion}
+\par{
+   Macro expansion consists of recursive file inclusion and macro expansion.
+
+   All zoem primitives and user keys are recursively expanded
+   until none remains. Zoem primitives and user keys take one
+   of the following forms:}
+
+\begin{itemize}{
+   {flow}{cascade}
+   {interitem}{1}
+}
+
+\item{\mc{abc_0123_}}
+\car{
+   A key with alphanumerics and underscores only. Ends with
+   any other character. All zoem primitives but one have this form.}
+   
+\par{
+   Note: \mc{_} denotes an anonymous key, see the \capref{anonymous} section.}
+
+\par{
+   These keys live in the \it{user} dictionary stack. Initially, there is
+   only one dictionary. The stack can be manipulated using the \pr{push#1}
+   and \pr{pop#1} primitives.}
+
+\item{\mc{"abc::def-ghi.jkl,mno+qrs"}}
+\car{
+   A quoted key. Almost anything inbetween quotes is allowed. Always
+   ends with a quote. No zoem primitive has this form.
+   These keys live in the same \it{user} dictionary stack
+   as the keys above.}
+
+\item{\mc{$abc_0123_}}
+\car{
+   A key introduced with a dollar sign. The name may further consist
+   of alphanumerics and underscores and it ends with any other character.
+   These keys live in the \it{dollar} dictionary stack.
+   A dictionary is pushed with every occurrence of
+   \pr{begin#2}, and that dictionary is popped with the corresponding
+   occurrence of \pr{end#1}.}
+
+\par{
+   Further note: \pr{$#2} is a zoem primitive.}
+
+\end{itemize}
+
+\par{
+   All three types of keys may take arguments, and overloading is allowed:}
+
+\verbatim{\
+   \\foo                          \\: signature foo
+   \\foo{bar}                     \\: signature foo#1
+   \\foo{bar}{bop}                \\: signature foo#2
+   \\$foo{bar}{baz}               \\: signature $foo#2
+   \\"foo::oof"{zut}{zit}{zot}    \\: signature "foo::oof"#3}
+
+\car{
+   is an ensemble of valid and unique keys, which can be defined for
+   example by}
+
+\verbatim{\
+\\def{foo}{FOO}
+\\def{foo#1}{The FOO of \\1}
+\\def{foo#2}{The FOO of \\1 and \\2}
+\\def{$foo#2}{The $FOO of \\1 and \\2}
+\\def{"foo::oof"#3}{\\foo{\\1}{\\2}\\foo{\\2}{\\3}}}
+
+\car{
+   Additionally, zoem allows the definition of \it{constant keys} that map
+   directly into device space and are ignored during macro expansion. Usage of
+   such keys looks like \mc{*{'e}} or \mc{*{(c)}} and is detailed later on.}
+
+\par{
+   A sequence\~\mc{k} where k is in 1-9 is allowed within anonymous keys (as
+   used for example in \pr{apply#2} and \pr{inspect#4}) and in the definition
+   argument of the \pr{def#2} primitive and its siblings \pr{defx#2},
+   \pr{set#2}, and \pr{setx#2}.  It indicates the position(s) where arguments
+   should be interpolated.
+   \bf{Note} during interpolation, positional parameters that are enclosed by
+   the \it{delay scope} \v{\\!{..}} will not be interpolated (see \pr{!#1}).
+   The status of this feature is not entirely clear.}
+
+\par{
+   A feature that should only rarely be needed is that zoem allows
+   name scopes. Refer to the \capref{dictionary} section.}
+
+\sec2{}{File inclusion}
+
+\par{
+   There is one zoem primitive which has four different uses. For each
+   of those uses, a built-in alias exists.}
+
+\verbatim{\
+\\dofile#2 use      alias          meaning
+
+\\dofile{expr}{!+}  \\input{expr}   require file, interpret and output
+\\dofile{expr}{!-}  \\import{expr}  require file, interpret only
+\\dofile{expr}{?+}  \\read{expr}    permit absence, interpret and output
+\\dofile{expr}{?-}  \\load{expr}    permit absence, interpret only}
+
+\car{
+   The \pr{dofile#2} primitive and its four aliases are perhaps a little funny
+   interface-wise \- better ideas are welcome.  The \v{expr} argument is
+   \it{digested}, that is, expanded until no macro's remain. It is thus possible
+   to specify \ssion{__fnbase__.zmt} and include a table of contents file that has
+   been written to in a previous run.  \pr{dofile#2} and its aliases have the
+   property that zoem really descends into the files, and on error will emit a
+   message containing the approximate line number where it occurred.}
+
+\par{
+   Additionally, the contents of a file can be placed inline using
+   \pr{finsert#1} and \pr{zinsert#1}.}
+
+\par{
+   Note: wherever \v{key} is written, it means that something
+   of the form \mc{foo}, \mc{$foo}, or \mc{"foo"} has to
+   be provided, so you would use \pr{setx#2} e.g. as
+   \mc{setx{foo}{\\finsert{\\__fnbase__.zyx}}}.}
+
+\sec2{protection}{Protection}
+
+\par{
+  The \pr{dofile#2} primitive requires that the files to be  included
+  satisfy zoem syntax. It will descend into the files and proceed parsing
+  them.}
+
+\par{
+  The \pr{finsert#1} and \pr{zinsert#1} primitives do not descend,
+  but rather act as if the contents of the file specified were pasted
+  into the place of macro invocation.}
+
+\par{
+  \pr{finsert#1} will \it{protect} the contents of the inserted file,
+  that is, all backslashes and curlies are escaped by preprending
+  them with a backslash.
+  \pr{zinsert#1} will include the file unchanged, assuming that its
+  contents satisfy zoem syntax.}
+
+\par{
+  The \pr{system#3} primitive is able to pipe data to a system command's
+  \stdin stream and retrieve data from the command's \stdout stream.
+  This primitive will \it{unprotect} the data it sends, and it will
+  protect the data it receives.
+  \bf{Note} the security implications of this feature
+  as discussed at the \pr{system#3} entry.}
+
+\par{
+  Data can be explicitly protected using the \pr{protect#1} primitive.}
+
+\par{
+  Protected data can (currently) never result in it being expanded
+  again. This is because escaped backslashes are only interpreted
+  at filter time, and never during expansion.
+  If you only need \it{temporary} delay of expansion, use
+  the \pr{!} primitive or the \pr{!#1} primitive.}
+
+\sec2{dichotomy}{Scope dichotomy}
+\par{
+   Zoem knows two parse scopes: \bf{plain scope} and \bf{device scope}.  The
+   latter is also called 'at scope' because \mc{@{..}} is one (but not the only)
+   way of entering device scope. In plain scope, every character
+   represents itself as a glyph, i.e. as something that should show that way in
+   print/on screen (after the zoem output/device input is fed to the device
+   interpreter).}
+
+\par{
+   For example, if you write the less than sign\~\v{<} in plain scope,
+   it should show up as a readable less than glyph, like in
+   this very sentence. In order to make this happen, zoem provides
+   the \pr{special#1} primitive, so that the less than sign can be
+   automatically mapped to the html entity sequence \v{&lt;}.}
+
+\par{
+   In device scope, nothing is mapped except for a double backslash should it
+   occur.  If you enter this particular sequence of mixed scope:
+   \mc{@{<b>}<hello world>\\@{</b>}} as zoem input,
+   the zoem output/device input is (provided the \pr{special#1}
+   primitive was correctly used for the html device):
+   \v{<b>&lt;hello world&gt;</b>}
+   and what you finally see on screen is:
+   \@{<b>}<hello world>\@{</b>}.
+   In device scope, every character (except for the escape sequences available
+   in that scope) represents itself as the character that should be
+   present in the zoem output/device input.  Device scope should normally only
+   be seen in macros and not in running zoem input.}
+
+\par{
+   In plain space you type characters just as you want to see them eventually
+   \- when you read the document after the zoem output was run through a device
+   interpreter (such as a browser or printer, or postscript previewer).
+   The only exceptions are the backslash and the two curlies, these should
+   be entered as\~\mc{\}}, \mc{\{}, and\~\mc{\}}, respectively.
+   Those escape sequences are interpreted as the characters or glyphs
+   \mc{}, \v{\{}, and\~\v{\}}.  For all characters, including these
+   three, it is checked whether they should be further mapped according to the
+   \pr{special#1} primitive. If a mapping is found, it is retrieved
+   and interpreted by the device scope filter. Read on.}
+
+\sec2{dscope}{Device scope}
+
+\par{
+   There are three kind of strings which are interpreted by the
+   generic device filter, and which are said to live in device scope:}
+
+\begin{itemize}{
+   {flow}{compact}
+   {interitem}{0}
+   {align}{right}
+}
+\item
+\car{
+   The strings embedded in \mc{@{..}} sequences.\|}
+
+\item
+\car{
+   The strings mapped to by the \pr{special#1} primitive, including
+   mappings of the zoem glyphs\~\mc{~}, \mc{|}, and\~\mc{-}.}
+
+\item
+\car{
+   The strings mapped to by the \pr{constant#1} primitive.}
+
+\end{itemize}
+
+\par{
+   In a macro package that is meant to work for multiple devices, every use of
+   any of these constructs will typically be embedded in something that tests
+   the value of the active device.  This can be done using either \pr{cmp#3}
+   with \pr{if#3}, \pr{switch#1}, or \pr{$#2}, in conjuction with the
+   pre-defined zoem key \ssion{__device__}, containing the name of the active
+   device (which can be specified on the command-line).  The following are
+   equivalent:}
+
+\verbatim{\
+   \\if{\\cmp{eq}{\\__device__}{html}}{ \\@{<!-- (c) foo bar -->} }{}
+
+   \\: is equivalent with
+
+   \\${html}{ \\@{<!-- (c) foo bar -->} }}
+
+\car{
+   The \pr{$#2} primitive is used if something needs to be done for one
+   device only, and it may occasionally appear in documents.  For example, the
+   \aref{http://micans.org/pud/}{\pud}
+   man macros enable the creation of a table of contents (for both html
+   and troff).  My own convention is to have a table of contents only in html,
+   and I specify this using the sequence}
+
+\verbatim{\mc{${html}{\\"man::maketoc"}}}
+
+\car{
+   When zoem enters device scope, it
+   outputs all characters literally, except that the backslash still has
+   special meaning. It is used for encoding the backlash itself (as
+   \mc{\\}), and for encoding the two curlies\~\v{\{} and\~\v{\}} (as
+   \mc{\{} and\~\mc{\}}).  This is the same as in plain scope (except that
+   in plain scope the resulting character may again be mapped onto something
+   else, for example, in troff the backslash also needs encoding as
+   \mc{\\}).}
+
+\par{
+   In device scope the sequence\~\mc{"} maps to a double quote.
+   This is an additional feature to allow zoem input to be more susceptible to
+   some editors moving features.  It is not \it{necessary} though; simply using
+   the double quote without escaping it is sufficient.}
+
+\par{
+   Additionally, the backslash can be followed by a single letter from a
+   prescribed set listed below.  Such a backslash+letter combination is called a
+   \it{device directive}.  By default, zoem will never print consecutive
+   newlines, and it will never print consecutive spaces or spaces at the
+   beginning of a line.  The device directives allow this to be altered.}
+
+\begin{itemize}{
+   {flow}{compact}
+   {interitem}{0}
+}
+\item{N} \car{garantuee a newline}
+\item{P} \car{garantuee a paragraph skip (two consecutive newlines)}
+\item{S} \car{garantuee a space (except if next char is newline)}
+\item{I} \car{increase indent by one (indent is printed after each newline)}
+\item{J} \car{decrease indent by one}
+\item{C} \car{set indent to zero}
+\item{n} \car{print newline}
+\item{s} \car{print space}
+\item{t} \car{print tab}
+\item{w} \car{stop managing white space (squashing spaces and newlines)}
+\item{W} \car{start managing white space (use after\~\v{w})}
+\item{&} \car{start \it{and} scope (see further below)}
+\item{+} \car{set the special level (see further below)}
+\end{itemize}
+
+\par{
+   Note that the directives mainly affect the lay-out of the device text (which
+   is zoem output), not the look of the interpreted device text.  The '\v{N}'
+   directive is rather important when constructing troff macros, as many
+   special troff commands are encoded by a dot as the first character on a
+   line, i.e. a newline followed by a dot. Since troff attaches special meaning
+   to two consecutive newlines as well (interpreting it as a paragraph break),
+   zoem needs to be able to specify \it{print a newline only if the previous
+   character was not a newline}. This is exactly what the \v{N}\~directive
+   means.  The '\v{W}' and '\v{w}' directives are required for enabling
+   the construction of a verbatim environment.}
+
+\par{
+   The sequence \mc{&{<almost any>}} can be used to avoid
+   overly cumbersome constructions. It is for example illegal
+   to write}
+
+\verbatim{\protect{\@{<table width="\width">}}}
+
+\car{
+   In the early days of zoem, you had to write}
+
+\verbatim{\protect{\@{<table width="}\width\@{">}}}
+
+\car{
+   \- ugly by most standards. Today you write}
+
+\verbatim{\protect{\@{<table width="\&{\width}">}}}
+
+\car{
+   Which is not any shorter, but more pleasant to read.
+   What happens is that the contents of \it{and} scope \v{\\&{..}} is first
+   fully expanded in plain scope, after which the result is passed back to
+   device scope.  You have to be careful though.  The content of \v{\\&{..}}
+   should never expand to something containing the \it{at} sequence \v{\\@{..}},
+   because device scope is not allowed to nest.  It should also not expand to
+   something containing the \it{and} sequence \v{\\&{..}} either, as this
+   sequence is illegal in plain scope.}
+
+\sec3{special}{Device scope resulting from mapping special characters}
+\par{
+   The first kind of zoem escape introducing device scope is \mc{@{..}}.
+   The second kind comprises the \pr{special#1} mappings, including the
+   three zoem glyphs\~\mc{~}, \mc{|}, and\~\mc{-}. Conventionally, these
+   are used to encode a non-breaking space (\v{&nbsp;} in html), a line break
+   (\v{<br>} in html), and a long dash (emdash, not present in html).
+   You would for example put}
+
+\verbatim{\
+\\if{\\cmp{eq}{\\__device__}{html}}{
+   \\special{
+      {38}  {&amp;}           \\: 38 is ascii character '&'
+      {60}  {&lt;}            \\: 60 -> '<'
+      {62}  {&gt;}            \\: 62 -> '>'
+      {-1}  {&nbsp;}          \\: the zoem escape \\~
+      {-2}  {<br>\\!N}          \\: the zoem escape \\|
+      {-3}  {-}               \\: the zoem escape \\-
+   }
+}{  
+}\
+}
+
+\car{
+   All \pr{special#1} definitions are interpreted in device scope. For every
+   character encountered in plain scope, it is checked whether a
+   \pr{special#1} definition exists, if so, the corresponding string is
+   retrieved and this is filtered through the device scope filter.
+   Note that the three zoem glyphs described here
+   may not be used in device scope, they can only be used in plain scope.  In
+   device scope you will have to write the explicit, device-specific sequence
+   such as \v{<br>} (in html).}
+
+\par{
+   The \pr{special#1} primitive allows different levels of mappings
+   to be defined simultaneously. Several definitions of the same
+   character are allowed; these are placed on a stack particular
+   to that character (cf. the
+   \pr{special#1} entry).
+   When zoem encounters a character for which
+   one or more mappings exist, it retrieves a mapping
+   using the \it{special level}. This is an integer that has by
+   default the value\~\v{1}. Each open output stream has a unique
+   special level associated with it. [Output streams exist
+   for the \it{default output file} (see e.g. \pr{writeto#1}) and
+   for each file openend by \pr{write#3}].
+   A mapping is retrieved using this rule: \it{The deepest element
+   is fetched for which the depth does not exceed the level}.
+   The most visible element (which is the element first occurring
+   in the \pr{special#1} invocation) has depth\~\v{1}.}
+
+\par{
+   The presence of different levels comes in handy e.g. when the troff
+   device is used. In some contexts, the double quote
+   is a special character in troff (and a printable quote is then
+   mysteriously represented by \it{two consecutive double quotes}),
+   in most contexts it is not.
+   This is combatted by including these two specifications in the
+   \mc{special#1} call preparing for troff output (note that 34 is
+   the \ascii value representing the double quote):}
+
+\verbatim{\\special{
+   ...
+   {34}{"}
+   {34}{""}
+   {92}{\\\\e}
+   ...
+}}
+
+\car{
+   The first pair shown simply maps the double quote onto itself, and the second
+   pair maps it onto a double double quote.  As long as the special level
+   is\~\v{1}, the second definition is not used. The backslash (with \ascii value
+   \v{92}) needs only one definition as it is escaped in the same way in all
+   troff contexts.}
+
+\par{
+   The special level can 
+   be set using the \mc{+}\~directive, which must be followed
+   immediately by a digit in the range \v{0-9} enclosed by curly brackets,
+   e.g. \v{\\@{\\+{2}}} will set the special level to \v{2}.
+   The special level \it{can} be set to\~\v{0} (zero) and this means
+   that no character will be mapped.}
+
+\cpar{Example}{
+   Double quotes need to be escaped in certain troff contexts.
+   This is achieved by the following.}
+
+\verbatim{\\@{\\+{2}"} ... funny quote context ... \\@{"\\+{1}}}
+
+\car{
+   Such a context is typically encapsulated by a macro defined in a package; its
+   definition should never be visibile to the user of the package.
+
+   Note that the double quotes embedded in \it{at} scope in the example
+   above are not susceptible to special mapping \- mapping is only
+   applied in plain scope.}
+
+
+\sec3{glyph}{Device scope resulting from glyph definitions}
+
+\par{
+   The third kind of device scope strings are those mapped to by the
+   \pr{constant#1} primitive. An example of (toy) usage is this:}
+
+\verbatim{\
+\\constant{
+   {'e}  {&eacute;}     \\: Use e.g. as \\*{'e}l\\*{`e}ve (\*{'e}l\*{`e}ve)
+   {(c)} {&copy;}       \\: Use e.g. as \\*{(c)} DEEDEE (\*{(c)} DEEDEE)
+   {+-}  {&plusmn;}     \\: Use e.g. as \\*{+-} a few (\*{+-} a few)
+}}
+
+\car{
+   This is largely convenient syntactic sugar. These constants
+   could also have been defined as}
+
+\verbatim{\
+   \\def{"'e"}{\\@{&eacute;}}
+   \\def{"(c)"}{\\@{&copy;}}
+   \\def{"+-"}{\\@{&plusmn;}}}
+
+\car{
+   The idea is that the \mc{*{..}} namespace is used for glyph-like
+   device-specific bindings, whereas the \mc{".."} namespace is used for
+   semantic purposes that are device-independent, but nothing prohibits you
+   from fiddling with this.}
+
+\sec2{xmlsugar}{\sgml/\html/\xml syntactic sugar cubes}
+
+\par{
+   Zoem provides a shorthand for entering \sgml-style tags.
+   It is checked by zoem for well-formedness of the resulting \sgml code,
+   and it can be freely mixed with other modes of entering tags.
+
+   Normally you would
+   have to enter \sgml-style tags in device scope,
+   or write a macro for doing that.
+   For example,
+   a macro \v{x#2} that expands \mc{x{b}{be bold}} to
+   \mc{@{<b>}be bold\\@{</b>}} is a likely candidate.
+   However, this would be inelegant for constructions that span
+   a long distance, and it does not provide for letting zoem expressions
+   expand within an xml tag.}
+
+\par{
+   Zoem provides the \mc{<} token.  It can be used in several ways:}
+
+\verbatim{\protect{
+   \<foo>            \:{!}: foo can be an expression.
+      Some <content> \:{!}: of course, expressions may occur here as well.
+      over here.
+      \<bar>{zut}    \:{!}: bar can be an expression too;
+                     \:{!}: this syntax will close itself.
+      Some <content> \:{!}: again, expressions may occur here as well.
+      over there.
+   \<>               \:{!}: this is a closing tag for the first foo. \</foo> works too.
+
+   \<tim x=y/>       \:{!}: zoem knows this closes itself.
+   \<*br>            \:{!}: zoem converts this to <br>
+}}
+
+\car{
+   Suppose that foo, bar, and zut are zoem expressions expanding
+   to strings FOO, BAR, and ZUT respectively (FOO and BAR might be of the form
+   \v{tag a="b" c="d"}).  Provided that the characters\~\v{<}, \v{>},
+   and\~\v{&} are automatically mapped in plain scope (as a result of correct
+   \pr{special#1} usage), the above will result in}
+
+\verbatim{\
+   <FOO>
+      Some &lt;content&gt;
+      over here.
+      <BAR>
+         ZUT
+      </BAR>
+      Some &lt;content&gt;
+      over there.
+   </FOO>
+
+   <tim x=y/>
+   <br>}
+
+\car{
+   The \v{foo} part inside the \mc{<foo>} syntax should never expand to
+   something containing a\~\v{>}. This is entirely the responsibility of the
+   user or macro package author.}
+
+\par{
+   Both kinds of syntax, \mc{<foo>} and \mc{<bar>{zut}}, are kept as they are
+   during the expansion stage, and they can be subjected to multiple levels of
+   expansion (which may be the case if such syntax is used inside e.g.
+   \pr{setx#2} or \pr{apply#2}).  It is only at the output stage that the
+   syntax is transformed to actual \sgml code and that well-formedness is
+   checked.  So, the two examples just seen will first transform to \mc{<FOO>}
+   and \mc{<BAR>{ZUT}} (please note that foo, bar, and zut all denote
+   expressions here). If they are at that point no longer subject to expansion
+   they enter the output stage where they are converted to \v{<FOO>} and
+   \v{<BAR>ZUT</BAR>} (plus some additional formatting/indenting)
+   respectively.}
+
+\par{
+   Zoem pushes on a stack of opening tags whenever it encounters \mc{<foo>}
+   syntax during the output stage. It naturally knows that a tag can be
+   followed by attributes.  It also knows that a tag such as \mc{<tag a=b/>}
+   closes itself (\xml syntax), and the applies for \dtd tags such as
+   \mc{<!ENTITY ...>}.  As a special case, \mc{<*tag foo bar zut>} is converted
+   to \v{<tag foo bar zut>} to allow encoding of \html tags such as \v{<meta>},
+   \v{<link>}, and \v{<hr>}. This syntax is mandatory for tags that will not be
+   closed.  Note that you should only use \mc{<p>} if you are going to use
+   \mc{</p>} or \mc{<>} as well (because zoem requires closing tags for opening
+   tags).  That said, the syntax \mc{<p>{ paragraph content }} is preferable in
+   most cases.
+   }
+
+\par{
+   Zoem does not know about other ways of entering tags, so
+   \mc{@{<body>}} would not affect the stack just mentioned.
+
+   \mc{<>} automatically closes
+   the top level opening tag from the stack.  Again, syntax such as
+   \mc{@{</body>}} does not interact with the stack.
+   }
+
+\par{
+   It is possible to explicitly close a tag by simply using \mc{</foo>}
+   syntax. Zoem will check whether the closing tag matches the top level
+   opening tag.  As seen before, \mc{<>} does the same thing, but rather than
+   doing a check, zoem will use the top level opening tag to construct the
+   corresponding closing tag.}
+
+\sec1{}{Zoem miscellanea}
+
+\sec2{signature}{Key signatures}
+
+\par{
+   Several keys take another key as argument, e.g. they store a value in a
+   second key or check whether the second key exists.  The full list of these
+   meta keys is \pr{def#2},  \pr{defx#2}, \pr{set#2}, \pr{setx#2},
+   \pr{undef#1}, \pr{defined#2}, \pr{apply#2}, and \pr{inspect#4}. In all
+   cases, the argument key is passed as the first argument, by means of the
+   \bf{key signature}.}
+
+\par{
+   For a key \mc{key} taking \v{k}\~(\v{k}>0) arguments its signature is
+   \v{key#k}.  The signature of a key \mc{key} taking no arguments is simply
+   \v{key}. The rule is: Key usage always includes a single
+   leading backslash (this activates the key). When a key is subject
+   of inspection, it is always referred to by its signature.}
+
+\par{
+   Throughout this text, a key with signature \v{key#k} is mentioned
+   by means of its \bf{key mention} \mc{key#k}, that is, for extra clarity
+   the backslash is prepended to the signature.}
+
+\par{
+   As explained in \capref{namespaces}, almost all primitives
+   can be specified using quote syntax. The quote syntax is
+   integrated with signatures. This means that primitives that
+   expect a signature (such as \pr{def#2}, \pr{undef#1}, and \pr{apply#2})
+   accept quoted signatures too when the signature refers to
+   a primitive.}
+
+\sec2{anonymous}{Anonymous keys}
+
+\par{
+   A single underscore introduces an \bf{anonymous key}.  It is optionally
+   followed by a \v{#k} tag (for\~\v{k} in\~\v{1..9}), denoting the number of
+   arguments the anonymous key takes. An occurrence of the latter is called a
+   \bf{tagged anonymous key}.  The first argument to the key should be a key
+   definition, the other arguments are the arguments for that key definition.
+   If a tag is present, it is used for verifying that the anonymous key is used
+   properly.}
+
+\: hierverder: this used to be useful because:
+\: This feature may be helpful when an anonymous key is the result of
+\: expanding the first argument to \pr{meta#3}.
+\:    and now? -- the example below does not work with \!:
+\: \begin{vbt}
+\:    \\def{foo}{#2{\\1 the \\2}}
+\:    \\def{bar}{#3{\\1 the \\2 and \\3}}
+\: 
+\:    \\meta{_\\foo}{x}{{billy}{kid}}
+\:    \\meta{_\\bar}{x}{{william}{fourth}{maxima}}
+\:    \\meta{_\\bar}{x}{{william}{fourth}}
+\: \end{vbt}
+\:
+\:  results in
+\: 
+\: \begin{vbt}
+\:    billy the kid
+\:    william the fourth and maxima
+\: \end{vbt}
+\:    
+\:  and the third will fail.
+
+\verbatim{\
+   \\_{\\1 the \\2}{row}{boat}
+   \\_#2{\\1 the \\2}{row}{boat}}
+
+\car{
+ results in}
+
+\verbatim{\
+   row the boat
+   row the boat}
+
+\car{
+   Anonymous keys may occur in the first argument of \pr{apply#2}, within the
+   first argument of \pr{inspect#4}, and they may occur freely in running text.
+   The presence of a tag is required when an anonymous key is used
+   within either of \pr{apply#2} and \pr{inspect#4}.
+   An example of usage in \pr{apply#2}:}
+
+\verbatim{\
+\\apply{_#2{\\1 kisses \\2\\|}}{{bill}{max}{max}{bill}}
+bill kisses max
+max kisses bill}
+   
+\car{
+   or even}
+
+\verbatim{\
+\\set{%foo}{{{\\1 hugs \\2\\|}}}
+\\apply{_#2\\%{foo}}{{bill}{max}{max}{bill}}
+bill hugs max
+max hugs bill}
+
+\car{
+   Note that in order to store a block with \pr{set#2}, an extra pair of
+   curlies has to be used, as blocks can only be passed as a sub-argument of a
+   single-element \iref{vararg}{vararg}.  Also note that in a vararg it is
+   allowed to put white space inbetween the constituting elements.}
+
+
+\sec2{grape}{Tree data}
+
+\par{
+   Data can be organized in a global tree with a specialized use of
+   \pr{set#2} and its siblings, as shown further below.
+   The data is retrieved from the tree using so called data keys.
+   Such a key is started using a percent sign, immediately followed
+   by zero, one, or more blocks, e.g. \mc{%}, \mc{%{..}}, and
+   \mc{%{...}{...}{...}} would all be allowable invocations.
+   If more than one block follows the percent sign,
+   there must be no interleaving white space.}
+
+\par{
+   The underlying primitive has signature \v{%#1}, as the trailing scopes are
+   congregated into a single argument before they are further processed.  The
+   two sibling primitives \v{%free#1} and \v{%dump#1} serve for freeing and
+   dumping parts or whole of the tree, as described further below.}
+
+\par{
+   When applied to data keys, \pr{set#2} and its siblings set one or more
+   values in a global multi-dimensional associative array that we shall refer
+   to here as \v{ROOT}. Please note that \v{ROOT} is for explanatory purposes
+   only. This associative array is best viewed as a tree, in which every node
+   can have branches to higher nodes. A node may or may not contain a value.
+
+   Let us denote the value contained by a node \v{some-node} as
+   \v{*(some-node)}.
+
+   The fact that \v{beta} is a node one branch higher than \v{alpha}, which is
+   in turn one branch higher than \v{ROOT}, is denoted as
+   \v{ROOT->"alpha"->"beta"}.
+
+   In this \it{path} notation, strings indexing nodes in the trees are written
+   inbetween quotes. This has the advantage that the empty string, which is a
+   valid index string, has the representation \v{""}.  Combining these
+   conventions, we write the value associated with \v{beta} as
+   \v{*(ROOT->"alpha"->"beta")}.
+
+   Consider these examples.}
+
+
+\verbatim{\
+\\set{%{foo}{bar}{zut}}{lez}
+      \\: now *(ROOT->"foo"->"bar"->"zut") is "lez"
+
+\\set{%{foo}{bar}{zut}}{{a}{b}{x}{y}}
+      \\: now *(ROOT->"foo"->"bar"->"zut"->"a") is "b"
+      \\: and *(ROOT->"foo"->"bar"->"zut"->"x") is "y"
+      \\: and *(ROOT->"foo"->"bar"->"zut") still is "lez"
+
+   \\: some special cases
+\\set{%{foo}{bar}{zut}}{{{c}}}
+      \\: now *(ROOT->"foo"->"bar"->"zut") is "{c}"
+\\set{%{foo}{bar}{zut}}{{c}}
+      \\: now *(ROOT->"foo"->"bar"->"zut") is "c"
+\\set{%{foo}{bar}{zut}}{c}
+      \\: now *(ROOT->"foo"->"bar"->"zut") is "c"
+
+\\set{{foo}{bar}{zut}}{{c}{d}{e}}
+      \\: This does nothing, because the second argument
+      \\: must either be an *even* vararg, a 1-element vararg,
+      \\: or a simple argument.
+
+\\set{%{{tiger}}}{in the woods}
+      \\: now *(ROOT->"{tiger}") is "in the woods"
+\\set{%{tiger}}{in the woods}
+      \\: now *(ROOT->"tiger") is "in the woods"
+\\set{%tiger}{on the loose}
+      \\: now *(ROOT->"tiger") is "on the loose"
+      \\: stripping curlies from a vararg with one argument
+      \\: does not make a difference with the exception of
+      \\: the case shown below.
+
+\\set{%{}}{empty}
+      \\: now *(ROOT->"") is "empty".
+\\set{%}{root}
+      \\: now *(ROOT) is "root".}
+
+\car{
+   Take note  of the rule  governing the  second argument. If  the first
+   non-white space  character is  a left  curly, \pr{set#2}  expects a
+   vararg. The vararg must either be even or it must contain exactly
+   \it{one} argument.}
+
+\par{
+   An even vararg is interpreted as a sequence  of key-value pairs.
+   Each key  induces a new branch  from the node specified  in the first
+   argument, and  each value is associated  with the node at  the end of
+   that branch.
+
+   If the vararg contains exactly one argument, that argument is simply used as
+   a value.  This is the only way to specify a block as the value.
+
+   If the first non-white space character is not a curly, \mc{set#2} will
+   simply interpret the second argument as  a value  to append  to the node
+   specified in  the first argument.
+
+   It is possible to sidestep these issues by using \pr{set#3} and
+   the directive \v{u} as argument to the \v{modes} key. This will cause
+   the value to be copied without further interpretation as a vararg
+   or block.
+   }
+
+
+\par{
+   If you want the data to be stored to be expanded before it is bound,
+   use \pr{setx#2} or \pr{defx#2}.}
+
+
+\par{
+   Data is retrieved simply by prefixing the path with the \mc{%} token.
+   Example:}
+
+\verbatim{\
+\\set{%{foo}{bar}{zut}}{{a}{b}{x}{y}}
+\\%{foo}{bar}{zut}{a}
+\\%{foo}{bar}{zut}{x}}
+
+\car{
+   will print \v{b} and \v{y}.
+   If the path is not an existing path in the current tree it will simply
+   be ignored, although an error message will be emitted.}
+
+\par{
+   Whole or part of the data tree can be freed using the \mc{%free} primitive.
+   Again, simply append the access sequence in which you are interested.  For
+   freeing the entire tree, use \mc{%free} without trailing scopes.  The
+   \mc{%free} primitive largely exists for testing purposes to ensure that zoem
+   gets its internal data manipulation right.}
+
+\par{
+   Whole or part of the data tree can be output for debugging purposes using
+   the \mc{%dump} primitive. Simply append the access sequence in which you are
+   interested.  For printing the entire tree, use \mc{%dump} without trailing
+   scopes. This can be used for debugging if your data manipulation does not
+   work out as expected.  There is no result text as far as usual processing is
+   concerned. The underlying primitive dumps its findings to \stdout in a
+   line-based textual representation of the data-tree.}
+
+\sec2{vararg}{Of blocks and varargs}
+
+\par{
+   A \bf{block} is a string beginning with a left curly and ending with a right
+   curly, the curlies being balanced.  This is a convenient naming
+   convention. Blocks can be used in constructing anonymous keys; refer to the
+   \capref{anonymous} section.}
+
+\par{
+   Some keys take a \it{vararg} argument, which is a single argument (enclosed
+   by curlies as are all arguments), which can contain any number of
+   sub-arguments, that is, a list consisting of blocks. Inbetween the blocks
+   white space may occur.  The \pr{special#1} and \pr{constant#1} keys both
+   take a single vararg argument, and the \pr{apply#2} and  \pr{switch#2} keys
+   each take a vararg as their second argument. For \pr{apply#2} the first
+   argument is a key that is applied to subsequent batches of arguments from
+   that vararg.  The \pr{table#5} primitive takes a vararg as its last
+   argument.  For examples, see the \capref{tour} section and the \pr{apply#2}
+   entry.}
+
+\par{
+   An \bf{even vararg} is a vararg with an even number of elements,
+   An \bf{odd vararg} is a vararg with an odd number of elements.}
+
+\par{
+   User keys may check whether an argument is a vararg
+   by employing the \pr{nargs#1} primitve. This can be used to
+   take different actions depending on the structure of the argument.}
+
+\sec2{session}{Session keys}
+
+\car{
+   This is a compact listing of session keys, created
+   by issuing \v{zoem -l session}.}
+
+\verbatim{\system{../src/zoem}{{-l}{session}}}
+
+\car{
+   This manual is littered with examples of the usage of \ssion{__device__}.  The
+   \ssion{__fnbase__} key is useful for creating sibling files of the entry file,
+   i.e. a table of contents file or a file containing reference information.  I
+   have the habit of naming those \ssion{__fnbase__.zmt} and \ssion{__fnbase__.zmr},
+   respectively.  The \ssion{__fnin__} key is useful for emitting log, warning, or
+   error messages particular to the file currently being parsed.  The
+   \ssion{__parmode__} macro affects the way in which zoem reads chunks in
+   interactive mode (refer to Section\~\secref{cline}).  The \ssion{__searchpath__}
+   macro is one of the ways in which zoem can be instructed to search for files
+   in a set of locations, when confronted with \pr{dofile#2} or one of its
+   built-in aliases.  Section\~\secref{searchpath} has more information about
+   the mechanism of file location.  See also \sibref{zoem}{session}{the zoem
+   manual}.}
+
+\sec2{builtin}{Built-in macros}
+
+\par{
+   This is the result from doing \v{zoem -l builtin}:}
+
+\verbatim{\system{../src/zoem}{{-l}{builtin}}}
+
+\sec2{dictionary}{Dictionary stacks}
+
+\par{
+   By default, when using \pr{def#2} and \pr{set#2}, keys and their values are
+   put in a global user dictionary. It could be useful to shadow keys by
+   entering a new name scope. Zoem facilitates this by providing the
+   \pr{push#1} and \pr{pop#1} keys. These push and pop a new dictionary onto/from
+   the user dictionary stack.}
+
+\par{
+   A second dictionary stack is the \it{dollar dictionary stack}, which
+   contains all keys that start with a dollar sign.
+   The \pr{begin#2} primitive pushes a dollar dictionary each
+   time it is invoked, and that dictionary is popped by the corresponding
+   \pr{end#1} invocation.  This is typically useful for creating nested
+   environments that need access to the same type of information - by storing
+   such information in dollar keys, it can be shadowed and recovered.  Refer to
+   the \pr{begin#2} entry.}
+
+\par{
+   When a key is used its definition is searched in all dictionaries, starting
+   from the top-level dictionary.  The key \pr{undef#1} has only access to the
+   top-level dictionary, and will never delete a key in any other dictionary.}
+
+\sec1{tour}{A zoem tour}
+\par{
+   What follows is an informal tour through zoem's offerings. The next
+   section contains a comprehensive overview of the zoem primitives.}
+
+\par{
+   Let us start with how filtering in plain space is configured.
+   The following was obtained from the
+   \aref{http://micans.org/pud/}{\pud} man macros.}
+
+\verbatim{\
+\\switch{\\__device__}{
+   {html}{
+      \\special{
+         {38}  {&amp;}
+         {60}  {&lt;}
+         {62}  {&gt;}
+         {-1}  {&nbsp;}          \\: the zoem escape \\~
+         {-2}  {<br>\\!N}          \\: the zoem escape \\|
+         {-3}  {-}               \\: the zoem escape \\-
+      }
+   }
+   {roff}{
+      \\special{
+         {46}  {\\\\.}
+         {96}  {\\\\`}
+         {92}  {\\\\\\\\}            \\: a single backslash
+         {-1}  {\\\\ }             \\: the zoem escape \\~
+         {-2}  {\\!N.br\\!N}         \\: the zoem escape \\|
+         {-3}  {\\\\-}             \\: the zoem escape \\-
+      }
+   }
+   {\\write{stderr}{txt}{No such device: \\__device__\\|}
+    \\write{\\__fnbase__.err}{txt}{No such device: \\__device__\\|}
+    \\exit
+   }
+}\
+}
+
+\car{
+   Take note of the number of backslashes. In order to print a backslash
+   in troff, the troff input must contain two consecutive backslashes.
+   In order to specify a backslash in zoem, we must also provide two,
+   thus we need four backslashes in all (in order to create this example
+   I needed eight backslashes in the zoem input).}
+
+\par{
+   Also note the use of the \pr{switch#2} primitive, which takes
+   an expression in the first argument and an arbitrary number of pairs plus an
+   optional clause in the second argument. The optional clause was in this case
+   used as a failure test.}
+
+\par{
+   \pr{special#1} is an example of a zoem key taking an argument that may
+   contain arbitrarily many sub-arguments
+   (i.e. a \iref{vararg}{vararg}).
+   In this particular case the
+   sub-arguments must be paired, each pair defining how certain
+   characters that are special to the device must be represented.}
+
+\par{
+   The \pr{write#3} and \pr{exit} need little comment, they work as
+   expected. Zoem opens output files as needed, and closes them when it is
+   done. The file name \v{-}\~is equivalent to
+   either \stdout or \stdin (depending on context),
+   the file name \v{stderr} denotes \stderr.}
+
+\: The \pr{dofile#2} input primitive and its aliases
+\: \pr{input#1}, \pr{import#1}, \pr{read#1}, and \pr{load#1} (you
+\: may abhor if you wish)
+
+\par{
+   \pr{exit} is considered a failure (and will cause zoem to stop and
+   complain), but \mc{throw{done}} is not.  \pr{throw#2} with argument \v{done} will
+   merely quit parsing the current stack, so if you specify it at top level in
+   a file \- not nested in a key that does its own parsing such as \pr{setx#2},
+   zoem will stop parsing the current file and transfer control back to the
+   file from which it was included.}
+
+\par{
+   The previous example introduces the keys \ssion{__device__} and
+   \ssion{__fnbase__}. They are so called session  variables
+   described in section \capref{session}.}
+
+\par{
+   A sibling primitive to \pr{special#1} is \pr{constant#1}. The
+   following is an example of use.}
+
+\verbatim{\
+\\constant{
+   {'e}  {&eacute;}     \\: Use e.g. as \\*{'e}l\\*{`e}ve (\*{'e}l\*{`e}ve)
+   {(c)} {&copy;}       \\: Use e.g. as \\*{(c)} DEEDEE (\*{(c)} DEEDEE)
+   {+-}  {&plusmn;}     \\: Use e.g. as \\*{+-} a few (\*{+-} a few)
+}\
+}
+
+\car{
+   The main thing to note here is that the target string (e.g. \v{&eacute;})
+   is \it{always interpreted in device space}.  In the reference string (e.g.
+   \v{'e}, \v{(c)} and \v{+-} in the example above) almost anything is allowed,
+   including backslash-escaped characters and balanced curlies. 
+   The latter are not recommended though.
+
+   }
+
+
+\par{
+   There are three zoem tokens representing the characters that have meaning to
+   zoem syntax, the backslash and the two curlies.  Those zoem tokens are just
+   like any other plain characters: they can be mapped in plain space, and they
+   are printed literally in device space.}
+
+\verbatim{\
+   \\\\            \\: A backslash; possibly mapped in plain space.
+   \\{            \\: A curly; possibly mapped in plain space.
+   \\}            \\: A curly; possibly mapped in plain space.
+   \\,            \\: The atomic separator (vanishes).}
+
+\car{
+   These tokens are mapped only during the (final) filter stage.
+   The atomic separator can be useful when you want to glue together
+   items some of which will be the result of macro expansion.}
+
+\verbatim{\
+   \\def{foo}{bar}
+   \\foo\\,1                    \\: \\foo1 would be the key \\foo1}
+
+\car{
+   This will result in bar1. The tokens\~\mc{\\}, \mc{\{}, and\~\mc{\}}
+   are really the corresponding ordinary characters.
+   They can be mapped in plain space via \pr{special#1} using their
+   \ascii values 92, 123, and 125 as was seen above for the backslash.
+   In device space, they will result in\~\mc{}, \v{\{}, and\~\v{\}}.}
+
+\par{
+   Let us now continue with device scope by implementing a \mc{bf#1} key.
+   Below you find two possible definitions:}
+
+\verbatim{\
+   \\def{bf}{1}{\\@{<b>} \\1 \\@{</b>}}    \\: OK
+   \\def{bf}{1}{\\@{<b> \\1 </b>}}        \\: Wrong! Wrong!}
+
+\car{
+   The second is wrong because the contents of\~\mc{1} end up in device
+   space. If the expansion of\~\mc{1} still contains keys they will not be
+   expanded (and cause a fatal syntax error when device space is filtered),
+   and additionally any special characters in\~\mc{1} will not be
+   mapped.}
+
+\sec1{language}{The zoem language}
+
+\sec2{}{Alphabetic index}
+
+\: this stuff constructs a 'Paragraph Of Contents'.
+\${roff}{\write{stderr}{txt}{no support for roff device!}\exit}
+\def{zzarg#1}{\{<\1>\}}
+\formatted{
+   \: third arg is a vararg in which all arguments of a key are stuffed.
+   \def{zprim#3}
+   {  
+      \setx{keyname}{\if{\defined{data}{{strangers}{\1}}}{\%{strangers}{\1}}{\1}}
+      \setx{keyref}{\if{\cmp{eq}{\2}{0}}{\keyname}{\keyname\""_\2}}
+      \setx{keysig}{\if{\cmp{eq}{\2}{0}}{\mc{\1}}{\mc{\1#\2}}}
+      \setx{keycall}{\if{\cmp{eq}{\2}{0}}{}{:\~\~\mc{\1\apply{zzarg#1}{\3}}}}
+      \@{\N<a name="}\keyref\@{">\N}
+      \@{\N</a>\N}
+      \keysig\keycall
+      \write{\__fnbase__.prm}{copy}
+      {\@{\N<a href=\"#}\keyref\@{\">\N}
+         \keysig
+       \@{\N</a>\N}\`{n}
+      }
+   }
+}
+
+\zinsert{\__fnbase__.prm}
+
+\sec2{topicindex}{Topic index}
+
+\par{
+ This is an overlapping categorization in topics.
+ }
+
+\begin{itemize}{
+   {flow}{cascade}
+   {interitem}{1}
+}
+
+\item{\bf{Using and inspecting keys}}
+   \pr{apply#2}
+   \pr{constant#1}
+   \pr{def#2}
+   \pr{defined#2}
+   \pr{defx#2}
+   \pr{inspect#4}
+   \pr{pop#1}
+   \pr{push#1}
+   \pr{set#2}
+   \pr{setx#2}
+   \pr{table#5}
+   \pr{undef#1}
+
+\par{
+ These primitives affect or use either \it{user keys} that are
+ stored in the user dictionary,
+ \it{dollar keys} that are stored in the dollar dictionary,
+ or \it{anonymous keys}.  Dictionaries are discussed in
+ \iref{dictionary}{Section\~\ref{dictionary}{num}}.
+ }
+
+
+\item{\bf{Control, booleans, testing and comparison}}
+   \pr{$#2}
+   \pr{apply#2}
+   \pr{branch#1}
+   \pr{cmp#3}
+   \pr{defined#2}
+   \pr{dowhile#2}
+   \pr{eqt#3}
+   \pr{if#3}
+   \pr{length#1}
+   \pr{register#2}
+   \pr{switch#2}
+   \pr{undef#1}
+   \pr{while#2}
+
+\item{\bf{Expansion, delay}}
+   \pr{!}
+   \pr{!#1}
+   \pr{apply#2}
+   \pr{defx#2}
+   \pr{eval#1}
+   \pr{setx#2}
+
+\item{\bf{Meta-zoem, introspection, exceptions, errors}}
+   \pr{catch#2}
+   \pr{exit}
+   \pr{throw#2}
+   \pr{try#1}
+
+\item{\bf{Execution, tracing}}
+   \pr{trace#1}
+
+\item{\bf{Input/output}}
+   \pr{dofile#2}
+   \pr{finsert#1}
+   \pr{format#1}
+   \pr{register#2}
+   \pr{vanish#1}
+   \pr{write#3}
+   \pr{writeto#1}
+   \pr{zinsert#1}
+
+\item{\bf{Filtering}}
+   \pr{special#1}
+   \pr{vanish#1}
+
+\item{\bf{Environment scopes}}
+   \pr{begin#2}
+   \pr{end#1}
+   \pr{env#4}
+
+\item{\bf{Name scopes}}
+   \pr{pop#1}
+   \pr{push#1}
+
+
+\item{\bf{Data storage}}
+   \mc{%}, \mc{%free}, and \mc{%dump} are primitives described elsewhere
+   \- refer to the \secref{grape} section.
+
+\item{\bf{String conversions}}
+   \pr{format#2}
+   \pr{inspect#4}
+   \pr{length#1}
+   \pr{textmap#2}
+   \pr{tr#4}
+
+\item{\bf{Arithmetic}}
+   \pr{f#2}
+   \pr{f#3}
+   \pr{fv#2}
+   \pr{let#3}
+
+\item{\bf{Glyphs}}
+   \pr{constant#1}
+
+\item{\bf{Syntactic sugar}}
+   \pr{formatted#1}
+   \pr{vanish#1}
+   \xmlpr1ref
+   \xmlpr2ref
+
+\end{itemize}
+
+
+\sec2{}{Primitives}
+
+\par{
+Zoem primitives may expand (which is the same as evaluate) one, several, or all
+of their arguments before using them. Such arguments are enclosed by double
+angle brackets in the listing below. The inside-out type evaluation is done
+recursively and works for arbitrary levels of nesting.  An argument which is
+first expanded and is then interpreted as a label is thus written
+\zarg{label} in the primary entry. In the definition text accompanying the
+entry, the expanded argument is simply refered to as \zarg{label}, so the extra
+pair of brackets is dropped.
+}
+
+\par{
+Each primitive below has a little paragraph with the caption
+\bf{Result text}. It gives a summary of 'what comes out'.
+Note that the result of macro expansion is always passed to the parser
+again, so the result text is again subject to expansion.
+}
+
+
+\begin{itemize}{
+   {flow}{cascade}
+   {interitem}{1}
+}
+
+\items{
+   {\enref{xmlpr1}{\mc{<>#1}}}
+   {\enref{xmlpr2}{\mc{<>#2}}}
+}
+   These are special. Refer to section \capref{xmlsugar}.
+   The angle brackets are part of the syntax, do not confuse them
+   with the angle brackets used below to enclose arguments.
+   These primitives are respectively used as \mc{<*any*>} and
+   \mc{<*any*>{*any*}},
+   so the positioning of arguments is different from all other
+   zoem primitives.
+
+\item{\zprim{!}{0}{}}
+   This primitive is triggered by an active backslash followed by a consecutive
+   run of exclamation marks, which is \it{not} followed by an opening curly.
+   The sequence is called a \it{delay sequence}, and its \it{arity} is the
+   count of backslashes. A single exclamation mark is stripped (i.e. the arity
+   is decremented) and the sequence is no longer subject to the current
+   expansion stage.  It is used to construct valid zoem input, which is usually
+   redirected to file with the copy filter, stored using \pr{setx#2}, or used
+   in nested occurrences of \pr{apply#2}, \pr{inspect#4}, and other primitives.
+   Other uses are possible, the main thing is that one should keep a clear view
+   of the meta-programming implied by\~\mc{!}.
+   Refer also to the \pr{eval#1} primitive.
+
+\cpar{Example}{
+   The primitive \pr{eval#1} evaluates its argument a single time,
+   and passes it on for further evaluation.
+   The following are fully equivalent: 
+   }
+
+\verbatim{\protect{\set{foo}{zut}
+\eval{\!foo}
+\foo}}
+
+\car{
+   whereas \v{\\!foo} would pass the sequence \v{\\foo} to the filtering stage,
+   where it will yield a (non-fatal) error message.
+   Similarly, \v{\\eval{\\eval{\\!!foo}}} is equivalent to the above.
+   }
+
+\cpar{Result text}{
+   A delay sequence of decremented arity.
+   }
+
+
+\item{\zprim{!}{1}{{any}}}
+\car{
+   This primitive is triggered by an active backslash followed by a consecutive
+   run of exclamation marks, which is in turn followed by a block.  The block
+   is called a \it{delay} scope.  The arity of the delay scope is the count of
+   backslashes found in the run.  A single exclamation mark is stripped (i.e.
+   the arity is decremented); if no further exclamation marks remain (i.e. the
+   arity becomes zero) then the introducing backslash and the delimiting
+   curlies are stripped as well.  The result (including the contents of the
+   block) is passed on and is no longer subject to the current expansion stage.
+   The same observations hold as those made for the previous entry.
+   Refer also to the \pr{eval#1} primitive.
+   }
+
+\par{
+   Additionally, blocks that are protected by the delay primitive will be
+   skipped during parameter interpolation.
+}
+
+\cpar{Result text}{
+   \zarg{any}, if the arity of the delay scope just found was equal to one,
+   otherwise, \zarg{any} put in a decremented delay scope.  \zarg{any} will in
+   both case no longer be subject to the current expansion stage.
+   }
+
+\item{\zprim{$}{2}{{str}{any}}}
+   This is a shortcut for activating output for a particular device.
+   If \ssion{__device__} expands to \zarg{str}, \zarg{any}
+   is passed on for expansion, otherwise it is ignored.
+   The following two are equivalent:
+
+\verbatim{\
+\\${html}{Seen only in the html device}
+
+\\if{\\cmp{eq}{\\__device__}{html}}{Seen only in the html device}{}}
+
+\ccar{Result text}{
+   Either none or \zarg{any}.
+   }
+
+
+\item{\zprim{apply}{2}{{<key-sig|anon-key>}{<vararg>}}}
+\car{
+   The first argument is expanded before use.
+   It should expand either to the signature of a user key, primitive or builtin
+   taking arguments, or to  a \iref{anonymous}{tagged anonymous key}.  Examples
+   of the first are \v{foo#k} and \v{"bar::baz"#k}, the latter takes the form
+   \v{_#k{..}}.  If you use an anonymous key containing macro sequences, be
+   sure to escape whole or part of the anonymous key, depending on your needs.
+   The expansion of \v{_#2\\!{{<any>}}} for example, will result in
+   \v{_#2{<any>}}. Primitives can used in both quoted and regular syntax.}
+
+\par{
+   The second argument should result in a vararg.  \pr{apply#2} extracts
+   \v{k}\~elements at a time from \zarg{vararg},
+   and applies the key resulting from
+   the first argument to each vector of \v{k}\~elements successively.
+   Any elements remaining in \zarg{vararg} are ignored.}
+
+\cpar{Result text}{
+   Entirely depending on the key specified in the first argument.}
+
+\item{\zprim{begin}{2}{{label}{<vararg>}}}
+\car{
+   \pr{begin#2} pushes a new dictionary onto the dollar dictionary stack which
+   is popped by the matching \pr{end#1}.}
+
+\par{
+   \mc{begin#1} is an alias which invokes \pr{begin#2} with an empty
+   \zarg{vararg} argument.}
+
+\par{
+   \pr{begin#2} pushes the begin expression associated with \zarg{label} via
+   \pr{env#4}.  The \v{<label>} part is \it{not} expanded.  The second argument
+   \zarg{vararg} consists of consecutive scopes denoting key-value pairs.  It is
+   expanded before use and is allowed to be empty.  The keys (which are the
+   odd-numbered scopes, starting with one) in \zarg{vararg} must be such that
+   prepending a dollar sign (\v{$}) to them yields a valid key signature.  That
+   signature will be used to set a dollar key in the newly pushed dollar
+   dictionary that expands to the \v{value} part associated with the key
+   (specified as the consecutive even-numbered scope in \zarg{vararg}).
+   Alternatively, since the 07-333 release,
+   it is also possible to explicitly include the dollar sign in the keys rather
+   than having them prepended.
+   }
+
+\par{
+   The \pr{env#4} invocation that defines the environment likely
+   sets defaults for the dollar keys (via the second argument
+   of \pr{env#4}) that can be set as described above.}
+
+\par{
+   The pushing of a dictionary provides a means for shadowing and localization
+   with nested \pr{begin#2} statements.  By associating dollar keys with an
+   environment, these keys can be given different meanings in nested
+   environments - the previous meaning will be restored once an environment is
+   closed. The advantages are that the environment does not have to exercise
+   \pr{push#1} and \pr{pop#1} itself, that the user dictionary stack is not
+   unnecessarily extended (saving look-up time), and that the 'dollar' look of
+   a key such as \mc{$align} signals that it will automagically work in nested
+   enviroments.  Of course, the latter is still the responsibility of the
+   author of the environment.}
+
+\cpar{Result text}{
+   The string associated with \zarg{label} via \pr{env#4}.}
+
+\cpar{Example I}{
+   The zoem faq macros define a \v{faqsec} environment, for which
+   two additional arguments are required. It is used for example as}
+
+\verbatim{\
+\\begin{faqsec}{{ref}{misc}{cap}{Miscellaneous questions}}
+ ...
+\\end{faqsec}}
+
+\car{
+   The \v{ref} key introduces the label, the \v{cap} key introduces the
+   caption.}
+
+\cpar{Example II}{
+   The itemize environment in the zoem \it{generic} package allows one
+   additional and optional argument. This argument, if present, must contain a
+   vararg, and is used to set options related to the itemize environment.  It
+   is used for example as}
+
+\verbatim{\
+\\begin{itemize}{
+   {interitem}{0}
+   {flow}{compact}
+   {mark}{\\*{itembullet}}
+   {align}{right}
+}
+ ...
+\\end{itemize}}
+
+\car{
+   Internally, the itemize environment maps these options to dollar keys.
+   Because a unique dollar dictionary is associated with each environment, this
+   makes it possible for nested itemize instances to have separate namespaces.}
+
+\cpar{Result text}{
+   The (unexpanded) string stored in the third argument of the corresponding
+   \pr{env#4} invocation.
+   }
+
+
+\item{\zprim{catch}{2}{{type}{any}}}
+\car{
+   This will process \zarg{any}. Depending on \zarg{type} the
+   result is accepted as succesful.
+
+   If \zarg{type} is \v{towel},
+   any occurrence of \mc{throw{towel}} in \zarg{any} is caught, and
+   the truncated result is further processed. For \v{towel},
+   zoem \it{errors} are not caught but cascade/escalate further down/up.
+
+   If \zarg{type} is \v{error},
+   any error in \zarg{any} is caught, and
+   the truncated result is further processed.
+
+   If \zarg{type} is \v{done}, no exception is accepted.
+   It is possible though to use \v{throw{done{..}}} which will stop processing
+   without generating an exception.  See also \pr{throw#2}.}
+
+\par{
+   Output will be truncated in case an error or exception was caught.
+   The status, currently one of \v{done}, \v{towel}, or \v{error},
+   is written in the session macro \ssion{__zoemstat__}.}
+
+\cpar{Result text}{
+   The possibly truncated result of expanding \zarg{any} in case
+   of a caught exception or error, else the full result.}
+
+
+\item{\zprim{cmp}{3}{{str}{<any>}{<any>}}}
+\car{
+   The last two arguments are expanded.  Their results are compared as
+   strings.  The first argument must be one of the labels
+   \v{lt|lq|eq|gq|gt|ne|cp}.  In case it equals one of the six labels
+   \v{lt|lq|eq|gq|gt|ne}, this primitive puts in place
+   the associated boolean as
+   a string (i.e. either\~\v{0} or\~\v{1}).  In case the label equals \v{cp},
+   it puts in place the result of the string compare (as a string),
+   namely one of\~\v{-1}, \v{0}, or\~\v{1}.}
+
+\cpar{Result text}{
+   Either the string enconding of a boolean (\v{0} or\~\v{1})
+   or the string encoding of the ternary value resulting from a string compare
+   (\v{-1}\~or \v{0} or\~\v{1}).}
+
+
+\item{\zprim{constant}{1}{{vararg}}}
+\car{
+   \zarg{vararg} must have an even number of arguments. These are interpreted
+   as pairs. The first of each pair must enclose a string that does not contain
+   any of the characters\~\v{*}, \mc{}, \v{\{}, or\~\v{\}}, say string
+   \zarg{keystr}.  The second encloses a string that will be interpreted in
+   device space, say string \zarg{valstr}.  When a sequence
+   \mc{*}\,{\zarg{keystr}} is encountered, it is interpreted as
+   \mc{@\{}\zarg{valstr}\v{\}}. This is done at filter time only, the sequence
+   is skipped during macro expansion.  It is not allowed to use a sequence
+   \mc{*}\,{\zarg{keystr}} in device scope, e.g.
+   \mc{@\{\\*}\,{\zarg{keystr}} is illegal.  For further information see
+   section \capref{dscope}.}
+
+\cpar{Result text}{None.}
+
+\item{\zprim{def}{2}{{key-sig|data-seq}{any}}}
+\car{
+   Bind second argument to the key or access sequence in the first argument.
+   This primitive will complain if a binding exists already, but it will
+   overwrite the previous binding and continue anyway.  Use \pr{set#2} if you
+   do no want to be warned for overwriting.  Examples of usage:}
+
+\verbatim{\
+   \\def{foo}{FOO}
+   \\def{foo#1}{The FOO of \\1}
+   \\def{foo#2}{The FOO of \\1 and \\2}
+   \\def{$foo#2}{The $FOO of \\1 and \\2}
+   \\def{"foo::oof"#3}{\\foo{\\1}{\\2}\\foo{\\2}{\\3}}}
+
+\car{
+   These examples are all of type \v{key-sig}.
+   See the \secref{grape} section for examples of type \v{data-seq}
+   (this pertains to multi-dimensional data storage).
+   See the \secref{macro} section for the forms that keys may take.  A key
+   signature is the name of a key with appended to
+   it the number of argument that the key takes, if any.  If the key takes no
+   arguments, than the key signature is identical to the key name.}
+
+\par{
+   If you want the value to be bound to be expanded before binding it,
+   use either \pr{defx#2} or \pr{setx#2}. This works the same for
+   data keys.}
+
+\cpar{Result text}{None.}
+\cpar{See also}{\pr{set#3}.}
+
+\item{\zprim{defx}{2}{{key-sig}{<any>}}}
+\car{
+   The second argument is expanded and stored in the key \zarg{key-name}.  This
+   primitive will complain if a binding for that key exists already, but it
+   will overwrite the previous value anyway.}
+
+\cpar{Result text}{None.}
+\cpar{See also}{\pr{set#3}.}
+
+
+\item{\zprim{defined}{2}{{type}{<access>}}}
+\car{
+   \zarg{type} is one string of \v{key}, \v{lkey}, \v{data},
+   \v{primitive}, \v{builtin}, \v{zoem} or \v{ENV}.  The
+   second argument is expanded before use.
+
+   For the type \v{key}, the \zarg{access} argument is looked up as a key
+   signature in either the user dictionary stack or the dollar dictionary
+   stack.
+
+   For the type \v{lkey}, it is looked up only in the top level dictionary.
+   
+   For the type \v{data}, the \zarg{access} argument is interpreted as a data
+   access sequence.
+   
+   For the type \v{primitive}, the \zarg{access} argument is looked up in
+   the zoem primitive table.
+
+   For the type \v{builtin}, the \zarg{access} argument is looked up in
+   the zoem builtin macro table.
+
+   The type \v{zoem} corresponds with the union of the types \v{primitive} and
+   \v{alias}.
+
+   For the type \v{ENV}, it is checked whether it exists as an environment
+   variable (which can be retrieved using the \pr{__env__#1} primitive).
+
+   This primitive pushes the string\~\v{1} if the result is
+   indeed a valid reference,  it pushes the string\~\v{0} otherwise.}
+
+\cpar{Result text}{The string encoding of a boolean (\v{0} or\~\v{1}).}
+
+
+\item{\zprim{dofile}{2}{{<file name>}{char[!?]><char[+-]}}}
+\car{
+   Open a file and process its contents while keeping track of line numbers.
+   Depending on the second argument, absence of the file is either allowed or
+   not, and its interpreted contents are output or not.  The fact
+   that \zarg{file name} is first expanded allows you to specify
+   file names such as \ssion{__fnbase__.zyx}.}
+
+\par{
+   Zoem may search for a file in several locations until it is found.
+   The process of locating a file is described in section \secref{searchpath}.}
+
+\par{
+   When found, the file is opened according to the specification in the second
+   argument.  This argument must contain exactly two characters, the first one
+   of [\v{!?}], the second one of [\v{+-}]. The first character indicates
+   whether the file is allowed to be absent. A '\v{!}' implies that absence is
+   fatal, a '\v{?}' permits absence. The latter is useful e.g. when creating a
+   Table Of Contents file.  The second character indicates whether the
+   interpreted file should be filtered and output or not ('\v{+}' for yes and
+   '\v{-}' for no). Macro packages typically need interpretation only, whereas
+   concatenation of document parts (c.q. chapters) stored in different files
+   requires that the interpreted content is also filtered and output.  The
+   following aliases are available:}
+
+\verbatim{\
+\: alias             equivalent with
+\\input{fname}        \\dofile{fname}{!+}
+\\import{fname}       \\dofile{fname}{!-}
+\\read{fname}         \\dofile{fname}{?+}
+\\load{fname}         \\dofile{fname}{?-}}
+
+\car{
+   The contents of \zarg{file name} cannot be captured. If you need to
+   capture the contents of a file, use \pr{finsert#1} or \pr{zinsert#1}.}
+
+\cpar{Result text}{
+   Technically none. Of course the processing of \zarg{file name}
+   may result in output, depending on the mode of opening.
+   However, this result text cannot be captured.
+   For example,}
+
+\verbatim{\\setx{foo}{\\dofile{bar}{!+}}}
+
+\car{
+   will result in the file \zarg{bar} being processed and output via
+   the standard output mechanisms, while the key \mc{foo} will have
+   the empty string as value.}
+   \: mq the standard output mechanisms.
+
+\item{\zprim{dowhile}{2}{{any}{condition}}}
+\car{
+   \zarg{any} is expanded and concatenated to the result text
+   until \zarg{condition} exands to something that is nonzero when interpreted
+   as an integer.  \zarg{any} is expanded at least one time.}
+
+\item{\zprim{__env__}{1}{{name}}}
+\car{
+   Looks up \zarg{name} in the environment.}
+
+\cpar{Result text}{
+   The corresponding value if \zarg{name} exists in the environment, the
+   empty string otherwise.}
+   
+\cpar{Note}{
+   This primitive yields identical results for names not in the environment
+   and names in the environment for which the value is empty.
+   Use \pr{defined#2} to check whether \zarg{name} exist.}
+
+\item{\zprim{end}{1}{{label}}}
+\car{
+   Expands the end definition associated with \zarg{label} via \pr{env#4}.}
+
+\cpar{Result text}{
+   The string associated with \zarg{label} via \pr{env#4}.}
+
+\item{\zprim{env}{4}{{label}{<any1>}{any2}{any3}}}
+
+\car{
+   Stores \it{expanded} \zarg{any1} and \it{unexpanded} \zarg{any2}
+   for later use with \pr{begin#2} (when
+   given argument \zarg{label}) and
+   unexpanded \zarg{any3} for later use with \pr{end#1} (when
+   given argument \zarg{label}).}
+
+\par{
+   \zarg{any1} may contain a vararg denoting key-value pairs.
+   These will be set for each \pr{begin#2} invocation
+   in the corresponding dollar dictionary. It provides a convenient
+   mechanism to set default values for keys that can be passed
+   in the second argument of \pr{begin#2}.
+   Note that keys are passed as regular macro signatures, but
+   they are then transformed to dollar keys by prepending a dollar sign.
+   Environments are tighly linked to the dollar dictionary stack.
+   Read more about this in the description of \pr{begin#2}.}
+
+\par{
+   With each \pr{begin#2} invocation, after \zarg{any1} is
+   processed as indicated above,
+   \zarg{any2} will be pushed onto the input stream.
+   Before this, \pr{begin#2} defines the keys \mc{$__args__}
+   and \mc{$__xargs__}. These contain respectively the vararg
+   that was passed as the second argument of \pr{begin#2} and the
+   same vararg after it was expanded.
+   These keys can be used in \zarg{any2}. One possible usage is
+   to pass the key-values on to other environment invocations.
+   This is a likely scenario in case one environment is a thin customization
+   wrapper around a full-fledged base
+   environment.}
+
+\cpar{Result text}{None.}
+
+
+\item{\zprim{eqt}{3}{{str}{<num1>}{<num2>}}}
+\car{
+   The last two arguments are expanded.  Their results are compared as
+   numbers.  The first argument must be one of the labels
+   \v{lt|lq|eq|gq|gt|ne|cp}.  In case it equals one of the six labels
+   \v{lt|lq|eq|gq|gt|ne}, this primitive pushes the associated boolean as a
+   string (i.e. either\~\v{0} or\~\v{1}).  In case the label equals\~\v{cp},
+   this primitive pushes the result of the integer compare,
+   namely one of \v{-1} (if the result of \zarg{any1} is
+   smaller than the result of \zarg{any2}),
+   \v{0} (equal to), or\~\v{1} (greater than).}
+
+\cpar{Result text}{
+   Either the string enconding of a boolean (\v{0} or\~\v{1})
+   or the string encoding of the ternary value resulting from
+   a numeric compare, (\v{-1} or\~\v{0} or\~\v{1}).}
+
+\item{\zprim{branch}{1}{{<vararg>}}}
+\car{
+   Two arguments are successively taken from \zarg{vararg}. The first is
+   expanded and then evaluated as an integer.  If the integer is nonzero, the
+   second argument is expanded and everything else is ignored.  Otherwise the
+   procedure is repeated.  If no (odd) argument matches, and the \zarg{vararg}
+   has an odd number of arguments, the last argument is put in place.  It can
+   be considered a default, else, or failure clause.}
+
+\item{\zprim{eval}{1}{{<any>}}}
+\car{
+   Expands \zarg{any} and passes it on for further evaluation.
+   This can come in handy when complicated requirements demand
+   zoem acrobatics. This primitive used to be implemented as a macro;
+   it is fully equivalent to}
+
+\verbatim{\protect{\set{eval#1}{\apply{_#1{\!1}}{\1}}}}
+
+\car{
+   The above macro works as follows. First, \pr{apply#2} expands both of its
+   arguments. The second argument is the data it received from \mc{eval}, i.e.
+   the latter's single argument. At this stage, the data is thus expanded for
+   the first time. \pr{apply#2} also expands its first argument.  The sequence
+   \mc{!1} is contracted to the sequence\~\mc{1}. The\~\mc{1} needed by
+   \pr{apply#2} needs to be protected by the interpolation that occurs when
+   \v{eval#1}'s argument is interpolated.  Expansion of \pr{apply#2}'s first
+   argument thus yields the anonymous key \v{_#1{\\1}} \- a key that simply
+   copies it argument and passes it on for further expansion.}
+
+\cpar{Example}{
+   \v{\\foo} and \v{\\eval{\\!foo}} are fully equivalent.
+   \v{\\!foo} on the other hand, expands to \v{\\foo} and is then
+   passed to the filter stage.}
+
+\cpar{See also}{
+   \pr{!}, \pr{!#1}.}
+
+\cpar{Result text}{
+    \zarg{any} gone through \it{two} stages of interpretation.}
+
+
+\item{\zprim{exit}{0}{}}
+\car{
+   goodbye world. This is a disgraceful exit for use when some error test
+   presumably yields true. See also \pr{throw#2}.}
+
+\cpar{Result text}{None.}
+
+\item{\zprim{f}{2}{{fun}{<num1>}}}
+\car{
+   Expand the last argument, interprets the result as a number,
+   applies the operand specified by \zarg{fun}, and puts the
+   result in place.
+   \zarg{fun} can be one of}
+
+\par{
+\apply{_#1{\!v{\1}, }}{
+   {floor} {ceil} {round} {abs} {sign} {inc} {dec} {not} {drand} {irand}
+}
+   and that's about it. Mode \mc{f{drand}{<num>}} yields a floating point
+   number in the range \v{[0-<num>]}, and mode \mc{f{irand}{<int>}}
+   yields an integer in the range \v{[0-<int>)}, that is, the argument
+   \v{<int>} itself is excluded from the range.
+   }
+
+\par{
+   For a wider range of mathematical functions, refer to
+   the \pr{let#1} primitive.}
+
+\cpar{Result text}{
+   The string encoding of a number.}
+
+\item{\zprim{f}{3}{{fun}{<num1>}{<num2>}}}
+\car{
+   Expands the last two arguments, interprets the results as
+   numbers, applies the operand specified by \zarg{fun}, and puts the
+   result in place.}
+
+\par{
+   Most arithmetic is done using floating point arithmetic (with the C double
+   type). Integers are preserved if possible.  Since nearly everything is
+   treated as a string in zoem, this simply means that no decimal fraction is
+   printed when the number is output. A number is considered integer if the
+   difference with the integer nearest by is less than the precision (1e-8)
+   \it{and} if it can be represented as an integer using the C long type.
+   Otherwise it is output in decimal representation of the underlying floating
+   point representation.}
+
+\par{
+   \zarg{fun} can be one of}
+
+\begin{itemize}{{flow}{compact}{interitem}{0}}
+\item{*} Multiplication.
+\item{+} Addition.
+\item{-} Subtraction.
+\item{/} Does true division, returns real.
+\item{%} Modulus.
+\item{and} Boolean \it{and}, results in\~\v{0} or\~\v{1}.
+\item{or} Boolean \it{or}, results in\~\v{0} or\~\v{1}.
+\item{div} Does integer division.
+\item{mod} Same as\~\v{%}.
+\item{pow} Power.
+\item{max} Maximum.
+\item{min} Minimum.
+\item{ceil} Nearest by higher multiple, e.g. \mc{f{ceil}{12}{5}=15}.
+\item{floor} Nearest by lower multiple, e.g. \mc{f{floor}{12}{5}=10}.
+\end{itemize}
+
+\par{
+   For a wider range of mathematical functions, refer to
+   the \pr{let#1} primitive.}
+
+\cpar{Note}{
+   \v{and} and \v{or} short-circuit.}
+
+\cpar{Result text}{
+   The string encoding of a number.}
+
+
+\item{\zprim{fv}{2}{{fun}{<vararg>}}}
+\car{
+   Expands the second argument and interprets it as vararg,
+   and applies the operator specified by \zarg{fun} to the elements of vararg.}
+
+\par{
+   \zarg{fun} can be one of}
+
+\begin{itemize}{{flow}{compact}{interitem}{0}}
+\item{*} Multiplication.
+\item{+} Addition.
+\item{and} Boolean and.
+\item{or} Boolean or.
+\item{max} Maximum.
+\item{min} Minimum.
+\end{itemize}
+
+\cpar{Note}{
+   \v{and} and \v{or} short-circuit.}
+
+\cpar{Result text}{
+   The string encoding of a number.}
+
+
+\item{\zprim{finsert}{1}{{file name}}}
+\car{
+   The argument is expanded and interpreted as file name.  The file is read,
+   and every\~\mc{}, \v{\{}, and\~\v{\}} is escaped (resulting in one of
+   \mc{\\}, \mc{\{}, and\~\mc{\}}) The altered contents are then put in
+   place.  See also \pr{zinsert#1}.
+   If file can not be opened, the empty string results.}
+
+\cpar{Note}{
+   This primitive cannot be used to read
+   \iref{fileread}{inline files} whereas \pr{zinsert#1} can.
+   The reason is that inline files have to satisfy zoem syntax.
+   \mc{finsert#1} can be used to read arbitrary data.}
+
+\cpar{Result text}{
+   The escaped contents of \zarg{file name} or the empty string if
+   file can not be opened.}
+
+
+\item{\zprim{format}{2}{{<fmt>}{<vararg>}}}
+\ccar{NOTE}{
+   This primitive was changed in an incompatible way in the 07-333 release.
+   The special case specification syntax was discarded and replaced by the more
+   robust and extensible key-value based syntax described below.
+   }
+
+\par{
+   The primitive formats elements from \zarg{vararg} according to the format
+   specification in \zarg{fmt}.  A format string may contain normal characters
+   that will be output, and meta sequences. A meta sequence is started with the
+   percent character \v{%} and either followed by a block or by another percent
+   sign.  A meta sequence consisting of two consecutive percent signs (\v{%%})
+   will be skipped and result in the output of a single percent sign.
+   Otherwise, the meta sequence will format the next argument from \zarg{arg}
+   according to the specification in the block. A specification consists of a
+   series of key-value pairs that may occur in any order. The key is called the
+   \it{directive} and the supported directives are:}
+
+\begin{itemize}{{interitem}{1}}
+\item{\v{{padding}{<any>}}}
+\car{
+   The literal string \v{padding} is the directive and indicates that the value
+   specifies the padding. The \zarg{any} content of the
+   value block is used as the padding string. By default spaces are used
+   for padding (and incidentally runs of spaces will be squashed unless
+   \v{\\@{\\w}} is issued).
+   Padding is applied if the width of the field exceeds the width of
+   \zarg{arg} plus the width of the optional delimiter(s) described below.
+   }
+
+\item{\v{{delimit}{<delimiter>}[{<delimiter>}]}}
+\car{
+   The content of the first block is inserted inbetween the padding and
+   \zarg{arg}. If centered alignment is used, this will be done on both sides.
+   By default no such delimiter is used.
+   It is possible to specify two \zarg{delimiter} arguments. In that
+   case the first specifies the left delimiter and the second specifies
+   the right delimiter.
+   }
+
+   
+\item{\v{{align}{left|center|right}}}
+\car{
+   The directive is \v{align}, the value is one of \v{left}, \v{center}, or \v{right}
+   and specifies how the argument taken from \zarg{vararg} is to be aligned.
+   }
+
+\item{\v{{width}{<num>}}}
+\car{
+   The directive is \v{width}, the value should be a positive integer number denoting
+   the desired width of the field on which \zarg{arg} is to be printed.
+   }
+
+\item{\v{{length}{{key}[{args}*]}}}
+\car{
+   The directive is \v{length}, the value consists of one or more blocks.
+   The first value block should contain the name of a macro.
+   This is for when you want to customize the way in
+   which the length of strings is computed.
+   The macro will be used to compute the lenght of strings under
+   consideration, using entries in the \it{double} directive as appropriate (see below).
+   This allows you for example to do alignment in \v{<pre>} formatted blocks in html,
+   while keeping the
+   possibility to insert elements that do not take up any width (e.g. links).
+   The first value block should contain the name of a macro.
+   A likely candidate is
+   \pr{length#1}, which should be specified simply as \v{length}.
+   The first argument that is given to this macro will be the string
+   under consideration.  The rest of the value blocks, if any, will be given
+   as additional arguments.
+   }
+
+\par{
+   Currently, this custom length computation is only applied to the
+   argument that is being formatted and the two delimiters if present.
+   All three of these can be replaced, for the purpose of length
+   computation, by placeholders using the \it{double} directive.
+   }
+
+\item{\v{{double}{{[{key}{value}]*}}}}
+\car{
+   The directive is \v{double}, the value consists of a single block containing
+   a vararg. This is used to specify placeholders when computing the length of
+   elements.  The vararg contains placeholder types as keys and the
+   corresponding placeholder values.  It is currently possible to specify three
+   different types of placeholders. These are the argument to be typeset,
+   specified with the placeholder key \it{arg}, the left delimiter, specified
+   with \it{delimit-left}, and the right delimiter, specified with
+   \it{delimit-right}.
+   }
+
+\cpar{NOTE}{
+   The value is enclosed in a block, as part of the key-value specification
+   employed by the \it{double} specification. The value itself is
+   a block containing key-value pairs (again specified as curly-delimited
+   blocks). So be sure to supply the correct number and nesting of blocks.
+   }
+
+\item{\v{{alignat}{{<pivot>}{<width>}}}}
+\car{
+   The directive is \v{alignat}, the value consists of two blocks.  This is used to
+   specify alignment.  The content of the first value block is used as the
+   string on which to align.  The content of the second block is used as the
+   width on which the first part of \zarg{arg} (up to and including the
+   alignment substring) will be right-aligned.  If the \v{length} specification
+   is used as well, the length macro specified therein will be used to compute
+   the width of the string specified in the first block.
+   }
+
+\item{\v{{reuse}{<num>}}}
+\car{
+   This instructs zoem to reuse the current specification for another \zarg{num}
+   arguments taken from \zarg{vararg}.
+   Instead of \zarg{num} it is possible to specify \v{{reuse}{*}}. This
+   will reuse the current specification until all arguments have been exhausted.
+   }
+
+\item{\v{{border}{{<left>}{<right>}}}}
+\car{
+   This borders the result of the current specification with \zarg{left}
+   and \zarg{right}.
+   This is useful in conjunction with the \v{reuse} specifier, for example
+   for adding device line-breaks to each formatted item.
+   }
+
+\cpar{Example}{}
+
+\verbatim{\protect{\:{/}
+\format{%{{align}{right}{width}{10}{reuse}{*}{padding}{{'}{}}}}{
+   {beauty}{lies}{in}{the}{eye}{of}{the}{beholder}
+}}}
+     
+\car{results in}
+
+\verbatim{\protect{\:{/}
+''''beauty''''''lies''''''''in'''''''the'''''''eye''''''''of'''''''the''beholder}}
+
+\end{itemize}
+
+
+\cpar{Result text}{
+   The formatted string.}
+
+
+\item{\zprim{formatted}{1}{{any}}}
+\car{
+   This removes and adds white space from its arguments
+   via the following rules:}
+
+\begin{itemize}{
+   {flow}{compact}
+   {interitem}{0}
+   {align}{right}
+}
+\item
+\car{
+   It skips any \mc{@{..}} enclosed sequence.}
+
+\item
+\car{
+   It skips any \mc{<..>} enclosed sequence - note that the contents
+   eventually will end up in \mc{@{..}} (at) scope.}
+
+\item
+\car{
+   It removes all spaces, tabs, and newlines it encounters otherwise.}
+
+\item
+\car{
+   It inspects and (after inspection) removes all \mc{`{..}} enclosed
+   sequences it encounters.  During inspection, \pr{formatted#1} maps
+   '\v{s}' to a space, '\v{t}' to a tab, and '\v{n}' to a newline.}
+
+\item
+\car{
+   If the sequence \mc{`{<}} is encountered (not in at scope),
+   \mc{formatted#1} starts copying literally without munging
+   whitespace; it resumes its normal mode of operation
+   after encountering the sequence \mc{`{>}}.}
+
+\end{itemize}
+   
+\par{
+ This is useful for writing legible macro files while exercising full control
+ over whitespace (modulo Zoem's white space munging rules).}
+
+\cpar{Result text}{
+ The argument in its unformatted form.}
+
+
+\item{\zprim{get}{2}{{dict-label}{key-sig}}}
+\car{
+   The user stack is searched from top to bottom for dictionaries
+   with label \zarg{dict-label}, and those dictionaries
+   are searched in order for a key with signature \zarg{key-sig}.
+   The first succesful match is retrieved and its definition
+   is pushed onto the interpretation stack.
+   It is an error if no such definition is found.
+   }
+
+\cpar{Note}{
+   The label of the default user dictionary is \v{''}. This ties
+   in with the syntax \mc{''keysig}, used to specify the user
+   dictionary stack. So the following:}
+
+\verbatim{\protect{\:/
+      \set{user}{Jill}
+      \push{foo}
+      \set{user}{Phil}
+      \push{bar}
+      \set{user}{Bill}
+      \get{''}{user} \get{foo}{user} \get{bar}{user}}}
+
+\car{
+   yields output \v{Jill Phill Bill}.}
+
+\cpar{Note}{
+   It is currently not possible to access keys that take arguments.
+   }
+
+
+\cpar{Result text}{
+   The result of processing the retrieved definition.}
+
+
+\item{\zprim{if}{3}{{<int-expr>}{any1}{any2}}}
+\car{
+   The first argument is expanded and interpreted as an integer.
+   If it is nonzero, \zarg{any1} is pushed on the interpretation stack
+   and \zarg{any2} is ignored, vice versa if it is zero.}
+
+\cpar{Result text}{
+   Either \zarg{any1} or \zarg{any2}.}
+
+\item{\zprim{inspect}{4}{{<vararg>}{<reg>}{<any|anon key>}{<any>}}}
+\ccar{status}{Experimental}
+
+\par{
+   All arguments are expanded before use. \zarg{vararg} currently
+   recognizes a single key \it{mods}.  The value of \it{mods} may contain a
+   comma-separated list of the following directives. Repeated use
+   of \it{mods} is allowed.}
+
+\verbatim{\:
+   posix
+   icase
+   dotall
+   iter-lines
+   iter-args
+   match-once
+   discard-nmp
+   discard-nil-out
+   discard-miss
+   count-matches}
+
+\par{
+   The \v{posix} directive is currently required, specifying that \posix
+   regular expressions are used. The future might bring other regex syntaxes.}
+
+\par{
+   Argument \zarg{reg} specifies a (\posix) regular expression. Before being
+   passed to the match engine, it undergoes \unix and \tilde tilde replacement
+   as described in \sibref{zoem}{tildexp}{the zoem manual}.}
+
+\par{
+   Consult the \posix documentation or the regex(7) manual page for a description
+   of posix regexp syntax.}
+
+\par{
+   The expansion of \zarg{any|anon key} can either result in plain data or in an
+   anonymous key.  The expansion of the last argument results in data to which
+   the regex \zarg{reg} is successively applied.}
+
+\cpar{Interpolation}{
+   If the second expansion starts with the pattern \v{_#k\{} it is assumed
+   to be an anonymous key.  The subpatterns from the matched pattern are
+   interpolated by the key, and the entire matched pattern is substituted by the
+   interpolation.  Else, the matched pattern is simply replaced by the expansion.}
+
+\par{
+   \v{icase} induces case insensitive matching.
+   \v{dotall} makes the dot\~\v{.} match any character, including the newline.
+   \v{iter-lines} causes matching to be applied to lines shifted from the data (i.e.
+     data is split on newlines).
+   \v{iter-args} causes matching to be applied to blocks shifted from the data (which
+     should obviously be a vararg).
+   \v{match-once} inspects each element under consideration only once.
+   \v{count-matches} replaces the data by the count of matches. In conjunction
+     with \v{iter-lines} or \v{iter-args} it yields the counts on separate lines
+     and in separate blocks, respectively.
+   \v{discard-nmp} discards non-matching parts.
+   \v{discard-miss} removes any lines or blocks which are empty after inspect
+     is done with it.
+   \v{discard-nil-out} discards any strings or lines or blocks that are empty
+     after matching and optionally interpolation has been applied.}
+
+\cpar{Bugs}{
+   The \gnu implementation of \posix regexes was at some point known to be buggy
+   for long strings and/or long matches.}
+
+\par{
+   A search pattern consisting of a single word boundary or the start-of-string
+   token (\v{^}) will match at each position, because after a succesful match
+   \pr{inspect#4} simply resumes searching for a new match by skipping to the
+   end of the previous match (and adding a single position if the match had
+   width zero and offset zero).  Similar but not yet noticed bugs may exist.}
+
+\par{
+   Nevertheless, this can be a very useful primitive for the occasional
+   odd job, and it should always work except for the cases just mentioned.
+   If you have a complicated instance of \pr{inspect#4}, test it first
+   in isolation. Consider sending a bug report in case you find one (a bug,
+   or a bug report).}
+
+\cpar{Result text}{
+   Depending on the presence of a match and the modifiers given.
+   }
+
+
+\item{\zprim{length}{1}{{<any>}}}
+\car{
+   Computes the length of \zarg{any} and puts this in place.
+   It takes into account the zoem escape sequences \mc{\\}, \mc{\{},
+   and \mc{\}}. The future may bring a generalized \mc{length#2} primitive
+   that provides different ways of measuring string length.}
+
+\cpar{Result text}{The length of any \zarg{any}.}
+
+\item{\zprim{let}{1}{{<let expression>}}}
+\car{
+   The \pr{let#1} primitive puts zoem in arithmetic mode and the contents are
+   parsed accordingly.  All of C's operators are supported  including the
+   logical, bitwise, and comparison operators as well as the ternary operator.
+   The operators \v{**} and \v{//} are added, which respectively denote
+   exponentiation and integer division.
+   Operations or functions resulting in integers are tracked, and
+   the result will be stored in the integer type used (typically
+   long) if possible. Thus one may find that}
+
+\verbatim{\
+\protect{\let{2**42}}
+\protect{\let{2**22}}
+}
+
+\car{
+   respectively result in \v{4398046511104.0} and \v{2097152}.}
+
+\par{
+   The precedence rules used by Zoem are simpler than C's. The respective groups
+   of logical, bitwise, and comparison operators all have identical precedence
+   internally, and associate from left to right.}
+
+\par{
+   Most of the \ansi C math functions are supported, with in addition
+   \v{max} and \v{min}. The functions \v{round}, \v{sign}, and \v{abs} behave
+   slightly different from their C counterparts, as they result in integer
+   results if no overflow occurs.}
+
+\par{
+   At any place where an atomic type is expected one is allowed to insert
+   a zoem macro invocation. It will be evaluated and the result will be
+   interpreted as a number. Evaluation will take place in the order
+   as dictated by the precedence rules governing the expression.}
+
+\par{
+   The logical operators shortcircuit and the ternary operator evaluates
+   only one of its branches. This can be used to create side effects, such
+   as in}
+
+\verbatim{\protect{
+   \let{\bar && \group{\set{foo}{zut}1}}
+}}
+
+\car{
+   This sets \v{foo} only if \v{bar} evaluates to a non-zero number.
+   The trailing\~\v{1} in the \v{group} macro is good practice because
+   \pr{let#1} expects a number to be the result of any macro it encounters.
+   It could have been any other number, or a macro or sequence of macros
+   evaluating to a number.
+   The \v{group} macro is a predefined macro that does nothing except
+   passing its arguments. It is necessary in this concocted example
+   because any occurrence of
+   a macro within \pr{let#1} is interpreted as a number by itself.
+   The sequence \v{\\bar \\bar} would for example be syntactically
+   identical to \v{1 1}, which is incorrect.}
+
+
+\cpar{Result text}{A number.}
+
+\item{\zprim{nargs}{1}{{any}}}
+\car{
+   The argument is not expanded. It puts in place a number that indicates
+   whether this argument could be parsed as a number of scopes or whether it is
+   a regular argument. The following list of examples illustrates
+   the rules according to which the number is created.}
+
+\verbatim{\protect{
+   \nargs{{abc}def}     : -2      \:{!}: neither fish nor fowl
+   \nargs{abc}          : -1      \:{!}: regular argument
+   \nargs{abc{def}}     : -1      \:{!}: regular argument too
+   \nargs{}             :  0      \:{!}: empty vararg (not empty regular arg)
+   \nargs{   }          :  0      \:{!}: empty vararg again
+   \nargs{{abc}}        :  1      \:{!}: vararg with 1 argument
+   \nargs{{abc}{def}}   :  2      \:{!}: vararg with 2 arguments
+   \nargs{   {abc}
+             {def}
+   }                    :  2      \:{!}: vararg with 2 arguments
+   \:{!}: etc.
+}}
+
+\par{
+   From this it is seen that if the first non-whitespace character
+   is an opening curly the primitive expects to find a number of scopes
+   with nothing inbetween or trailing.
+   If it does not succeed the result text is set to the special value -2.}
+
+
+\cpar{Result text}{integer}
+
+\item{\zprim{pop}{1}{{label}}}
+\car{
+   Pops a dictionary from the user dictionary stack pushed earlier
+   by \pr{push#1}. The tag \zarg{label} must be same as the one
+   supplied by that specific \pr{push#1} invocation.}
+
+\cpar{Result text}{None.}
+
+
+\item{\zprim{protect}{1}{{<any>}}}
+\car{
+   The argument is expanded. Subsequently, all backslashes and curlies
+   are escaped. The resulting text is put in place.}
+
+\cpar{Result text}{
+   \zarg{any} with backslashes and curlies escaped.}
+
+
+\item{\zprim{push}{1}{{label}}}
+\car{
+   Pushes a new dictionary onto the user dictionary stack with tag
+   \zarg{label}.  The corresponding \pr{pop#1} should use the same tag.  Note
+   that \pr{defined#2} with the \v{lkey} directive checks only the top-level
+   dictionary, whereas \pr{defined#2} with the \v{key} directive checks the
+   whole stack of dictionaries.  Also, \pr{undef#1} only removes a key from the
+   top-level dictionary. There is currently not a way to access keys based on
+   dictionary label.}
+
+\cpar{Result text}{None.}
+
+\par{
+   Example of usage:}
+
+\verbatim{\
+\\def{num}{1}
+\\push{foo}
+   \\def{num}{2}
+   \\push{bar}
+      \\def{num}{3}
+      \\push{tim}
+         \\def{num}{4}
+      \\pop{tim}
+      num is \\num
+   \\pop{bar}
+   num is \\num
+\\pop{foo}
+num is \\num}
+
+\car{
+   results in
+   }
+
+\verbatim{\
+num is 3
+num is 2
+num is 1}
+
+
+\item{\zprim{register}{2}{{tag}{any}}}
+\car{
+   Register \zarg{any} to be processed at the occassion specified by
+   \zarg{tag}. The only \zarg{tag} currently supported is \v{END}.
+   \v{END} registrees are processed only after all regular input has been
+   processed.  Multiple \pr{register#2} invocations are allowed. Registrees are
+   processed in the order of registration.}
+
+\cpar{Result text}{
+   None at time of registering, the result of \zarg{any} at time of
+   processing.}
+
+\item{\zprim{set}{2}{{key-sig}{any}}}
+\car{
+   As \pr{def#2} above, except that \pr{set#2} will not complain
+   if the key labeled by \zarg{key-sig} already exists.}
+
+\cpar{Result text}{None.}
+\cpar{See also}{\pr{set#3}.}
+
+\item{\zprim{setx}{2}{{key-sig}{<any>}}}
+\car{
+ The second argument is expanded and stored in the key \zarg{key-name}.
+ Besides simply storing the expansion of an expression, it can
+ also be used to do trickier things as}
+
+\verbatim{\
+   \\def{bar}{klaas}
+   \\setx{foo#2}{\\bar says \\1 and \\2}
+   \\foo{x}{y}
+   klaas says x and y}
+
+\car{
+ If you need lambda-like capabilities, take note that you can use \mc{!k} or
+ \mc{!{\\k}} to construct a positional parameter\~\mc{k}, if you want to
+ interpolate arguments into a key that will later take other arguments. Like
+ this:}
+
+\verbatim{\
+   \\: is there any use for this wacky stuff?
+   \\def{lambda#2}{\\setx{\\1#1}{\\2 says \\!1}}
+   \\lambda{foo}{bar}
+   \\foo{moo}
+   bar says moo}
+
+\car{
+ Take care: the \pr{dofile#2} key outputs
+ to the default output file. If you need to include the contents of
+ a file within a \pr{setx#2} call, you need to use \pr{finsert#1} or \pr{zinsert#1}
+ in conjunction with \pr{setx#2}.}
+
+\cpar{Result text}{None.}
+\cpar{See also}{\pr{set#3}.}
+
+
+\: item{\zprim{set}{3}{{[{modes}{<modes>}][{if}{<int-expr>}][{unless}{<int-expr>}][{dict}{<dict-name}]}{key-sig}{any}}}
+\item{\zprim{set}{3}{{{modes}{..}{if}{..}{unless}{..}{dict}{..}{start}{..}{width}{..}}{key-sig}{any}}}
+\car{
+ This primitive encompasses all of the previous four as well as providing
+ additional modes of operation. 
+ The first argument
+ is a vararg storing key-value pairs. The possible keys are \v{modes},
+ \v{if}, \v{unless}, \v{dict}, \v{start} and \v{width}. All of these
+ are optional.
+ }
+
+\par{
+ The \zarg{modes}
+ value, if present must be a string over the following characters.}
+
+\itemize_set3_modifiers
+
+\par{
+   The \v{u} directive applies when setting \iref{grape}{data}.
+   The \v{v} directive applies when setting regular keys.
+   In this case, \zarg{key-sig} must be empty, and \zarg{any}
+   is treated as a vararg of repeated key-value pairs.
+   Directives can be combined as needed.
+   }
+
+\par{
+   Note that keys in the global user dictionary can be accessed
+   even if other dictionaries are pushed using the syntax \mc{''foo}.}
+
+\par{
+   The \it{if} and \it{unless} directives can be used to trigger action (i.e.
+   definition of keys) only if the corresponding clause evaluates to non-zero
+   or zero, respectively.
+   }
+
+\par{
+   The \it{dict} directive must be followed by a dictionary name in the subsequent
+   block. The dictionary stack will be searched for a dictionary with
+   this name. The type of dictionary is derived from the key signature.
+   This is either the dollar dictonary used for the dictionary stack
+   associated with \pr{begin#2} (if the key starts with a dollar sign \v{$}),
+   or the default user dictionary.
+   }
+
+\par{
+   The \it{start} and \it{width} directives only work if a single key is set.
+   Their values should evaluate to integers \v{<start>} and \v{<width>}.
+   The key will be set to its old value with a segment of length
+   \v{<width>} starting at offest \v{<start>} replaced by \zarg{any}.
+   Offsets are zero-based and units are in bytes.
+   }
+
+\cpar{Result text}{None.}
+\cpar{See also}{\pr{def#2}, \pr{defx#2}, \pr{set#2}, \pr{setx#2}.}
+
+\item{\zprim{special}{1}{{<vararg>}}}
+\car{
+   \zarg{vararg} is expanded before use.
+   It must have an even number of arguments.  These are
+   interpreted as pairs. The first of each pair must enclose an integer in
+   the range 0-255 or one of the special token identifiers \v{-1},
+   \v{-2} or \v{-3}. The integers in the range 0-255 are interpreted as
+   character indices The characters indexed \v{-1}, \v{-2}
+   and \v{-3} correspond with the zoem glyphs\~\mc{~}, \mc{|}, and\~\mc{-}
+   respectively.  The second element in each pair defines the string to
+   which the character specified by the first element must be mapped.  This
+   string is interpreted in device scope.  See the
+   \capref{dscope} section for simple uses.}
+
+\par{
+   A key may occur multiple times. The corresponding definitions
+   are stacked away and will be accessed according to the current
+   \it{special level}
+   (cf. the section on \iref{special}{mapped characters in device scope}).}
+
+\par{
+   Repeated use of \mc{special#1} does not cause the removal of previous
+   definitions, with one exception: If \mc{special#1} is invoked
+   with no arguments at all then all definitions are removed.}
+
+\cpar{Note}{
+Be sure to use delay sequences as appropriate, noting that vararg is expanded.
+Below is how \aref{http://micans.org/pud/}{Portable Unix Documentation}
+encodes a line break in troff:}
+
+\verbatim{{-2} {\\!N.br\\!N}}
+
+\car{
+   Zoem interprets the value and accordingly associates
+   the device scope sequence \v{\\N.br\\N} with the token \v{\\|}.
+   The escape sequence \v{\\N} will thus be processed during
+   the filter stage as is appropriate.
+   Without the delay sequence zoem would try to expand \v{\\N} during
+   processing of the \pr{special#1} primitive.}
+
+\cpar{Result text}{None.}
+
+
+\item{\zprim{switch}{2}{{<pivot>}{vararg}}}
+\car{
+   The first argument is expanded. Subsequently, two arguments are successively
+   taken from \zarg{vararg}. The first is expanded and string compared with
+   \zarg{pivot}. If they match, the second argument is expanded and everything
+   else is ignored.  If they do not match, the procedure is repeated.  If no
+   (odd) argument matches, and the \zarg{vararg} has an odd number of
+   arguments, the last argument is put in place.  It can be considered a
+   failure clause.  This primitive does not have fall-through behaviour; at
+   most one branch will be handed to the parser.}
+
+\car{
+   Different cases can be grouped in a vararg. If \pr{switch#2} recognizes
+   that the test argument can be parsed as a vararg it will exctract all
+   the corresponding sub-arguments. If the pivot matches any of these
+   the branch corresponding to the test argument will be taken.}
+
+\cpar{Result text}{
+   Either the first block associated with a matching case of \zarg{pivot},
+   the failure clause, or nothing at all.}
+
+
+\item{\zprim{system}{3}{{cmd}{<args>}{<data>}}}
+\car{
+   \it{By default this primitive is disallowed.}
+   The first argument is the name of a system command. The environment variable
+   PATH is used in tracing the location of the command.  If \zarg{data} is
+   non-empty, it is first \it{unprotected}, that is, escaped backslashes and
+   curlies are unescaped.  The resulting text is then fed to command \zarg{cmd}
+   with arguments \zarg{args}. The latter, if non-empty, must be
+   specified as a vararg, even if only a single argument is present.
+   Should execution of the command (be it with or
+   without data) result in output on \stdout then the latter is captured,
+   backslashes and curlies are escaped (i.e. the output is protected), and the
+   result is put in place. \stderr  is the same as it is for the parent (zoem).}
+
+\cpar{Note}{
+   The security implications of this feature. By default
+   zoem will \it{ignore} \mc{system}. The
+   command line option \v{--unsafe} will cause zoem to prompt for user
+   confirmation (if prompting is not possible it will ignore again) for
+   each encountered \mc{system} invocation. The option \v{--unsafe-silent}
+   will silently allow all \mc{system} invocations. The option
+   \v{--allow=cmd[:cmd]*} explicitly specifies which commands to allow silently.
+   It is also possible to use this option repeatedly rather than separate
+   different commands by colons.}
+
+\par{
+   If the zoem command line option \v{--system-honor} is used, zoem will
+   exit if a system command fails or is ignored.}
+
+\par{
+   A simple exit status is written in the variable \ssion{__sysval__}:
+   it is zero (\v{0}) on success, and one (\v{1}) on failure.}
+
+\par{
+   Refer to \sibref{zoem}{the manual page of the zoem interpreter} for
+   more information on \v{--unsafe}, \v{--unsafe-silent},
+   \v{--allow=}, and \v{--system-honor}.}
+
+\par{
+   Built-in macros \mc{system#2} and \v{system#1} exist. The former
+   drops the \zarg{data} argument, the latter also drops the \zarg{args}
+   argument.}
+
+\cpar{Example}{}
+\verbatim{\\system{sort}{{-n}}{\\finsert{foo}}
+\\system{ls}{{-l}{-a}}
+\\system{date}}
+
+\cpar{Result text}{
+   The output captured (and then protected) from \zarg{cmd}'s \stdout, if any.}
+
+
+\item{\zprim{table}{5}{{<row length>}{any1}{any2}{any3}{<vararg>}}}
+\car{
+   The first argument is expanded and interpreted as an integer, say\~\v{k}.
+   Successively, vectors of \v{k}\~elements are shifted from
+   \zarg{vararg}. Each vector is bordered on the left with
+   \zarg{any1}, bordered on the right with \zarg{any3}, and
+   all elements in the vector are separated with \zarg{any2}.}
+
+\par{
+   This primitive is perhaps not really needed as its functionality
+   is largely covered by \pr{apply#2}.}
+
+\cpar{Result text}{
+   The blocks from \zarg{vararg} interspersed in a table-like
+   manner with \zarg{any1}, \zarg{any2}, and \zarg{any3}.}
+
+
+\item{\zprim{textmap}{2}{{vararg}{<any>}}}
+\car{
+   Apply one or more transformations to \zarg{any} and
+   put the result in place.
+   \zarg{vararg} takes a succession of key-value pairs.
+   The associated transformation are applied in order. The
+   supported transformations are:}
+
+\begin{itemize}{
+   {flow}{compact}
+   {itemmargin}{5}
+   {interitem}{0}
+   {textindent}{6}
+   {align}{right}
+}
+\item{{word}{ucase}}       Uppercase \zarg{any}
+\item{{word}{lcase}}       Lowercase \zarg{any}
+\item{{number}{roman}}       Convert number to Roman
+\item{{number}{alpha}}       Convert number to letters
+\item{{repeat}{<num>}}        Concatenate <num> copies of \zarg{any}
+\item{{caesar}{<num>}}        Apply caesar encryption
+\item{{vigenere}{<key>}}      Apply vigenere encryption
+\item{{vigenerex}{<key>}}     Apply vigenere encryption and include space
+\end{itemize}
+
+\par{
+   The roman transformation can e.g. used to equip the Aephea itemize
+   environment with roman numbering. To get uppercase roman,
+   do this:}
+
+\verbatim{\:{/}
+   \\textmap{{number}{roman}{word}{ucase}}{\\your_nice_counter}}
+
+\car{
+   The alpha transformation maps its argument to a string over the alphabet \v{_a-z}, i.e.
+   all the set of all lowercase letters with the underscore added.
+   This set is simply used for counting in base\~27, with the underscore
+   playing the role of zero.}
+
+\cpar{Result text}{
+   The transformed text.}
+
+
+\item{\zprim{throw}{2}{{towel|error|done}{<any>}}}
+\car{
+   Quit parsing, unwind stack until some occurrence of
+   \pr{catch#2}, \pr{try#1} captures this throw.
+   }
+
+\par{
+   The throw \mc{throw{done}} is also unconditionally caught by
+   \pr{while#2} and \pr{eval#1}.
+   If \mc{throw{done}} is encapsulated by neither of these four
+   primitives it means that processing of the current file
+   is stopped, and processing at the including file, if applicable,
+   is resumed.
+   }
+
+\par{
+   \zarg{any} is digested; if it has positive length the result
+   is issued as a diagnostic.
+   }
+
+\cpar{Note}{
+   Many primitives evaluate one or more of their arguments before use,
+   as indicated in this manual.
+   An occurrence of \mc{throw{done}} in such an argument, if not caught, will be
+   treated like an error. It is possible to use \mc{throw{done}} in such
+   an instance by encapsulating the argument in \pr{eval#1}.
+   }
+
+
+\cpar{Result text}{
+   None, affects the result text of the embedding scopes.
+   }
+ 
+\item{\zprim{tr}{2}{{vararg}{<any>}}}
+\car{
+   \zarg{vararg} contains key-value pairs. The accepted keys
+   are \it{from} and \it{to} which must always occur together,
+   and \it{delete} and \it{squash}. The values of these keys
+   must be valid \it{translation} specifications.
+   This primitive transforms \zarg{any} by successively applying
+   translation, deletion and squashing in that order. Only the
+   transformations that are needed need be specified.}
+
+\par{
+   The syntax accepted as translation specification is almost
+   fully compliant with the syntax accepted by \bf{tr}(1), with
+   three exceptions. First, repeats are introduced as
+   \v{[*a*20]} rather than \v{[a*20]}. Second, ranges can (for
+   now) only be entered as \v{X-Y}, not as \v{[X-Y]}.
+   \v{X} and \v{Y} \it{can} be entered in either octal or
+   hexadecimal notation (see further below).
+
+   As an additional feature, the magic repeat operator \v{[*a#]} stops on both
+   class and range boundaries.  Finally, character specifications can be
+   complemented by preceding them with the caret \v{^}.  See further below for
+   examples where these features are used.}
+
+\cpar{Preprocessing}{
+   The values (not the data \zarg{any}) are subjected to \unix tilde expansion
+   as described in the \sibref{zoem}{tildexp}{the zoem manual}.}
+
+\cpar{Syntax}{
+   Specifications may contain ranges of
+   characters such as \v{a-z} and \v{0-9}. Posix character classes
+   are allowed. The available classes are}
+
+\verbatim{\:{/}
+   [:alnum:]
+   [:alpha:]
+   [:cntrl:]
+   [:digit:]
+   [:graph:]
+   [:lower:]
+   [:print:]
+   [:punct:]
+   [:space:]
+   [:upper:]
+   [:xdigit:]}
+
+\par{
+   Characters can be specified using octal notation, e.g.
+   \mc{012} encodes the newline. Use \mc{173} for the opening curly,
+   \mc{175} for the closing curly, \mc{134} for the backslash, and \mc{036} for
+   the caret if it is the first character in a specification.  \it{DON'T} use
+   \mc{\\}, \mc{\{}, or\~\mc{\}} in this case!  Hexadecimal notation is written
+   as \mc{x7b} (the left curly in this instance).}
+
+\cpar{Result text}{
+   The expanded \zarg{any} subjected to the \v{tr} operator as specified.}
+
+\cpar{Example}{
+   The following was entered in interactive mode.}
+
+\verbatim{\:{/}
+\\tr{
+   {from}{[:lower:][:upper:][:digit:][:space:][:punct:]}
+   {to}{[*L#][*U#][*D#][*S#][*P#]}}{
+ !"#$%&'()*+,-./0123456789:;<=>?@
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+[\\\\]^_`
+abcdefghijklmnopqrstuvwxyz
+\\{|\\}~]}
+.
+----------------------------------------
+SSPPPPPPPPPPPPPPPDDDDDDDDDDPPPPPPPSUUUUUUUUUUUUUUUUUUUUUUUUUUSPPPPPPSLLLLLLLLLLLLLLLLLLLLLLLLLLSPPPPP
+----------------------------------------
+\\tr{
+   {squash}{^}
+   {from}{[:lower:][:upper:][:digit:][:space:][:punct:]}
+   {to}{[*L#][*U#][*D#][*S#][*P#]}}{
+ !"#$%&'()*+,-./0123456789:;<=>?@
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+[\\\\]^_`
+abcdefghijklmnopqrstuvwxyz
+\\{|\\}~]}
+.
+----------------------------------------
+SPDPSUSPSLSP}
+
+\car{Note how the magic repeat operator \v{[*#]} stops on class boundaries.}
+
+
+\item{\zprim{trace}{1}{{<int>}}}
+\car{
+   The argument is expanded and interpreted as an integer.  This integer
+   encodes an ensemble of flags controlling the trace output. The different
+   modes are exactly the same as those that can be set from the command line.
+   Refer to the \iref{cline}{corresponding section} for more information.
+   Special values are\~\v{0} (switch off all tracing),
+   \v{-1} (switch on all tracing modes in short mode),
+   \v{-2} (switch on all tracing modes in long mode),
+   \v{-3} (switch to the previous tracing value),
+   and \v{-4} emit a listing of tracing bits.
+   The third can be useful to switch tracing on for a short while and then off
+   again if you need to debug your document.
+   Additionally and redundantly, \mc{trace#1} puts the previous tracing
+   value in place.}
+
+\cpar{Result text}{
+   The previous tracing value.}
+
+
+\item{\zprim{try}{1}{{any}}}
+\car{
+   This will process the content and
+   output is written in the macro \ssion{__zoemput__}.  Output will
+   be truncated in case \pr{throw#2} was used or an error occurred.
+   The status, currently one of \v{done}, \v{towel}, or \v{error},
+   is written in the session macro \ssion{__zoemstat__}.}
+
+\cpar{Result text}{
+   None.}
+
+
+\item{\zprim{undef}{1}{{key-sig}}}
+\car{
+   Deletes the key with signature \zarg{key-sig} from the
+   top level dictionary. Complains (but does not fail) if the key
+   does not exist in that dictionary.
+   It is possible to specify that a regular key (i.e. not a dollar key)
+   must be looked up in the global dictionary by prefixing its
+   signature with two single quotes.
+   }
+
+\cpar{Result text}{
+   None.}
+
+
+\item{\zprim{vanish}{1}{{any}}}
+\car{
+   This will only process the content for its side effects. Any result text is
+   disregarded.  This allows easy free-style commenting of sequences of
+   definitions.  By comparison, \pr{formatted#1} provides the means to give a
+   formatted presentation of the definitions themselves.}
+
+\cpar{Result text}{
+   None.}
+
+
+\item{\zprim{while}{2}{{condition}{any}}}
+\car{
+   While \zarg{condition} exands to something that is nonzero when interpreted
+   as an integer, \zarg{any} is expanded and concatenated to the result text.
+   The following piece of zoem asks the user for an integer and writes all
+   Fibonacci numbers smaller than that integer plus one extra to \stdout.}
+
+\verbatim{\
+\\import{ctr.zmm}     \\: import ctr macros.
+\\def{fib#1}{
+   \\ctrset{a}{1}
+   \\ctrset{b}{1}
+   \\ctrset{c}{0}
+   \\while{\\eqt{lq}{\\ctrput{c}}{\\1}}{
+      \\ctrset{c}{\\ctrput{a}}
+      \\ctrset{a}{\\let{\\ctrput{a}+\\ctrput{b}}}
+      \\write{-}{txt}{\\ctrput{c}\\|}
+      \\ctrset{b}{\\ctrset{c}}
+   }
+}
+
+\\write{-}{txt}{Enter a number please, }
+\\write{-}{txt}{then press <cr> and <ctl-d>\\|}
+\\setx{num}{\\finsert{-}}    \\:  this reads from \stdin.
+\\fib{\\num}}
+
+\ccar{Note}{
+   The strings built up by \pr{while#2} are internally concatenated
+   until it is done, so the result from \pr{while#2} \it{can} be captured.
+   This will make \pr{while#2} work for \pr{setx#2}.  If you want to output
+   100M worth of lines or paragraphs in a while loop, either embed the stuff to
+   be output in a \pr{write#3} call and make sure that no whitespace results
+   from the loop (for example by using \pr{formatted#1}), or simply use
+   \pr{whilst#2}. With \pr{write#3} you can specify a file name to which
+   results should be output (use \ssion{__fnout__} for the current default output
+   file) whereas \pr{whilst#2} simply outputs to the current default stream.}
+
+\item{\zprim{whilst}{2}{{condition}{any}}}
+\car{
+   While \zarg{condition} exands to something that is nonzero when interpreted
+   as an integer, \zarg{any} is expanded and \it{immediately output} to
+   the current default output stream.}
+
+\cpar{Result text}{
+   None \- everything is sent to the default output stream right away.
+   Output from \pr{while#2} \it{can} be captured, i.e. it can be that what
+   is assigned by a \pr{setx#2} invocation.}
+
+
+\item{\zprim{write}{3}{{<file name>}{str}{<any>}}}
+\car{
+   The first argument is expanded and used as a file name.  It is a fatal error
+   if the file has either not been opened by a previous \mc{write#3} call or
+   cannot be opened for writing.  Two special file names or 'streams' are
+   recognized, namely \v{-} and \v{stderr}. They map to \stdout
+   and \stderr.
+   The third argument is expanded, filtered, and written to file.  The second
+   argument indicates the filter to be used. It must be one of the (literal)
+   strings \v{copy}, \v{device}, or \v{txt}.}
+
+\par{
+   The \v{copy} filter does not filter anything at all (neither plain scope
+   nor device scope) and does not touch any of the zoem escape sequences
+   remaining after expansion.}
+
+\par{
+   The \v{device} filter does a full-fledged filtering of both parse scopes.
+   It respects the settings according to the \pr{special#1}
+   primitive. The write primitive associates unique metadata with each
+   file it opens, so \it{at directives} such as\~\mc{N}, \mc{W}, and \mc{+}
+   for different output files do not interfere with one another.
+   Refer to the \secref{dscope} section for more information on
+   at directives.}
+
+\par{
+   The \v{txt} filter maps \mc{\\} to \mc{} (i.e. a single
+   backslash), \mc{~}\~to a single space, \mc{-}\~to a single hyphen,
+   \mc{,} (the atomic separator) to nil, \mc{|}\~to a newline,
+   \mc{\{}\~to\~\v{\{}, and\~\mc{\}} to\~\v{\}}. It copies everything
+   else verbatim.}
+
+\cpar{Result text}{
+   Technically none, as the output of \pr{write#3} cannot be captured.}
+
+\item{\zprim{writeto}{1}{{<file-name>}}}
+\car{
+   Closes the current default output stream, and changes it to point to file
+   \zarg{file name}. Useful when splitting a document into chapters, or god
+   forbid, nodes.}
+
+\cpar{Notes}{
+   If the file name contains a path separator, zoem will refuse to carry
+   on, because this may pose a risk that sensitive files are overwritten -
+   in case someone has written a malicious zoem input file to do just that.
+   If the option \v{--unsafe} is used, zoem will query the user
+   what to do. If the option \v{--unsafe-silent} is used, zoem will
+   merrily buzz on without querying.
+   The path separator is entirely \unix-centric, i.e. a forward slash.}
+
+\par{
+   Zoem will recognize if \mc{writeto#1} is issued more than once for the same
+   file \zarg{file-name}. On the first occassion, it will simply open the file
+   and truncate any previous contents.  On the second occasion and onwards, it
+   will append to the file.  There is currently no option to vary this
+   behaviour.  Zoem will not recognize the fact that different strings might
+   refer to the same file (e.g. \v{foo} and \v{./foo}). Whenever it encounters
+   a file name not seen before, it will try to open the file in write mode.}
+
+\par{
+   In interactive mode, \mc{writeto#1} has no effect for text entered
+   in plain mode. It \it{does} have effect in case \pr{write#3} is issued
+   with \ssion{__fnout__} as the file name argument, since \mc{writeto#3}
+   resets the \ssion{__fnout__} macro.}
+
+\cpar{Result text}{
+   None.}
+
+\item{\zprim{zinsert}{1}{{<file name>}}}
+\car{
+   The contents of file \zarg{file name} are put in place unaltered
+   enclosed by the \pr{!#1} delay primitive.  The contents must necessarily
+   satisfy zoem syntax.  If the file can not be opened, the empty
+   string results.
+   See also \pr{finsert#1}.}
+
+\cpar{Example}{}
+
+\verbatim{\protect{\setx{foo}{\zinsert{mydata}}}
+\protect{\setx{foo}{\eval{\zinsert{mydata}}}}}
+
+\par{
+   In the first case, \mc{foo} will contain the exact contents
+   of file \v{mydata}. Those contents are first
+   enclosed within the \pr{!#1} primitive by \pr{zinsert#1}.
+   The resulting text is evaluated by \pr{setx#2} - the only
+   thing this does is strip the enclosing \v{\\!{}} scope.}
+
+\par{
+   In the second case, \mc{foo} will contain the \it{evaluated}
+   contents of file \v{mydata}, as \pr{eval#1} adds an additional
+   layer of evaluation.}
+
+\cpar{Note}{
+   This primitive is able to read
+   \iref{fileread}{inline files}, unlike \pr{finsert#1}.}
+   
+\cpar{Result text}{
+   The contents of file \v{file name} or the empty string if
+   file can not be opened.}
+
+\end{itemize}
+
+\sec1{pitfalls}{Pitfalls}
+\par{
+   This is a young section, with only few entries yet.}
+
+\begin{itemize}{{flow}{compact}{align}{right}{interitem}{1}}
+\item
+\car{
+   [\pr{system#3}] Beware that the argument/option list (the second
+   argument of \mc{system#3}) is encoded
+   as a vararg. If you have a single argument, it is easy to
+   forget the enclosing curlies. In that case, zoem ignores the
+   argument altogether.}
+
+\par{
+   Zoem protects the data returned by \mc{system#3}. So you may
+   e.g. think (as I once did) that}
+
+\verbatim{\protect{\system{date}{{%e}{%B}{%Y}}}}
+
+\car{
+   Is a neat way to create a vararg, but you will end up with
+   something like}
+
+\verbatim{\protect{\{24\}\{April\}\{2004\}}}
+
+\item
+\car{
+   [Package authors] Beware of using \it{and} scope within \it{at} scope
+   within a \mc{write#3} invocation that uses the copy filter.}
+
+\verbatim{\protect{\write{file}{copy}{ foo \@{ zut \&{ bar }}}}}
+
+\car{
+   The \v{bar} part will not be evaluated as the copy filter does not apply the
+   filtering stage. If the stuff written is read back in from some other part
+   of the document, or from another document altogether, the \v{bar} part will
+   be evaluated in a different context than the one in which it was created.}
+
+\item
+\car{
+   \pr{throw#2} with argument \v{done} can be used to halt processing of the
+   current file. Refer to the \pr{throw#2} description for the associated
+   requirements.}
+
+\end{itemize}
+
+
+\sec1{glossary}{Glossary}
+
+\par{
+   For \bf{user keys}, \bf{dollar keys}, and \bf{dictionary stacks},
+   refer to the \capref{dictionary} section and the \capref{macro} section.
+   For \bf{data keys}, refer to the \secref{grape} section.}
+
+\par{
+   For \bf{key signatures} and \bf{key mention}, refer to the \capref{signature}
+   section.  For \bf{anonymous keys}: the \capref{anonymous} section.}
+
+\par{
+   \bf{Session variables} are described in the \capref{session} section.}
+
+\: funky looking macros such as \ssion{__searchpath__}
+\: that either affect zoem's runtime behaviour (as  \ssion{__searchpath__} does)
+\: or provide some information to the user
+\: (e.g. \ssion{__fnin__} and \ssion{__fnbase__}).
+
+\par{
+   For \bf{varargs}, arguments in which a variable number of sub-arguments
+   can be stored, and for \bf{blocks}: the \capref{vararg} section.}
+
+\par{
+   For \bf{plain scope}, \bf{device scope}, \bf{at scope}, and \bf{glyph
+   sequences}: The \capref{dichotomy} and \capref{dscope} sections.}
+
+\par{
+   For file read and  \bf{inline files}: the \capref{fileread} section.}
+
+\par{
+ Sometimes zoem \it{protects} or \it{unprotects} data. Refer to the
+ \capref{protection} section.}
+
+
+
+\"asd::add-toc-end"{End}
+}}
+
+
+\: mq
+\end{simpledocument2}
+
+\done
+
+

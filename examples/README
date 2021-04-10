@@ -1,0 +1,49 @@
+
+Each pair of files
+
+   name.azm name.ozm
+
+demonstrates one or more concepts from the zoem language.
+Basic processing for file 'name.azm'
+
+   zoem -i name
+
+results in the output file 'name.ozm'.  Some files need additional processing
+flags, these are indicated below and can be found in the Makefile as well.
+
+The file fib.azm demonstrates how to include input interactively,
+so there is no matching 'fib.ozm' file.
+
+The file stress.azm contains a large set of error tests from which zoem must be
+able to recover fully - it should in general recover from almost any
+conceivable error. In stress.azm this is done via \catch{error}{.. erroneous
+stuf ..}. In interactive mode, zoem will recover from errors without any help.
+Zoem can enter interactive mode upon errors in regular file processing
+via the -x option.
+
+
+
+DESCRIPTION
+------------------------------------------------------------------------------
+catch.azm                  nested while{1}{...} stopped by throwing exception.
+fib.azm                      prompting and inclusion via STDIN, while{} stuff.
+loop.azm                                             nested apply invocations.
+meta.azm                                zoem 'closure' mechanism of some sort.
+nest.azm                  anon/nesting/delay arithmetic, not very instructive.
+power-of-2.azm                       computing 2*k by recursion and file size.
+reverse.azm                           how to revert (nested!) lists with zoem.
+scope.azm                          basic illustration of push/pop name scopes.
+special.azm                      silly illustration of filtering capabilities.
+stress.azm                                        extensive stress test suite.
+tr.azm                           some translate options, not very interesting.
+txt-table.azm                                        text formatting examples. 
+xml.azm                                          *ML syntactic sugar examples.
+
+
+ADDITIONAL OPTIONS NEEDED
+------------------------------------------------------------------------------
+stress.azm        --err-out -o - --allow=date:#:ls
+power-of-2.azm    --allow=ls [-s level=<int>]
+xml.azm           -tl 3
+fib.azm           -o -
+

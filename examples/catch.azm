@@ -1,0 +1,39 @@
+
+\: zoem -i catch -tl 3
+\: (to see nested while structure back in output)
+
+\catch{towel}{
+   \apply{_#1\!{{\if{\cmp{eq}{\1}{d}}{Skipping the rest!\@{\N}\throw{towel}foo}{\1}\@{\N}}}}{
+      {a}{b}{c}{d}{e}{f}
+   }
+}
+At the bottom 1
+\@{\P}
+
+\catch{towel}{
+   \set{i}{0}
+   \while{1}{
+      * i = \i
+      BEFORE throw 1
+      \@{\I}
+      \if{\eqt{eq}{\i}{2}}{\throw{towel}}{}
+      \setx{i}{\let{\i+1}}
+      \catch{towel}{
+         \set{j}{0}
+         \while{1}{
+            before throw 2
+            \if{\eqt{eq}{\j}{3}}{\throw{towel}}{}
+            \setx{j}{\let{\j+1}}
+            i = \i and j = \j\@{\N}
+            end of body 2
+         }
+      }
+      \: \if{\cmp{ne}{\__zoemstat__}{error}}{\__zoemput__}{}
+      \@{\J}
+      END of body 1
+   }
+}
+\@{\J}
+\: \if{\cmp{ne}{\__zoemstat__}{error}}{ \__zoemput__ }{}
+At the bottom again
+

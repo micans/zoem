@@ -1,0 +1,484 @@
+
+\:    This file checks whether various kinds of errors escalate correctly.
+
+\:    It also checks for every primitive whether errors are pushed correctly
+\:    so that catch can catch them. If a primitive has different error
+\:    paths, all of them should be represented here.
+
+\:    Process this file with
+\:    zoem -i stress --system-honor --unsafe-silent --err-out -o - > stress.ozm .
+
+\:    With valgrind, it should be memory and error clean.
+
+
+\:    One should try to find cases where primitives (should) accept some kind
+\:    of sublanguage, and test them with misfits.
+\:    \begin{label}{{!}{a}} is/was a good example.
+
+
+\if{\defined{key}{get_it_on}}{}{
+   \write{-}{device}{Process this file with
+../src/zoem -i stress --system-honor --unsafe-silent --err-out -s get_it_on=1 -o - > stress.ozm\@{\N}
+}
+   \done
+}
+
+\set{defs}{\!{
+   \set{recurse_segment}{\recurse_segment}
+   \set{recurse_stack}{\eval{\recurse_stack}}
+   \set{overflow_user}{\push{user}\overflow_user}
+   \set{underflow_user}{\pop{user}\underflow_user}
+   \set{foo}{foo_start\@{ foo_at }foo_end}
+   \set{__device__}{stress}
+   \set{one}{1}
+   \set{zero}{0}
+   \set{abc}{abc}
+   \set{def}{def}
+   \set{ct}{0}
+   \env{myenv}{myenv_start}{myenv_end}
+   \env{myenv2}{myenv2_start}{myenv2_end}
+   \begin{myenv}
+   \begin{myenv2}
+}}
+\write{\__fnout__}{device}{DEFINITIONS USED:\apply{protect#1}{{\defs}}}
+\eval{\defs}
+\@{\P}
+
+\apply{_#2{
+   \!write{-}{device}{||| \1:\@{\N}}
+   \!write{-}{device}{||| \!protect{\2}\@{\N}}
+   \!catch{error}{\!abc[\2]\!def}\@{\P}
+   \!setx{ct}{\!let{\!ct+1}}
+}}{
+ \!{
+      {undef in plain scope}
+      {\nsk}
+
+      {undef in at scope}
+      {\@{\nsk}}
+
+      {undef at deeper level}
+      {\eval{\textmap{{word}{ucase}{number}{roman}}{\nsk}}}
+
+      {undef in and scope}       \: error at output time
+      {\write{\__fnout__}{device}{\@{\&{\nsk}}}}
+
+      {recurse segment}
+      {\recurse_segment}
+
+      {recurse stack}
+      {\recurse_stack}
+
+      {overflow user dictionary stack}
+      {\overflow_user}
+
+      {underflow user dictionary stack (requires nuser>nsegment)}
+      {\underflow_user}
+
+      {inserting spurious left curly}
+      {\eval{\!""\__lc__}}
+
+      {and scope in plain scope}
+      {\&{\foo}}
+
+      {at scope in and scope}
+      {\@{\&{\foo}}}
+
+      {incorrect anonymous key}
+      {\_#1{\1}{bar}{foo}}
+
+      {and scope in plain scope}
+      {\&{\foo}}
+
+      {incorrect anonymous key}
+      {\_#1{\1}{bar}{foo}}
+
+
+\: xml sugar
+\: syntactig sugar happens at output time, not digest time.
+\: catch cannot catch this, write can.
+
+      {some broken XML syntactic sugar}
+      {\write{\__fnout__}{device}{\<foo>\<bar>\</bar>\</zut>}}
+
+      {\@{\C}XML syntactic sugar underflow}
+      {\write{\__fnout__}{device}{\<foo>\<bar>\<>\<>\<>}}
+
+      {XML content syntax error}
+      {\<foo>{\nsk}}
+
+\: \$#2
+
+      {error in $#2}
+      {\${stress}{\nsk}}
+
+\: \%#1
+\: grape keys
+\: !absence is not (yet) an error
+
+      {absent grape node, fetched}
+      {\%{nsg}}
+
+      {absent grape node, freed}
+      {\%free{nsg}}
+
+      {absent grape node, dumped}
+      {\%dump{nsg}}
+
+\: \apply#2
+
+      {no such key}
+      {\apply{nsk#2}{{a}{b}}}
+
+      {wrong anonymous key}
+      {\apply{_#a{\1}}{{a}{b}}}
+
+      {trailing arguments}
+      {\apply{_#2{[\1\2]}}{{a}}}
+
+      {argument does not parse}
+      {\apply{_#2{[\1\2]}}{{a}{b}{c}{\nsk}}}
+
+\: \begin#2
+
+      {label does not exist}
+      {\begin{nsl}}
+
+      {argument does not parse}
+      {\begin{myenv}{{\nsk}{\nsk}}}
+
+\: \branch#1
+
+      {parse error}
+      {\branch{{\let{0<}}{}}}
+
+\: \catch#2
+
+      {uncaught catch}
+      {\catch{towel}{\nsk}}
+
+      {uncaught (delayed) error}
+      {\catch{error}{\!{\nsk}}}
+
+      {catch towel at 6}
+      {  \set{foo}{0}
+         \catch{towel}{\while{\let{\foo<10}}{
+               foo \foo bar\@{\N}
+               \if{\let{\foo==6}}{\throw{towel}}{}
+               \setx{foo}{\let{\foo+1}}
+            }
+         }
+      }
+
+
+\: \cmp#3
+
+      {argument does not parse}
+      {\cmp{eq}{\nsk}{foo}}
+
+      {no such mode}
+      {\cmp{__}{bar}{foo}}
+
+\: \constant#1
+
+      {parse error (not fatal, trailing element)}
+      {\constant{{(c)} boo {}}}
+
+\: \def#2
+
+      {wrong key signature}
+      {\def{^zut}{foo}}
+
+\: \defined#2
+
+      {wrong mode}
+      {\defined{__}{__}}
+
+\: \defx#2
+
+      {wrong key signature}
+      {\defx{^zut}{foo}}
+
+      {parse error}
+      {\defx{zut}{\nsk}}
+
+\: \dofile#2
+
+      {no such file}
+      {\dofile{no-such-file}{!+}}
+
+\: \dowhile#2
+
+      {parse error}
+      {\dowhile{\nsk}{1}}
+
+      {parse error}
+      {\dowhile{1}{\nsk}}
+
+\: \end#1
+
+      {no such env}
+      {\end{nse}}
+
+      {cannot close myenv}
+      {\end{myenv}}
+
+      {can close myenv2}
+      {\end{myenv2}}
+
+\: \env#3
+
+      {cannot define env while in environment}
+      {\env{myenv3}{foo}{bar}}
+
+\: \eqt#3
+
+      {argument does not parse}
+      {\eqt{eq}{\nsk}{1}}
+
+      {no such mode}
+      {\eqt{__}{1}{1}}
+
+      {argument not numeric I}
+      {\eqt{eq}{aap}{\one}}
+
+      {argument not numeric II}
+      {\eqt{eq}{aap}{\zero}}
+
+\: \eval#1
+
+      {parse error}
+      {\eval{\nsk}}
+
+\: \f#2
+
+      {no such mode}
+      {\f{nsm}{2.5}}
+
+      {overflow I ?}
+      {\f{sign}{111111111111111111111111111111}}
+
+      {overflow II ?}
+      {\f{sign}{3e100000}}
+
+      {parse error}
+      {\f{sign}{\nsk}}
+
+\: \finsert#1
+
+      {parse error}
+      {\finsert{\nsk}}
+
+\: \format#1            \: todo: more format torturing.
+
+
+\: \formatted#2         \: hum, not very exciting.
+
+
+\: \fv#2
+
+      {no such mode}
+      {\fv{nsm}{{1}{2}{3}}}
+
+      {parse error}
+      {\fv{sum}{{\zero}{\one}{\nsk}}}
+
+      {this should work}
+      {\fv{max}{{\zero}{\one}{2}}}
+
+
+\: \if#3
+
+      {parse error condition}
+      {\if{\nsk}{}{}}
+
+      {parse error if}
+      {\if{1}{\nsk}{}}
+
+      {parse error else}
+      {\if{0}{}{\nsk}}
+
+
+\: \inspect#4           \: leave this until after inspect#4 rewrite.
+
+\: \f#3
+
+      {arithmetic exception in f}
+      {\f{div}{1}{0}}
+
+
+\: let
+
+      {syntax error in let}
+      {\let{1+}}
+
+      {another syntax error in let}
+      {\let{1+sin(1,)}}
+
+      {callback error in let}
+      {\let{\nsk}}
+
+      {nested callback error in let}
+      {\let{\let{\nsk}}}
+
+      {arithmetic exception in let}
+      {\let{1/0}}
+
+      {overflow in let}
+      {\let{300**300}}
+
+      {complicated and correct let expression, including redundant callbacks}
+      {\let{\let{sin(\let{\one})}**2+\let{cos(\let{\one})}**2}}
+
+      {complicated and failing let expression}
+      {\let{\let{sin(\let{\one})}**2+\let{cos(\let{1/0})}**2}}
+
+\: \length#1
+
+      {parse error}
+      {\length{\nsk}}
+
+\: \pop#1               \: under/overflow tested elsewhere.
+
+      {no such dictionary stack}
+      {\pop{nsds}}
+
+\: \protect#1           \: what could be problematic here ?
+
+
+\: \push#1
+
+      {no such dictionary stack}
+      {\push{nsds}}
+
+\: \roman#1
+
+      {parse error}
+      {\roman{\nsk}}
+
+      {convert error}
+      {\roman{abc}}
+
+\: \set#2
+
+\: \setx#2
+
+\: system
+
+      {absent system call}
+      {\system{#}}
+
+      {failing system call}
+      {\system{ls}{{-#}}}
+
+      {finally a systemcall that should succeed}
+      {\system{true}}
+
+
+      {should close myenv}
+      {\end{myenv}}
+
+\: \special#1        \: it'll mostly work.
+
+\: \switch#2
+
+      {parse error in pivot}
+      {\switch{\nsk}{{}{}}}
+
+      {parse error in clause}
+      {\switch{foo}{{\nsk}{A}{b}{B}}}
+
+      {parse error in case}
+      {\switch{foo}{{foo}{\nsk}{b}{B}}}
+
+\: \table#5          \: not motivated; it is a sitting duck anyway.
+
+\: \tr#2
+
+      {this should work}
+      {\tr{{from}{a-z}{to}{A-Z}{squash}{A-Z}}{squash the bookkeeper}}
+
+\: \trace#1
+
+      {parse error}
+      {\trace{\nsk}}
+
+
+\: \try#1            \: todotodo
+
+
+\: \ucase#1
+
+      {parse error}
+      {\textmap{{word}{ucase}}{\nsk}}
+
+\: \undef#1
+
+      {wrong signature}
+      {\undef{!}}
+
+\: \vanish#1
+
+      {parse error}
+      {\vanish{\nsk}}
+
+\: \while#2
+
+      {parse error condition}
+      {\while{\nsk}{}}
+
+      {parse error body}
+      {\while{1}{\nsk}}
+
+\: \write#3
+
+      {open error}
+      {\write{/no/such/file}{copy}{foo}}
+
+      {no such filter}
+      {\write{/dev/null}{nsf}{foo}}
+
+      {parse error}
+      {\write{/dev/null}{copy}{\nsk}}
+
+      {throw}
+      {\write{/dev/null}{copy}{\throw{towel}}}
+
+\: \writeto#1
+
+      \: {open error}
+      \: {\writeto{/no/such/file}}
+      \:
+      \: this is in fact fatal, currently. too much stress.
+
+\: \zinsert#1
+
+      {inline file should work}
+      {\zinsert{monkey}}
+
+      {parse error}
+      {\zinsert{\nsk}}
+
+      {inline file with parse error}
+      {\eval{\zinsert{fox}}}
+
+\: delay scope
+      
+       {delay parse error}
+       {\write{\__fnout__}{device}{\!{\nsk}}}
+
+      \:
+      \: if not wrapped in write it is only seen by output,
+      \: not by digest, so uncatchable.
+   }
+}
+
+Done with \ct error tests.
+
+\={monkey}=
+\zero \one monkey see monkey do
+\==
+
+\={fox}=
+\zero \one \nsk
+\==

@@ -1,0 +1,133 @@
+
+An attempt at distilling some mainlines from TODO.
+
+-  better structuring and sectioning of source code.
+   parse/segment/digest include most of each other,
+   due e.g. to seg_check_ok and yamFormatted1.
+
+-  Env well-formedness should pbb best be checked at output time,
+   not during processing time. It should be possible (?) to make
+   contrived examples failing during processing time, producing
+   correct output nevertheless.
+
+-  A design for allowing overwriting primitives?
+   A design for setting keys in the bottom dictionary (defg, defgx, setg, setgx)
+   An extenstion design where zoem primitives are lexically recognizable.
+   Hum.
+      g  global
+      x  expand
+      c  conditional (only if not defined)
+
+-  implement append modes \writeto{a}{name}, \write{a}{name}{filter}{stuff}.
+   For writeto also make commandline switch that makes \writeto{name}
+   append by default.
+
+-  better hashing of file pointers (right now by name,
+   so foo and ./foo are different).
+
+-  remove 9-arg limitation.
+
+-  better special/level design.
+
+-  the implementation of f#2 f#3 and fv#2 is very straightforward
+   from a numerical point of view.
+
+-  (ever) better separate character munging code.
+   clearer grip on device whitespace munging and special rules
+   for the extreme corner cases.
+
+-  fix long routines.
+
+-  reconsider tracing implementation.
+
+-  who gets to err and why (given all the unwinding)?
+
+
+
+further qualify stacks + dictionaries with associated sink?
+or, perhaps,
+
+\get{itemize}{foo}
+   will search across all stacks irrespective of sink.
+
+zum.azm:
+   boot  wt    new
+   1     0     1
+   0     0     1
+   0     0     0  
+   0     0     1
+
+zoem.azm
+   boot  wt    new
+   1     0     1
+   0     0     1
+   0     1     1
+
+
+  [][][][]|    |
+          |____|
+            ^
+            ^
+  [][][][]|    | ----------------- .....
+          |____|                                         
+            ^                                  [][][][]|    |
+            ^                                          |____|
+  [][][][]|    | ----------------- .....                 ^
+          |____|                                         ^
+            ^                                            sink_default 
+            ^                                            writeto
+            busystack
+               push
+               pop
+
+               getDLRtop
+
+
+dollarstack tied to output.
+default dollarstack: changed by writeto.
+
+
+aephea:
+   \writeto{-}
+      \begin{presentation}
+   \writeto{1.html}
+      \begin{slide}
+           \get{$presentation}{foo}
+           \write{index.htmL}{device}{.... ??\get{$presentation}{foo}?? ...}
+      \end{slide}
+
+
+write3
+      yamOutputNew(fname->str))
+      yamKeyDef("__fnwrite__", fname->str)
+      yamOutput(yamtxt, xfout->usr, fltidx)
+         sinkPush(sk, fltidx)
+         sinkPop(sk)
+
+
+
+
+
+writeto
+   yamOutputClose
+   yamOutputNew
+      if (!xf->usr)
+      xf->usr = sinkNew
+      else
+      filterSetFP
+   sinkPush
+   ## changed sinkPush: does this fix it?
+
+write
+
+-  in zpresent \writeto{} makes env {presentation} inaccessible.
+   1) is there a global dollar stack? (yes, sinkGetDLRdefault)
+   2) why is env presentation not tied to it?
+      a) is there a way to tie it?
+      b) if no, make it.
+         -> way to specify that dictionary should be tied to DLRdefault.
+         -> OR \writeto should act the same as \write
+         -> and optionally make that configurable.
+
+
+

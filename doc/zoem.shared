@@ -1,0 +1,68 @@
+
+\def{zarg#1}{\v{<\1>}}
+
+\set{{modes}{xv}}{}{
+
+   {"man::year"}  {\'zinsert{stamp.year}}
+   {"man::month"} {\'zinsert{stamp.month}}
+   {"man::day"}   {\'zinsert{stamp.day}}
+   {"zum::stamp"} {\'zinsert{stamp.stamp}}
+
+   {"man::year"}  {\'tr{{delete}{[:space:]}}{\"man::year"}}
+   {"man::month"} {\'tr{{delete}{[:space:]}}{\"man::month"}}
+   {"man::day"}   {\'tr{{delete}{[:space:]}}{\"man::day"}}
+   {"zum::stamp"} {\'tr{{delete}{[:space:]}}{\"zum::stamp"}}
+
+   {"man::tag"}   {\"zum::stamp"}
+}
+
+\setx{man_share}{
+   {year}    {\"man::year"}
+   {month}   {\"man::month"}
+   {day}     {\"man::day"}
+   {tag}     {\"zum::stamp"}
+   {stamp}   {\"zum::stamp"}
+}
+
+\'def{mc#1}{\v{\\\1}}
+\'def{sibref7#1}{\sibref{\1}{\1\'${roff}{(7)}}}
+
+\set{css}{\<abbr class="ucase" title="Cascading Style Sheets">{CSS}}
+\set{xsl}{\<abbr class="ucase" title="Extensible Stylesheet Language">{XSL}}
+\set{xml}{\<abbr class="ucase" title="Extensible Markup Language">{XML}}
+\set{html}{\<abbr class="ucase" title="Hyper Text Markup Language">{HTML}}
+\set{sgml}{\<abbr class="ucase" title="Standard Generalized Markup Language">{SGML}}
+\set{ahtml}{\<abbr class="ucase" title="Aephea Hyper Text Markup Language">{A-HTML}}
+\set{utf8}{\<abbr class="ucase" title="8-Bit Unicode Transformation Format">{UTF-8}}
+\def{faq}{\<abbr class="ucase" title="Frequently Asked Questions">{FAQ}}
+\def{zum}{\<abbr class="ucase" title="Zoem User's Manual">{ZUM}}
+\def{pdf}{\<abbr class="ucase" title="Portable Document Format">{PDF}}
+\def{mcl}{\<abbr class="ucase" title="Markov CLuster">{MCL}}
+\def{dtd}{\<abbr class="ucase" title="Document Type Definition">{DTD}}
+\def{ascii}{\<abbr class="ucase" title="American Standard Code for Information Interchange">{ASCII}}
+\def{ansi}{\<abbr class="ucase" title="American National Standards Institute">{ANSI}}
+
+\def{pud}{\<acronym class="ucase" title="Portable Unix Documentation">{PUD}}
+\def{posix}{\<acronym class="ucase" title="Portable Operating System Interface [for Unix]">{POSIX}}
+\def{gnu}{\<acronym class="ucase" title="GNU's Not Unix">{GNU}}
+
+\def{readme}{\sc{README}}
+\def{unix}{\sc{UNIX}}
+\def{stdout}{\sc{STDOUT}}
+\def{stdin}{\sc{STDIN}}
+\def{stderr}{\sc{STDERR}}
+\def{tilde}{\sc{TILDE}}
+\def{io}{\sc{I/O}}
+
+\def{itemize_set3_modifiers}{
+\begin{itemize}{{flow}{compact}}
+\item{a} \car{append to the key, do not overwrite, create if not existing.}
+\item{c} \car{conditionally; only set if not already defined.}
+\item{e} \car{existing; update existing key, possibly in lower dictionary.}
+\item{g} \car{global; set in the global (bottom) user dictionary.}
+\item{u} \car{unary; do not interpret vararg in \zarg{any} as key-value list (data keys only)}
+\item{v} \car{vararg; interpret vararg in \zarg{any} as key-value list (regular keys only).}
+\item{w} \car{warn if key exists (like \mc{def#2} and \mc{defx#2}).}
+\item{x} \car{expand argument (like \mc{setx#2} and \mc{defx#2}).}
+\end{itemize}}
+

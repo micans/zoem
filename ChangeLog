@@ -1,0 +1,1303 @@
+
+
+Wed, Jun 15 2011
+
+   *  zoem-11-166 released.
+
+   *  The default search path was changed. The obsolete PREFIX/zoem/mac
+      component was dropped, and PREFIX/aephea was added.  Now, if zoem and
+      aephea are both configured with the same prefix for installation (e.g.
+      --prefix=/usr/local or --prefix=$HOME/local), then aephea include files
+      will be found automatically by zoem.
+
+   *  set#3 can now splice into a variable (that is, the string
+      refered to by a macro). This is achieved by pairing the respective
+      keys {start} and {width} with appropriate values in the first
+      argument to set#3. The start position is relative to an offst
+      of zero, so
+
+      \set{foo}{kaboom}
+      \set{{start}{2}{width}{3}}{foo}{za}
+      '\foo'
+
+      yields 'kazam'.
+
+   *  The example zoem solution 8q2.azm to the N queens problem
+      has been updated. It now pretty-prints asciific chess boards using the
+      new splice mode to set#3.
+
+   *  Small documentation fixes.
+
+
+Wed, Sep 22 2010
+
+   *  zoem-10-265 released.
+
+   *  In interactive mode zoem now utilise readline editing and history
+      capababilities if available. This can be disabled completely at compile
+      time or optionally at run time.
+
+   *  A new builtin macro seq#4 can be used as a simple type of
+      for loop.
+
+         \seq{i}{a}{b}{ ... }
+
+      is equivalent to the pseudo code
+
+         for (i=a;i<b;i++) {
+            ...
+         }
+
+      Internally, its definition is
+
+         \set{\1}{\2}
+         \while{\let{\get{''}{\1}<\3}}{
+            \4
+            \setx{\1}{\let{\get{''}{\1}+1}}
+         }
+
+   *  Environments that are not closed at end of processing are now reported in
+      a diagnostic message.
+
+
+Fri, Jan 8 2010
+
+   *  zoem-10-008 released.
+
+   *  The HTML document framework has been wrapped up and split off under the
+      name Aephea, Adaptable Exo-skeleton for Practical HTML Extension and
+      Abstraction. PUD (Portable  UNIX Documentation) is now shipped with
+      Aephea.  PUD provides limited support for two mini languages (manuals and
+      FAQs) for two output devices, troff and HTML. Aephea provides more
+      elaborate support for a single output device, HTML.
+
+      The zoem package from now on provides only resources and documentation
+      for the macro/programming language zoem itself.
+
+   *  This release mostly provides improved and streamlined support
+      for using zoem as a convenient and powerful layer on top of HTML,
+      providing full extension and abstraction capabilities.
+
+   *  New device scope syntax was introduced specifically targeted
+      at HTML: \@e{ent} will expand to the character entity &ent; --
+      it is equivalent to and minimally shorter than \@{&ent;} .
+
+   *  Trailing whitespace is removed from the output captured
+      by \system#3 invocations. This may be made optional in the future.
+
+   *  Set macros can now be targeted at named dictionaries within the
+      dictionary stacks (of which there are two, the stack associated with
+      \begin{} - \end{} environments, and the default user stack). A new get#2
+      primitive allows getting from named dictionaries.
+
+      User stack
+      Getting: \get{foo}{tim}                   (looks only in foo dictionaries)
+      Setting: \set{{dict}{foo}}{tim}{zut}      (sets in topmost foo dictionary)
+
+      Env stack
+      Getting: \get{foo}{$tim}                  (looks only in foo dictionaries)
+      Setting: \set{{dict}{foo}}{$tim}{zut}     (sets in topmost foo dictionary)
+
+      The stack type to query is inferred from the key signature.  No mechanism
+      is yet provided to get and use, in this manner, keys that take arguments,
+      although it can be achieved using apply#2.
+
+   *  The f#2 (mathematical functions) primitive has new modes (first argument
+      to f#2) irand and drand for generating respectively integer and double
+      random numbers within the range specified in the second argument to f#2.
+
+   *  An update mode for setting keys has been added to set#3, where a key is
+      required to be already present. The dictionary stack will be traversed
+      downwards until a key is found. This can be used to update keys in a
+      first environment from within a second environment. Aliases update#2 and
+      updatex#2 are provided.
+
+   *  When the html device is set using the command line option -d html,
+      zoem automatically sets up mapping tables so that the HTML special
+      characters are converted where necessary.
+
+   *  New syntax for HTML/XML tags that do not have an associated close tag,
+      such as <meta>, <link>, and <hr>. This is now specified in zoem
+      as for example \<*meta>.  The previously accepted syntax \<meta!> is now
+      deprecated. The new syntax is more reasonable and makes it easier
+      to recognize such special tags.
+
+   *  Zoem recognizes special classes of HTML/XML tags that do not have an associated
+      close tag. For now these are tags that start with '!' or '?'.
+      Previously accepted syntax such as \<!-- comment --!> is deprecated
+      and is now simply written \<!-- comment -->.
+
+   *  The read routines now ignore nul bytes in files, improving zoem's
+      robustness. It no longer yields unpredictable results on files with
+      embedded nul bytes.
+
+Fri, Sep 5 2008
+
+   *  zoem-08-248 released.
+
+   *  A bug manifested itself on powerpc + linux in the form of a crash,
+      resulting from using vsnprintf repeatedly without sufficient
+      corresponding va_start and va_end invocations. On some other platforms
+      this bug would manifest itself as a mysterious zoem syntax error due to
+      heap corruption. Fixed. Thanks to Philipp Benner, Tobias Quathamer, and
+      Joost van Baal for bug reports.
+
+   *  Two modes for the defined#2 primitive have been renamed.
+      "prim" has become "primitive" and "alias" has become "builtin",
+      in line with zoem nomenclature and documentation. This change
+      is backwards incompatible, but unlikely to affect anyone.
+
+   *  Option -ndollar was not working. fixed.
+
+Thu, Nov 29 2007
+
+   *  zoem-07-333 released.
+
+   *  SYNOPSIS
+      A bug in set#3 was removed, and two directives were added, namely batch
+      definitions and a more legible way of appending to keys (see below).
+
+      Keys local to environments (aka dollar keys) can now be defined using
+      the same signature as when invoked, e.g. \begin{env}{{$k1}{v1}{$k2}{v2}}.
+
+      This release also continues the focus on retiring what little special
+      case syntax still exists.  The format#2 specification syntax has been
+      reworked (in an incompatible way) into a standard and extensible
+      key-value syntax (see below). The format#2 implementation was redone and
+      several new format#2 directives were added.
+
+      xml/html syntactic sugar now stops introducing whitespace formatting
+      when so instructed with the at directive \@{\w}.
+
+   *  Fixed bug in set#3 where usage of the {if} or {unless} directive
+      corrupts state when combined with the {modes}{x} directive.
+
+   *  xml syntactic sugar cubes now obey the device scope \w directive.
+      This means that xml elements, in the scope of an at directive
+      \@{\w} no longer introduce white-space. This only affects the
+      formatting of the XML/HTML code itself.
+      This is for example useful when creating <pre> elements.
+
+   *  The set#3 {modes} directive now accepts a v (for vararg mode)
+      where a batch of key-value pairs can be defined within a single set#3
+      invocation. This may improve the readability of resource files
+      containing many definitions. Example:
+
+         \set{{modes}{vw}}{}{
+            {is_last}   {0}
+            {ctrprev}   {0}
+            {ctrnow}    {1}
+         }
+
+   *  Introduced append mode in set#3:
+         \set{foo}{bar}
+         \set{{modes}{a}}{foo}{bar}
+      sets foo to barbar.
+
+      append#2 is an alias for \set{{modes}{a}}{\1}{\2}
+      appendx#2 is an alias for \set{{modes}{ax}}{\1}{\2}
+
+      Hence append#2 appends to keys without expanding and appendx#2 appends
+      to keys after expanding the to be appended text.
+      Keys that are not defined when appended to will first be instantiated
+      with an empty string.
+
+   *  Keys local to environments (started by \begin#2) can now
+      be defined using the same signature as used when invoking them, i.e.
+      \begin{env}{{$foo}{bar}} as well as \begin{env}{{foo}{bar}}.
+
+   *  Some bugs were found and removed in the format#2 implementation.
+
+   *  format#2 has acquired a reuse mode where a format specification
+      can be be reused a number of times or exhaust all arguments (see below).
+      It has also acquired the 'border' directive for adding constant strings
+      to the left and right of the formatted units.
+
+   *  The tr#2 specification language is now also described in zoem(1), the manual
+      page of the interpreter. The idea is that all - as few as possible -
+      special purpose sub-languages will be described in there for ease of
+      reference.
+
+   *  The unwieldy format#2 specification language has been redefined to
+      follow standard zoem syntax using keys and vararg value lists.  It is
+      more verbose, but also more robust, compatibly extensible, powerful, and
+      more easily understandable. As an example one now writes
+
+      \format{
+         %{{padding}{-=-_}
+           {delimit}{ }
+           {align}{left}
+           {length}{length}
+           {double}{{{arg}{foo}}}
+           {width}{40}
+          }%{
+            {align}{right}
+            {width}{40}
+          }
+      }{
+         {arg1}{arg2}
+      }
+
+      rather than
+
+      \format{%~{-=-_}{ }<40*{length}{foo}.%>40.}{
+         {arg1}{arg2}
+      }
+
+      Formerly a format specifier was enclosed inbetween '%' and '.' . It
+      interpreted special characters '<', '>', and '=', as well as the special
+      characters '@', '*', '~' each of which had to be followed by two blocks.
+      The same syntax is now obtained by a more customary key-value structure
+      encoded as a zoem vararg.
+
+      format#2 accepts new directives {border}{{left}{right}},
+      {delimit}{{left}{right}}, {double}{{[{key}{value}]*}}, and
+      {reuse}{<num>|*}.
+
+      {delimit} parameters decorate the formatted argument on the sides, and
+      participate in the computations involving width, alignment and padding.
+      There is no padding inbetween delimiters and the argument to be
+      formatted.
+
+      {border} parameters decorate the entire formatted product and do not
+      participate in aforementioned computations. Padding is computed and
+      produced before the borders are added.
+
+      {double} can be used have the length computations performed on
+      fake parameters. This can be useful when certain formatting
+      elements need to be present in the true parameters.
+
+      {reuse}{<num>} will reuse the current specification <num> times,
+      {reuse}{*} will reuse it until all arguments are exhausted. Thus
+
+      \format{%{{align}{right}{width}{10}{reuse}{*}{padding}{{'}{}}}}{
+         {beauty}{lies}{in}{the}{eye}{of}{the}{beholder}
+      }
+      \textmap{{repeat}{8}}{1234567890}
+
+      results in
+
+''''beauty''''''lies''''''''in'''''''the'''''''eye''''''''of'''''''the''beholder
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+
+Fri, Nov 9 2007
+
+   *  zoem-07-313 released.
+
+   *  \set{''foo}{bar} now works. It sets a key in the bottom (global)
+      user dictionary. Same semantics as \set{{modes}{g}}{foo}{bar}.
+
+   *  \undef#1 now checks whether its argument is a valid key signature.
+
+   *  \undef{''foo} now works.
+
+   *  Streamlined the error-processing part of the code.
+
+   *  Added \textmap{{repeat}{<num>}}{<string>} mode. This results in <string>
+      <num> times repeated. <num> is evaluated before use.
+
+   *  The special magic comment sequences
+         \:/   delete rest of line including newline
+         \:!   replace by '\' (for quoting zoem comments)
+
+      are now deprecated (but still supported). Preferably use
+         \:{/}
+         \:{!}
+
+      instead. This syntax is both more robust and more extensible.  This
+      change is similar to previous changes introducing \`{}, \={} and \*{}.
+
+Wed, Jul 25 2007
+
+   *  zoem-07-205 released.
+
+   *  Zoem is now licensed under the GNU General Public License version 3
+      (or later).
+
+   *  Added \set#3 that provides all the modalities of set#2, setx#2,
+      def#2, defx#2 (namely optional warning, expansion), as well as
+      additional modalities. It is possible to define a key conditionally (if
+      not set already), and a key can be explicitly set in the global (bottom)
+      user dictionary.
+
+   *  \''foo will look up foo in the bottom user dictionary, allowing
+      this dictionary to function as a global namespace.
+
+   *  Success status, as written in the session macro \__zoemstat__ by try#1
+      and catch#2 is now associated with the string "done" rather than "ok".
+      The status "done" can now be explicitly thrown with \throw{done}{}.  In
+      this case the unprocessed part of the current interpretation stack is
+      discarded, but no error is generated.
+
+      When not captured by try#1 or catch#2, \throw{done}{} can be captured by
+      eval#1 and while#2.  If neither of these four primitives catches the
+      throw, it is captured at the file processing level and results in
+      end-of-processing for the current file. This is fully equivalent
+      with what used to be the primitive \done. This primitive has now
+      been implemented as the alias \throw{done}{}.
+
+   *  The primitive \done is now implemented as \throw{done}{}.
+
+   *  Introduced \`{..} syntax, equivalent with \`..` syntax. These are only
+      available within the \formatted#1 primitive (where .. is a placeholder
+      for valid formatted#1 directives).  This change is similar to previous
+      changes introducing \={} and \*{}. The old \`..` syntax is deprecated
+      and if it is used error messages are issued. The rationale for these
+      changes is that the new syntax is more pleasant on the eye and will be
+      extendible if needed.
+
+   *  Added \ifdef#3 and \ifdef#4 aliases. This is the ifdef#3
+      definition:
+
+      \set{ifdef#3}{\if{\defined{\1}{\2}{\3}}}
+
+   *  \defined{mode}{} now accepts modes 'zoem', 'prim', 'alias'.
+      mode zoem accepts the combined classes of prim(itives) and
+      alias.
+
+   *  The command line option -s accepts 'key' as well as 'key=val'
+      syntax. In the former case the value of key will be set to '1'.
+
+   *  Added two solutions to the N-queen problem in the examples directory.
+
+Wed, Dec 13 2006
+
+   *  zoem-06-347 released.
+
+   *  Fixed display bug in PUD -- the { itemize, long-item, html, safari }
+      combination where long-item would be split over lines.
+
+   *  Clean-ups and modifications in underlying util library (mostly
+      hash-related).
+
+Wed, Aug 23 2006
+
+   *  zoem-06-234 released.
+
+   *  Added beta key \__env__#1 to retrieve environment variable settings.
+      \defined#2 tests for existence of a name in the environment with
+      the ENV type.
+
+   *  Added caveat in zoem(1) and Zoem User Manual documentation;
+      \done will stop processing the current file only if it was read in its
+      entirety, i.e. if the chunk size is sufficiently large. The default
+      chunk size (1Mb) should be more than sufficient for authoring
+      environments.
+
+   *  The session key \__fnup__ is set to the file that includes
+      the current file to aid in diagnostics.
+
+   *  The underlying utility library was overhauled - it's integer
+      type system was redone and a more rigorous design was put in place,
+      following common practices (size_t and ssize_t wise).
+
+Tue, Mar 22 2006
+
+   *  zoem-06-080 released.
+
+   *  A number of developments have settled with release. To sum up the most
+      noteworthy items (C, F and H stem from this release):
+
+         A) primitive namespace identification with \'
+         B) user keys can shadow primitives
+      +  C) user keys can inspect (vararg) argument structure with \nargs#1
+  ABC => D) improved facilities for backward compatability
+         E) PUD or portable UNIX documentation is now a separate entity
+      +  F) \__line__ now yields what it promises
+         G) many primitives recoded as user macros (counters and references)
+      +  H) \switch#2 can group branches
+         I) \register adds useful processing hook registration
+         J) \whilst#2 flushes output immediately
+
+   *  A long standing minor bug has been fixed. Comments up to and including
+      the newline can be stripped with the sequence \:/.
+      This used to corrupt the file line counter as seen in the session macro
+      \__line__ and in error messages. No more.
+
+   *  \switch#2 can collect several cases together using a vararg.
+      In the \nargs#1 example below one might use e.g.
+
+      \def{test#1}{
+         \switch{\nargs{\1}}{
+            {{-1}{-2}} { .. regular stuff .. }
+            {   .. apply stuff .. }
+         }
+      }
+
+      to do the same thing for both of the -1 and -2 cases.
+      Different devices can easily be lumped together using the idiom
+
+      \${ {{txt}{roff}}  { .. stuff A .. }
+          {html}          { .. stuff B .. }
+       }
+
+       In this case the txt and roff devices pass through the same
+       branch. \$#1 is a new alias introduced further below.
+
+   *  Added \nargs#1 primitive which counts the number of scopes in its
+      argument - WHICH IS NOT EVALUATED. This allows construction of user
+      macros that can overload one or more particular arguments, i.e.  behave
+      differently depending on the number of scopes in the argument.
+
+      A likely application is an argument that either specifies a simple
+      string (assuming default modes) or a vararg with strings and 
+      modes specified using a key-value vararg.
+      One usage is to extend a macro's functionality while retaining
+      backward compatibility.
+
+      \nargs{{abc}def}     : -2      \: neither fish nor fowl
+      \nargs{abc}          : -1      \: regular argument
+      \nargs{abc{def}}     : -1      \: regular argument too
+      \nargs{}             :  0      \: empty vararg (not empty regular arg)
+      \nargs{   }          :  0      \: empty vararg again
+      \nargs{{abc}}        :  1      \: vararg with 1 argument
+      \nargs{{abc}{def}}   :  2      \: vararg with 2 arguments
+      \nargs{   {abc}
+                {def}
+      }                    :  2      \: vararg with 2 arguments
+      etc.
+
+      User macros can now use a framework such as
+
+      \def{test#1}{
+         \switch{\nargs{\1}}{
+            {-2}{\inform{mixed feelings}\exit}
+            {-1}{ .. regular stuff .. }
+            {  \switch{\let{\nargs{\1}%2}}{
+                  {0}{\apply{_#2\!{{ .. stuff with \1 and \2 .. }}}{\1}}
+                  {\inform{vararg invocation requires paired arguments\exit}}
+               }
+            }
+         }
+      }
+
+      to branch on scope presence/absence. The purpose of the -2 return value
+      is to promote frameworks that spot errors early. Group -2 and -1
+      as {{-2}{-1}} within switch to make them pass through the same branch.
+
+   *  Added $#1 and $#3 aliases.
+      $#1 maps to \switch{\__device__}{\1}            \: switch
+      $#3 maps to \switch{\__device__}{{\1}{\2}{\3}}   \: ifelse
+
+   *  within write#3 invocations the key \__fnwrite__ is set to the
+      appropriate output file name. This allows easy branching on the file
+      being written to from macros accessed within the third argument. The key
+      is deleted after evaluation of the third argument has finished.  Nested
+      invocations will currently overwrite this key.
+
+   *  Spreading \foo over two lines as in
+      \fo\:/
+      o
+
+      (with the 'o' at the beginning of line) will be correctly parsed
+      regardless of chunk size.
+
+Wed, 22 Feb 2006
+
+   *  zoem-06-053 released.
+
+   *  inspect#4 was broken since the previous release; the parse
+      code responsible for firing of the callback macro had not
+      been updated properly. Fixed.
+
+   *  minor documentation improvements.
+
+   *  The TODO was shrunk to a more reasonable size and PUD
+      now has its own DOPUD.
+
+Wed, 15 Feb 2006
+
+   *  zoem-06-046 released.
+
+   *  Major clean-ups in both code and documentation. Facilitated
+      syntactic separation of primitives and user macros.
+
+   *  (minor) Backward incompatible change in the PUD macro package.
+
+      As a further clean-up of the reference framework (in which refload#2
+      and friends moved to ref.zmm), publanch#2 and publref#1 have now
+      moved to ref.zmm and have been renamed to reference#2 and refer#1
+      for better consistency.
+
+      ref.zmm is now documented in pud-ref(7).
+
+   *  pud-ref(7)
+      pud(7)
+
+      were added. The first describes the reference framework, which was
+      recently removed from the Zoem User Manual as it is no longer
+      implemented by primitives. The second is an introduction to and an
+      overview of Portable Unix Documentation.
+
+   *  The counter primitives \ctradd#2, \ctrset#2, \ctrput#1 and the builtins
+      \ctrinc#2 and \ctrdec#2 were recoded as user macros in the new macro
+      package ctr.zmm .
+
+   *  For primitives or builtins with standard alphabetic names
+      and the special primitive \$#2 and the special builtins
+      \"" and \""#1 the syntax
+
+         \'standard{arg1}..
+         \'${arg1}{arg2}
+         \'""
+         \'""{arg1}
+
+      is now accepted. Moreover, primitive definitions can be shadowed in
+      the user dictionary. Currently a warning is issued when this happens.
+
+      The prefered way of accessing primitives is now with the new syntax.
+      This makes existing zoem files compatible in case future zoem
+      primitives clash with user-defined keys.
+
+      It also makes works based on such files still extendible since the
+      new primitive can be unambiguously accessed by the new syntax.
+
+      Finally, with the new syntax zoem needs to do less hash table
+      lookups, making it again slightly faster. Said tiny speed increment
+      has been fully negated by the redefinition of counter primitives
+      as user macros however.
+
+   *  The number of builtin aliases has been cut back.
+
+   *  The idiosyncratic \> (close XML-type tag) syntax has been removed.
+      Use \<> or explicit \</foo> style syntax.
+
+   *  Cleanups and deduplication in the parsing code. Examples:
+         \apply{<>#2}{{foo}{bar}}
+         \apply{$#2}{{html}{yes}}
+      now do something. You probably will not need it.
+         \def{<>}{foo}
+      now chokes.
+
+   *  Documentation fixes and additions.
+
+Tue, 10 Jan 2005
+
+   *  zoem-06-010 released.
+
+   *  Assembled the man and FAQ macros under the Portable Unix
+      Documentation label.
+
+      -  the man_zmm(7) manual page was renamed to pud-man.
+      -  the faq_zmm(7) manual page was renamed to pud-faq.
+      -  the generic_zmm(7) manual page was renamed to pud-base.
+
+   *  Redid a lot of documentation. Further separated package descriptions
+      from core zoem documentation.
+
+Thu 5 Jan 2006
+
+   *  zoem-06-005 released.
+
+   *  Pruned the Zoem User Manual to only describe the core zoem language.
+      Diatribes and mini-language excursions were removed.
+
+   *  A missing clearerr in util/io.c caused
+         ./zoem --unsafe -E '\register{END}{\system{date}}'
+      to loop on EOF on at least one architecture (mac OSX). Fixed.
+
+Thu, 24 Nov 2005
+
+   *  zoem-05-328 released.
+
+   *  This release contains substantial behind-the-scenes changes.
+      Oddbal zoem primitives were reimplemented as macros of exisisting
+      primitives or as special cases of a new more generic primitive.  Users of
+      packages (man, faq, doc) should not be affected, with this exception:
+       ____________________________________________________________________ 
+      {                                                                    }
+      {  The new zoem will choke on existing *.zmr and *.zmt auxiliary     }
+      {  files. Remove these and you should be fine.                       }
+      {____________________________________________________________________}
+
+      The reason being that the primitive refload#6 is now replaced by
+      the macro refload#2 provided by the new ref.zmm package.
+
+   *  Added \register#2, use e.g. as
+
+      \register{END}{
+         \if{\ctrput{zoem::ref::misses}}{
+          \write{stderr}{txt}{>>> [REF] \ctrput{zoem::ref::misses} missing references\|}
+         }{}
+      }
+
+      This example is from the file ref.zmm that now implements zoem
+      references.  This particular registered macro outputs a warning after all
+      input has been processed if missing references were found during a run.
+
+      Currently only END is supported. registered macros are processed in
+      the order of registration.
+
+   *  Reference handling was removed from the core zoem language.
+      \refload#6 and \ref#2 were reimplemented as simple macros (\refload#2 and
+      \ref#2) using the zoem data facilities and the new register#2 primitive.
+      They are found in the new macro file ref.zmm.
+
+      \refloadx#2 was added, it can be used to attach custom information to
+      a reference.
+
+   *  \ucase#1 \roman#1 and \alpha#1 are reimplemented as simple
+      macros - and deprecated. They are now specific invocations
+      of the new \textmap#2 primitive.
+
+   *  \textmap#2 implements a variety of text transformations. Among them:
+
+         {word}{ucase}
+         {word}{lcase}
+         {number}{roman}
+         {number}{alpha}
+         {caesar}{<num>}
+         {vigenere}{<key>}
+         {vigenerex}{<key>}
+
+      These transformations are applied sequentially, implying that
+
+         \textmap{{number}{roman}{word}{ucase}}{\your_nice_counter}
+
+      does what you expect it to do. Use caesar and vigerene[x] to
+      encrypt your sensitive data.
+
+   *  Added \whilst2, which sends output to the current output file
+      without building up intermediate results.
+
+   *  The tr#4 was sanitized. See further below.
+
+   *  The zoem output implementation was thoroughly cleansed
+      and is in a maintainable state now. This bears on the handling of
+      multiple output sinks (altiplexing?).
+
+      Same for environment well-formedness checks.  As part of the clean-up an
+      experimental (but backwards compatible) feature was put in place; see
+      immediately below.
+
+   *  This item is important only for people that write their own
+      environment definitions.  Dictionary stacks are now tied to (output)
+      sinks. This implies that
+
+      \begin{foo}
+         \write{zutfut}{device}{\begin{zut}}
+      \end{foo}
+         \write{zutfut}{device}{\end{zut}}
+
+      is now legal zoem, and any dollar key within a write scope is tied to the
+      output stream defined by the write invocation.  Different instances of
+      the same environment spread over different output sinks will thus not
+      clobber one another.
+
+      If a dollar key is not found within some write scope, it is searched
+      in the default output scope.
+
+   *  added \genoptref#1 to the generic package, for generic (html) linking to
+      an option only using the option identifier string.
+
+   *  The first argument of inspect now takes a vararg rather than
+      a single string. The modifiers previously accepted as the first
+      argument are now accepted as argument to the 'mods' key.
+      So use e.g. \inspect{{mods}{count-matches}}{..}{..}{..}
+      if counting matches is what you are after.
+
+   *  Incompatible change in what presumably is one of the
+      lesser-used primitives.
+
+      Removed \tr#4 because its interface was broken beyond repair.
+      Added \tr#2.
+
+         \tr{  {from}{from-spec}
+               {to}{to-spec}
+               {delete}{delete-spec}
+               {squash}{squash-spec}
+            }{
+               data
+            }
+
+      Data is unprotected, all specs are subject to tilde expansion.
+
+      Specs are largely POSIX compliant except that repeats are
+      denoted
+
+         [*c*20]     \: repeat c 20 times
+         [*\012*20]  \: repeat newline 20 times
+         [*X*]       \: fill with X
+         [*X#]       \: repeat X until class/range boundary
+
+      The magic repeat operator # stops on boundaries. A boundary happens at
+      start or end of a class or range.  Complements are denoted by a leading
+      caret.
+
+   *  \push#1 and \pop#1 semantics have changed.  \push#1 now always pushes the
+      user dictionary stack. Its argument now denotes the name of dictionary
+      stack that is pushed.  The matching \pop#1 should specify the same name.
+
+   *  made -o work with -e and -E.
+
+   *  rewrote parts of zmm_generic for the html device. It now makes
+      more use of style sheets and is reworked towards better
+      customizability.
+
+   *  Included a description of the \inspect#4 and \format#2
+      (mini-mini) sublanguages in the zoem(1) manual. This covers
+      respectively tilde expansion for \inspect#4 and the format
+      specification strings for \format#2.
+
+   *  itemize accepts {smallertext}{1}
+
+   *  Added fase support for centering with \format#2. With centering,
+      the default now is that strings of length 1 and 2 will be layed-out
+      thusly:           (even width)
+         [....8...]
+         [....9...]
+         [...10...]
+         [...11...]
+      or                (odd width)
+         [....8....]
+         [....9....]
+         [...10....]
+         [...11....]
+      This can be changed by using '==' as the centering specification:
+         [...8....]
+         [...9....]
+         [...10...]
+         [...11...]
+      and
+         [....8....]
+         [....9....]
+         [....10...]
+         [....11...]
+
+      This pattern applies generally to strings of length (2*k+1, 2*k+2).
+      In case you need it, the fase will alternate with each equal sign
+      appended to it.
+
+   *  Zoem's \alpha#1 macro (now implemented as
+      \textmap{{number}{roman}}{\1}) transforms numbers to strings by writing
+      them in base 27, using _ as zero.  It's use is primarily to enable a) b)
+      c) style itemization.  While experimenting with alpha#1, I found that
+
+         \alpha{1444} = azm
+
+     The most wonderful coincidence as azm is the zoem suffix
+     and 1444 is 38 squared - 38 is one of my lucky numbers no less.
+
+     This is a universal truth rather than a change. However, the simple act of
+     perceiving a universal truth instantly creates truth ripples through the
+     fabric of everything, and in doing so changes the course of the universe
+     in profound ways.  I thought you might like to know this.
+
+Fri, 3 Jun 2005
+
+   *  zoem-05-154 released.
+
+   *  Fixed segmentation fault occurring with -e option, introduced
+      in previous release.
+
+   *  Added a regression test suite, stress2.azm.
+      stress.azm is now also called a regression test suite.
+
+   *  Tested a large number of error paths, fixed a few
+      to yield truncated output as they should.
+
+   *  Fixed doc.zmm to produce better W3C compliant output -
+      specifically compliant <a> anchors.
+
+   *  Added a tilde escape mechanism to inspect#4 to prevent
+      cumbersome regexes when slashes are needed (either as a
+      literal or as a regex metacharacter).
+
+   *  Sanitized the \inspect#4 implementation and interface.
+         supported options:
+            iter-args            (was vararg)
+            iter-lines           (was lines)
+            discard-nmp          (was skip)  [non-matching-part]
+            discard-nil-out      (was snip)
+            count-matches        (was count)
+            discard-miss
+            dotall
+            icase
+
+Tue, 24 May 2005
+
+   *  zoem-05-144 released
+
+   *  Writeto obeys the --unsafe and --unsafe-silent options (or their
+      absence) when its filename contains a path separator, the forward
+      slash (entirely UNIX-centric). Such a path separator is considered
+      a risk in overwriting sensitive files. Zoem will prompt
+      the user according to the safety settings. It will never prompt the
+      user if the filename does not contain a path separator.
+
+   *  The primitive env#3 has become env#4 and env#3 is now a macro
+      expanding to \env{\1}{}{\2}{\3}.
+      The second argument of env#4 is a list of key-value pairs
+      in a vararg that are set as default dollar keys. This simplifies
+      the definition of environments.
+
+   *  keys set in the second (vararg) argument begin#2 can now
+      be keys taking arguments. e.g.
+
+         \begin{foo}{{bar#2}{\!2\!1}}
+
+      defines a key that is used as
+
+         \$bar{a}{b}
+
+      which would result in
+
+         ba
+
+   *  Environments set \$__args__ and \$__xargs__ so that they can pass
+      the full argument list onwards if needed.
+
+   *  Environments will now silently overwrite local keys previously defined.
+      This enables a convenient override system when one environment
+      encapsulates another environment - it can append user arguments
+      (using \$__args__) to default settings.
+
+   *  Changed --allow=<name>[:<name>]* syntax to
+      -allow <name>[:<name>]* syntax.
+
+   *  Moved option parsing to structured mcxOption framework.
+
+Mon, 21 Jun 2004
+
+   *  zoem-04-173 released.
+
+   *  Repeated use of \special#1 would decrease available stack space.
+      Quite rare bug revealed by Tim Hughes as one of the first to use
+      clmformat/zoem on a larger scale.
+      This will not affect normal usage of zoem.
+      Fixed.
+
+   *  Made the code better ISO-C compliant (split long constant strings).
+
+Wed, 16 Jun 2004
+
+   *  zoem-04-168 released.
+
+   *  fixed embarassing special-related bug. It *did* affect exisiting macro
+      packages (see below).
+
+Tue, 15 Jun 2004
+
+   *  zoem-04-167 released.
+
+   *  \special#1 now evaluates its argument. This does not affect existing
+      macro packages.
+
+   *  Updated generic_zmm documentation.
+
+   *  Treat spaces in manual name correctly (fixed bug in man.zmm results
+      spotted by Joost van Baal).
+
+Sun, 13 Jun 2004
+
+   *  zoem-04-165 released.
+
+   *  fixed bug where inline files would cause zoem to crash.
+
+   *  introduced enclosing variants for all paragraph incarnations.
+      \par     ->    \par#1         (content)
+      \cpar#1  ->    \cpar#2        (caption, content)
+      \car     ->    \car#1         (content)
+      \ccar#1  ->    \ccar#2        (caption, content)
+      Separation tags (such as \par) will be phased out from the
+      zoem macro packages. \item and \sec are to follow.
+
+   *  \formatted#1 now skips \<> scope as well.
+
+   *  Embedded newlines in *ml syntactic sugar \<..> would screw up the
+      line count. Now fixed.
+
+   *  \<> stacks are now tied to files, so that alternating output
+      can never erroneously corrupt the well-formedness stack. (Do note that
+      funny user-side inverse processing could and still can do that).
+
+   *  Environment stacks (\begin and \end stuff) are now also tied to files,
+      same as above.
+
+   *  The hash module in the underlying library code was overhauled.
+      hashes now maintain private storage for links and key-value pointers.
+
+Tue, 20 Apr 2004
+
+   *  zoem-04-111 released.
+
+   *  small documentation fixes.
+
+
+Mon, 19 Apr 2004
+
+   *  zoem-04-110 released.
+
+   *  the builtin alias \error#1 is gone, replaced by \inform#1.
+
+   *  Streamlined the examples, made them more suitable for web-publishing.
+
+   *  Fixed a bug recently introduced into the util library;
+      file read from STDIN would only read a single line.
+
+   *  (updated web index, otherwise irrelevant).
+
+Sat, 17 Apr 2004
+
+   *  zoem-04-108 released.
+
+   *  Some activity at meta-zoem primitive level.
+      A new exception mechanism was fully integrated with the error
+      framework.
+
+      -  Introduced \throw#2, which generalizes \quit (now removed).
+      -  Removed \zoem#1. It is generalized by \catch{label}{expression}
+         and \try{expression}.
+      -  Reimplemented \quit as \done, specialized for clean premature
+         file exit.
+
+      This enables
+
+         \catch{towel}{
+            \while{1}{
+               do stuff
+               \if{ifstuff}{\throw{towel}}{}
+               do stuff
+            }
+         }
+
+      and
+      
+         \catch{error}{
+            do possibly erroneous *or* towel stuff
+         }
+
+      or
+
+         \try{ stuff }
+
+         inspect
+            \__zoemstat__ (towel|error|ok) and
+            \__zoemput__  (the possibly truncated result of \try{stuff})
+
+      \catch#2 and \try#2 can be arbitrarily nested.
+         
+   *  The primitive \throw#2 is used as
+         \throw{towel}{msg}
+         \throw{error}{msg}
+
+      The macros
+         \throw{towel}
+         \throw{error}
+
+      expand to \throw{towel}{} and \throw{error}{} and do not issue a message.
+
+   *  The new alias \error#1 generates an error message, it expands to
+      to \write{stderr}{device}{\1\@{\N}}
+
+   *  Removed alias \ignore#1, use \""#1 instead.
+      (e.g. \""{ignore
+               stuff
+            }
+      )
+
+   *  Fixed zum.azm, which contained bogus begin#1 description.
+
+   *  Fixed small bug; \write#3 would erroneously set \__fnout__.
+      Using \__fnout__ as in \write{\__fnout__}{filter}{stuff}
+      now works as expected.
+
+Wed, 7 Apr 2004
+
+   *  zoem-04-098 released.
+
+   *  fixed documentation to exclusively use/describe the begin#2 primitive.
+
+   *  The old and ugly \begin{itemize{{foo}{bar}}} syntax now generates
+      a syntax error. (use \begin{itemize}{{foo}{bar}}, introduced
+      in zoem-04-072).
+
+   *  fixed -e option related bug, changed its implementation.
+
+   *  Introduced \*{'e} syntax, equivalent with \*'e* syntax. The new syntax
+      is optionally extendible and more in line with the rest of zoem.
+      This move is similar to the inline file name change \=fname= -> \={fname}
+      introduced earlier.  The old \*'e* syntax will not be removed but
+      if used error messages are issued.
+
+   *  The \formatted#1 tokens \`<` and \`>` were changed to \`[` and \`]` for
+      esthetic reasons.
+
+Tue, 30 Mar 2004
+
+   *  zoem-04-090 released.
+
+   *  Fixed some small documentation glitches.
+
+   *  At request of the zoem user community, the faqsec environment
+      was moved to a key/value based syntax. The two positional arguments
+      <label> (first) and <caption> (second) are now tied to
+      values 'ref' and 'cap'. So now you write
+
+         \begin{faqsec}{{ref}{abc}{cap}{Any Balding Clown}}
+
+      which was previously
+
+         \begin{faqsec}{:{abc}{Any Balding Clown}}
+
+Fri, 12 Mar 2004
+
+   *  zoem-04-072 released.
+
+   *  As an exceptional case, a syntax change (fix, really)
+      was introduced that requires updating of user-space zoem files that use
+      the faqsec environment from the FAQ package faq.zmm .  This is the only
+      environment affected by the change in begin#1 parsing described below.
+
+   *  Implemented chunked reads. By default, zoem will read entire files
+      before processing them. If -chunk <num> is specified on the command
+      line, zoem will try to output a chunk once its size exceeds <num> bytes.
+      At that stage it will simply append lines until it finds itself in the
+      outermost scope (outside of any block).  So, finally, you will be able
+      to throw files of any size at zoem.  Do note the level restriction
+      though; if a block (pair of balanced curlies) spans the entire file zoem
+      will attempt to read the file in its entirety.
+
+      Perhaps chunked reads will become the default in a later release.
+
+   *  Added begin#2 macro (not a primitive). The vararg part of
+      the begin#1 syntax \begin{itemize{{align}{left}}} is placed
+      in a separate argument as it should have been from the
+      beginning: \begin{itemize}{{align}{left}}. The old syntax
+      is deprecated, as it is special-case and not in line with
+      general zoem syntax principles.
+
+      The old syntax is still available - in fact, begin#2
+      is currently rewritten to the begin#1 syntax.
+      The plan is to phase out begin#1 at some point in the future.
+
+   *  By default, the second argument of begin#2 (or the vararg
+      part of begin#1 for that matter) is parsed as a sequence of key-value
+      pairs which are set in the newly pushed dollar scope.
+
+         \begin{foo}{{bar}{zut}{tim}{eek}}
+
+      thus results in these keys and values:
+
+         \$bar -> zut
+         \$tim -> eek
+         \$0   -> 2     \: contains the number of key-value pairs.
+
+      The old behaviour (in which pseudo positional parameters
+      \$1, \$2 and onwards are set) can be obtained by inserting a colon.
+
+         \begin{foo}{:{bar}{zut}{tim}{eek}}
+
+      results in these keys and values:
+
+         \$1   -> bar
+         \$2   -> zut
+         \$3   -> tim
+         \$4   -> eek
+         \$0   -> 4     \: the number of arguments.
+
+      As a bonus, you can now set arbitrarily many pseudo positional
+      parameters.
+
+Sat, 6 Mar 2004
+
+   *  zoem-04-066 released.
+
+   *  Changed format parsing so that parts may occur in any order.
+      A new part *{..}{..} may be used to specify virtual length.
+      A new part ~{..}{..} may be used to specify padding and delimiter.
+      A new part @{..}{..} may be used to align on substring/offset.
+
+      <=>            alignment specification; left right centered.
+      ~{..}{..}      padding specification
+      @{..}{..}      alignment specification; substring + offset.
+      *{..}{..}      length macro + glyph string specification.
+      <num>
+
+   *  Added \lenght#1 which computes the length of its argument.
+      It can be useful in the powerful new format virtual length
+      functionality.
+
+   *  Added *{key-name}{target-string} pretense part to format specification.
+      Key-name specifies a macro computing a length (a likely candidate
+      is \length#1 which is specified simply as length). Target-string will be
+      used to compute the length, but the actual argument from the format
+      vararg will be inserted. This allows some degree of separation between
+      visible width of glyph arrays and their representation.
+
+   *  Added introspective \zoem#1 primitive. The content will be processed
+      and if this succeeds output is written in the macro \__zoemput__.  The
+      result text is "1" for succesful and "0" for unsuccesful processing.
+
+   *  Added \vanish#1, which processes it content but does not output
+      anything. It is an alternative to \formatted#2.
+      \vanish#1 allows to do lots of commenting outside definitions.
+      \formatted#2 allows to format definitions themselves.
+
+Sun, 29 Feb 2004
+
+   *  zoem-04-061 released.
+
+   *  Added \format#2 primitive.
+      It can separately left align, center, or right align different
+      arguments from a sequence.  First argument is the format string, second
+      argument is a vararg.
+
+   *  \writeto#1 (which can redirect the default output stream), if
+      invoked more than once for the same file name, will append
+      from the second time onwards, rather than overwrite.
+
+   *  Fixed bug in switch#2 and branch#1; in the absence of a default-
+      or else-type block, the last block would be evaluated regardless
+      of the truth value of its pivot block.
+
+   *  Fixed various documentation flaws pointed out by Joost van Baal (thx!).
+
+   *  The obscure \%% syntax (providing freeing of multidimensional data)
+      was changed to \%free, the syntax \%%% (providing dumping of
+      multidimensional data) was changed to \%dump.
+
+   *  Implemented --allow=cmd1[:cmd2]* option, allowing explicit
+      specification of system commands that can be executed without asking.
+
+Mon, 27 Oct 2003
+
+   *  zoem-03-300 released. We are spending day 300 in 2003 people!
+
+   *  added -tl k [tablength] option for regulating (optional) indent.
+
+   *  Introduced zoemzoem manual page which lists the available
+      zoem documentation.
+
+   *  Fixed DOCTYPE declaration for html output, it contained stupid
+      whitespace/case errors.
+
+   *  Fixed some XML/HTML syntactic sugar bugs.
+
+   *  Introduced the concept of alpha-stage new syntax.
+      alpha-stage syntax is volatile and subject to change.
+
+   *  \: is now generally described as introducing a pre-processing sequence;
+      Its main use (and with syntax obeying the principle of Huffman
+      encoding) is that of introducing comments.
+
+   *  Retro-actively declared the recently introduced \:\ syntax
+      to be alpha-stage, and removed it.
+
+      Subtle errors could arise when commenting out
+      macro sequences \foo as \:\foo (removing the newline as well).
+      \:\ will never be extended preprocessing syntax again.
+
+      The functionality previously provided by \:\ is now provided by \:/
+      (introducing a comment up till and including the newline).
+
+   *  Added alpha-stage \<foobar!> syntactic sugar for writing HTML-style
+      single tags such as <br>. Now you can write
+      \<br!> rather than \@{<br>} -- both result in <br>.
+      It's alpha stage because perhaps another character might be better.
+      Opinions, anyone?
+
+   *  Added \:! preprocessing sequence, and the following rule:
+      \: followed by whitespace or alphanumerical character or backslash will
+      always be a regular comment up till and excluding the newline.
+
+      \:! will be replaced during preprocessing time by a '\' (backslash).
+      One use is this:
+      \verbatim{\protect{\foo
+         \bar
+         \:!:  this will end up as a comment.
+      }}
+
+Sun, 12 Oct 2003
+
+   *  zoem-03-285 released.
+
+   *  Disabled (by default) \system#3, implemented the --unsafe,
+      --unsafe-silent, and --system-honor options.
+
+      With --unsafe, the user is prompted for each \system#3 invocation.
+         If prompting is not possible (due to STDIN redirection),
+         the primitive fails.
+      With --unsafe-silent, the user is not prompted.
+      With --system-honor, any \system#3 failure (for whatever reason,
+         including safe behaviour) is regarded as a zoem failure.
+         Without --system-honor (i.e. by default), \system#3 failures are
+         ignored in all modes: safe, unsafe, and unsafe-silent.
+
+   *  applied/fixed a number of fixes/issues brought forth by Andreas Kahari.
+
+   *  added \dowhile#2 primitive.
+
+   *  added \branch#1 primitive, which employs a vararg.
+      \branch{
+         {condition1}{branch1}
+         {condition2}{branch2}
+           ...
+         {conditionN}{branchN}
+         {else branch}     \: optional
+      }
+
+   *  fixed inspect#4 segfaulting bug, and inspect#4 functional bug.
+
+   *  documented the man macros \genkvp#2 \usekvp#2 \defkvp#3 in man_zmm(7).
+
+   *  Added \"man::cat" which can optionally be used to set
+      the category heading for manual pages. If not set, a default
+      is derived from the \"man::section" macro.
+
+Mon, 22 Sep 2003
+
+   *  Introduced NAME#2 macro; using this will ensure that the NAME
+      section is apropos compatible.
+
+   *  groff-base 1.18.1-10 has an entirely new idea of what a reasonable
+      right margin is (no less than 2 positions wide). Since zoem adjusted
+      the line lenght a little, this caused previous zoem output
+      to have no right margin at all. Consequently, zoem now decreases
+      the output line length by 2.
+
+   *  \:\ now introduces a comment that will be stripped up to and including
+      the newline. All other \: sequences introduce a comment that will
+      be stripped up to and excluding the newline.
+
+   *  Eliminated irregular inline file syntax. It now behaves the
+      same as other primitives taking an argument (the argument
+      is delimited by balanced curlies).
+
+Tue, 12 Aug 2003
+
+   *  zoem-03-224 released
+
+   *  Removed \%snt% syntax in \formatted; replaced by
+      fully similar \`snt` syntax. It looks better (no :?) and the % syntax
+      was needed for grape keys (the new name for multi-dimensional data).
+
+   *  Replaced low-level at directives \# \^ \_ by single \+{} directive.
+
+   *  Fixed bug in formerly \dfree#1, now \%%%.
+
+   *  Removed dget#1 dset#2 dsetx#2 dfree#1 dprint#1
+      Their syntax was assimilated by set#2 def#2 setx#2 defx#2
+      so that more functional behaviour was obtained with less primitives.
+      Assigning:
+
+      \set{%{a}{b}}{d}.
+
+      retrieval now done using
+         \%{a}{b}
+
+      removal done with
+         \%%{a}{b} [ \%% for the full tree ]
+
+      dumping done with
+         \%%%{a}{b} [ \%%% for the full tree ]
+
+   *  added \"html::charset" to the generic macros.
+
+Tue, 03 Jun 2003
+
+   *  zoem-03-166 released.
+
+   *  began tracking changes in ChangeLog.
+

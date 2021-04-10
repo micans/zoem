@@ -1,0 +1,8 @@
+\tr{{from}{abcd-g}{delete}{hij}{to}{1234-7}}{abcdefghijlmn}
+\tr{{from}{d-gI}{to}{4-7i}{delete}{hij}}{map D-G and remove HIJ altogether, is what I say}
+\tr{{delete}{hij}}{defghijklm}
+\tr{{squash}{^}{from}{^a-zA-Z.}{to}{[* *]}}{ *!* abolish *!* capital *!*  punishment}
+\tr{{from}{[:lower:]}{to}{[:upper:]}}{\tr{{squash}{^}{from}{^a-zA-Z.}{to}{[* *]}}{ *!* abolish *!* capital *!*  punishment}}
+\tr{{from}{^a-zA-Z.}{to}{[*_*]}}{  complement  with  neither  squash  nor  delete  }
+\tr{{squash}{[:alpha:]}}{squash the bookkeeper}
+\tr{{squash}{[:alpha:]}}{squash the bookkeeper}

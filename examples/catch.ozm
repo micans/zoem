@@ -1,0 +1,35 @@
+a
+b
+c
+Skipping the rest!
+At the bottom 1
+
+* i = 0
+BEFORE throw 1
+before throw 2
+i = 1 and j = 1
+end of body 2
+before throw 2
+i = 1 and j = 2
+end of body 2
+before throw 2
+i = 1 and j = 3
+end of body 2
+before throw 2
+END of body 1
+* i = 1
+BEFORE throw 1
+before throw 2
+i = 2 and j = 1
+end of body 2
+before throw 2
+i = 2 and j = 2
+end of body 2
+before throw 2
+i = 2 and j = 3
+end of body 2
+before throw 2
+END of body 1
+* i = 2
+BEFORE throw 1
+At the bottom again

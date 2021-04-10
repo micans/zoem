@@ -1,0 +1,397 @@
+\import{aephea/simpledocument.zmm}
+\: todo: k (f1,i1,n1,o1) q u v x1 y1 z1
+
+\begin{simpledocument}{
+   {html_title}{Inhabitants of the authoring ecosphere}
+   {title}{Inhabitants of the authoring ecosphere}
+   {author}{Stijn van Dongen}
+   {toc_and_date}{0}
+   {year}{0}
+   {month}{Feb}
+   {day}{29}
+   {keywords}{macro processing programming template expansion mark-up character filtering}
+   {css_append}{
+      body { font-family: "Garamond", "Gill Sans", "Verdana", sans-serif; }
+      body
+      {  text-align: justify;
+         margin-left: 8%;
+         margin-right: 8%;
+      }
+   }
+}
+
+\par{
+ The following is a collection of links to macro and mark-up languages,
+ their associated processors, and several mark-up converters.
+ The links are to Google searches, as I am lazy and the items
+ are in varying states of being supported.
+ One missing from the list below is \lref{index.html}{zoem}.
+}
+
+\set{askee}{http://www.google.com/search?q=}
+\ctrset{n_critters}{0}
+
+\""{
+
+  [vanished?] m5 macro processor m4 on steroids
+  [vanished?] ProMAC
+  [vapourware?] unixdoc
+
+   group:
+      setext
+      restructuredtext
+      stx (structured text)
+      mml modest markup language
+
+   highlight is a universal converter from source code to many formats
+   doxygen JavaDoc-like documentation system for C++, C, Objective-C, C#, Java,
+      IDL, and PHP. Doxygen can be used to generate an on-line class browser
+      (in HTML) and/or an off-line reference manual (in LaTeX or RTF) from a
+      set of source files
+
+   VH-man2html
+   man2html by Richard Verhoeven
+}
+
+\begin{spacing}{{left}{2}}
+\begin{itemize}{
+   {flow}{compact}
+   {interitem}{0}
+   {margintop}{1}
+   {textindent}{10}
+}
+\apply{_#3\!{{
+   \ctrinc{n_critters}
+   \item{\aref{\askee\,\1}{\bf{\2}}}
+      \3
+   }
+}}{
+
+ {aft+almost+free+text}
+ {aft}
+ {almost free text}
+
+ {arfg+pipelined+meta-language}
+ {arfg}
+ {pipelined meta-language employing m4, text-block diversions, and eperl}
+
+ {asciidoc+text+document+format+html+docbook}
+ {AsciiDoc}
+ {translate (customizable) text format to HTML and [sic] DocBook}
+
+ {convert+apt+almost+plain+text}
+ {Aptconvert}
+ {convert almost plain text}
+
+ {bhl+plain+text+html+latex}
+ {BHL}
+ {brute (plain) html latex}
+
+ {blogme+extensible+markup+lua}
+ {BlogMe}
+ {mark-up with embedded lua}
+
+ {chakotay+chpp+macro+preprocessor}
+ {chakotay}
+ {chakotay/chpp}
+
+ {deplate+markup+latex+html+document}
+ {deplate}
+ {wiki-like document markup for LaTeX/HTML output}
+
+ {dita-xml+darwin+information+typing+architecture}
+ {Dita-XML}
+ {Darwin Information Typing Architecture}
+
+ {docfrac+converter+between+text+html+rtf}
+ {DocFrac}
+ {DocFrac}
+
+ {doclifter+troff+request+docbook}
+ {doclifter}
+ {translate troff requests into DocBook}
+
+ {docutils+text+processing+system}
+ {docutils}
+ {process plaintext documentation into HTML, LaTeX etc}
+
+ {empy+template+embedding+python+text}
+ {EmPy}
+ {embedded python [in text]}
+
+ {etset+automatic+typesetting+of+electronic+text}
+ {etset}
+ {ETset, translate ISO 8859 Etext to LaTeX, HTML, PML, or ASCII}
+
+ {literate+programming+macro+preprocessor}
+ {FunnelWeb}
+ {literate programming and macro processing}
+
+ {gellmu}
+ {gellmu}
+ {generalized extensible LaTeX-like markup}
+
+ {gema+macro+preprocessor}
+ {gema}
+ {gema, the general purpose macro preprocessor}
+
+ {gpp+generic+preprocessor}
+ {gpp}
+ {gpp, generic preprocessor}
+
+ {grutaxt+plain+text+html}
+ {grutaxt}
+ {grutaxt, a plain text to HTML converter}
+
+ {hsc+html+sucks+competely}
+ {hsc}
+ {HTML s*cks completely [sic modulo s/*/u/]}
+
+ {htmlprag+html+scheme}
+ {HtmlPrag}
+ {permissive HTML parsing and emitting capability to Scheme programs [sic]}
+
+ {htlatex}
+ {htlatex}
+ {hypertext LaTeX}
+
+ {htp+html+pre-processor}
+ {htp}
+ {HTML pre-processor}
+
+ {gnu+info}
+ {info}
+ {GNU info, from the folks that abhor man pages and love topic splatter}
+
+ {jamal+macro+language}
+ {jamal}
+ {Jamal, Just Another Macro Language}
+
+ {latex2html}
+ {latex2html}
+ {latex to html, on my system a 17032 line Perl-script}
+
+ {latex2man}
+ {latex2man}
+ {latex to man}
+
+ {latte+html}
+ {latte}
+ {latte}
+
+ {LMNL+layered+markup+annotation+language}
+ {LMNL}
+ {Layered Markup and Annotation Language}
+
+ {m4}
+ {m4}
+ {a Unix macro processor}
+
+ {makefaq+python+faq+html+docbook}
+ {makefaq}
+ {exports makefaq format to HTML, txt and DocBook}
+
+ {man2html}
+ {man2html}
+ {man to html}
+
+ {ManEdit+Unix+manual+page+format}
+ {ManEdit}
+ {edit man pages with an "integrated XML interface"}
+
+ {manServer+convert+manual+pages+HTML}
+ {manServer}
+ {convert manual pages to HTML}
+
+ {ManStyle+technical+documentation}
+ {ManStyle}
+ {documentation for HTML and PS from a simple XML format}
+
+ {markdown+html+syntax}
+ {Markdown}
+ {A (plain) text-to-html conversion tool}
+
+ {mp4h+macro+processor+html}
+ {MHT}
+ {A macro processor for rendering HTML}
+
+ {ML%2FI+general+purpose+macro+processor}
+ {ML/I}
+ {A general purpose macro processor}
+
+ {MML+modest+markup+language}
+ {MML}
+ {text markup language based on setext}
+
+ {mp4h+macro+html}
+ {mp4h}
+ {m4 based macro processor for HTML documents}
+
+ {mtex+tex+macros}
+ {mtex}
+ {manual TeX [by Mike Sofka]}
+
+ {mtex+lim}
+ {mtex}
+ {manual TeX [by Compaq]}
+
+ {no+tags+markup}
+ {No-Tags Markup}
+ {no-tags markup, \it{a few unobtrusive characters}}
+
+ {otl+customizable+mark-up}
+ {otl}
+ {from user-specified syntax to user-specified mark-up} 
+
+ {pod+plain+old+documentation}
+ {pod}
+ {plain old documentation (Perl's documentation format)}
+
+ {rman+PolyglotMan}
+ {PolyglotMan}
+ {parses and maps troff source to other devices}
+
+ {p4+perl+macro+processor}
+ {p4}
+ {beyond cpp and m4, probably perl-programmable}
+
+ {pym+macro+preprocessor+python}
+ {PYM}
+ {PYM (A Macro Preprocessor based on Python)}
+
+ {rest2web}
+ {rest2web}
+ {integrates with docutils and reStructuredText/HTML}
+
+ {reStructuredText}
+ {reStructuredText}
+ {reStructuredText, not unlike aft and pod}
+
+ {sdf+streaming+document+format}
+ {SDF}
+ {Streaming Document Format, XML saves the day}
+
+ {setext+structurally+enhanced+text}
+ {setext}
+ {Structurally enhanced text (old, I believe)}
+
+ {slip+sorta+like+python+shorthand+xml}
+ {SLiP}
+ {SLiP - a \it{Sorta Like Python} shorthand for XML}
+
+ {smarthtml+html}
+ {smartHTML}
+ {smart HTML}
+
+ {stx+structured+text}
+ {STX/structuredtext}
+ {structured text, one of the elders}
+
+ {t2t+text+table+translator}
+ {t2t}
+ {text to (HTML) table translator}
+
+ {tei+text+encoding+initiative}
+ {tei}
+ {text encoding initiative}
+
+ {tex4ht}
+ {tex4ht}
+ {TeX for hypertext?}
+
+ {textile+markup+web+text+generator}
+ {textile}
+ {Web text generator}
+
+ {troffcvt+translator+formats}
+ {troffcvt}
+ {translator for troff to various other formats}
+
+ {txt2docbook}
+ {txt2docbook}
+ {simple text format, docbook output}
+
+ {txt2dw+converting+ASCII+text+XML+developer+works}
+ {txt2dw}
+ {converting ascii to xml, IBM-developer-works-inspired}
+
+ {txt2tags+one+source+multi+targets}
+ {txt2tags}
+ {txt2tags, not unlike reStructuredText, aft, and pod}
+
+ {WebCompile+macro+processor+HTML}
+ {WebCompile}
+ {An HTML macro-processor}
+
+ {wlatex}
+ {wlatex}
+ {web LaTeX?}
+
+ {wml+website+meta+language}
+ {WML}
+ {Website Meta Language}
+
+ {xml+from+plain+text}
+ {xfpt}
+ {xml from plain text}
+
+ {yodl+yet+oneOther+Documentation+Language}
+ {yodl}
+ {yet oneOther Documentation Language}
+
+ {zml+text+wiki+formatting+alternative+syntax+XML}
+ {ZML}
+ {wiki-style formatting plus alternative XML syntax}
+}
+\end{itemize}
+\end{spacing}
+
+\par{
+ Although I have not used it, the
+ \bf{gema} language seems well thought-out and powerful. It transforms text by
+ applying pattern transformations, so it is not tied to a single syntax.
+}
+
+\par{
+ Christopher Browne has a section on macro languages:
+ \httpref{http://linuxfinances.info/info/macros.html}
+}
+
+\par{
+ There is a section on converting to/from HTML at
+ \httpref{http://www.hypernews.org/HyperNews/get/www/html/converters.html}
+}
+
+\par{
+ You might also be interested in these Freshmeat tags:
+ \aref{http://freshmeat.net/tags/text-processing}{text-processing},
+ \aref{http://freshmeat.net/tags/markup}{Markup},
+ \aref{http://freshmeat.net/search?q=macro+text&submit=Search}{macro+text}.
+}
+
+\par{
+ The Debian text section
+ \httpref{http://packages.debian.org/unstable/text/} has many interesting
+ entries, and so has the OpenBSD Ports textproc section
+ \httpref{http://openports.se/textproc/}.
+}
+
+\par{
+  The following wikipedia page links to this humble page, presently
+  (and unrelatedly) needs cleanup, and mainly has a comparison
+  of various fairly free-style mark-up languages.
+  For example, \v{*bold*} is typically bold, \v{/italic/}
+  may be italic, \v{[[...]]} denotes a hyperlink,
+  \v{=...=}, \v{==...==} denote first and second-level headings, and so on.
+  
+  I do not very much like this style of mark-up as it seems fragile. For
+  example, white-space is significant in many different ways. It introduces a
+  large amount of syntax and hard-wired conventions, has poor escape
+  mechanisms, usually lacks the power of macros and is hard to extend.
+
+   Anyway, the page is
+\aref{http://en.wikipedia.org/wiki/List_of_lightweight_markup_languages}{this}.
+  }
+
+\end{simpledocument}
+

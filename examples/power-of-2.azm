@@ -1,0 +1,38 @@
+
+\: zoem -i power-of-2 --allow=ls -s level=10
+\: zoem -i power-of-2 --allow=ls -s level=11
+
+\: This creates big files, by succesively doubling a string.
+\: It then writes the file characteristics to STDOUT,
+\: Use this to compute powers of two (you'll need to pipe it through
+\: tail and/or cut though).
+
+\formatted{
+
+   \if{\defined{key}{level}}
+      {}
+      {\def{level}{10}}
+
+   \inform{Using\` `level=\level}
+
+   \def{double#1}{
+      \switch{\level}{
+         {0}{}
+         {1}{\1}
+         {  \setx{level}{\let{\level-1}
+            }
+            \write{stderr}{device}{[\level]}\double{\1\1}
+         }
+      }
+   }
+}
+
+\double{*
+}
+\write{stderr}{device}{\@{\N}}
+
+\setx{cluefile}{\__fnout__}
+\writeto{-}
+
+\if{\cmp{ne}{\cluefile}{-}}{\@{\w}\system{ls}{{-l}{\cluefile}}\@{\W}}{}
+

@@ -1,0 +1,5 @@
+\: not really shore whether lambda is appropriate. oh well.
+
+\def{lambda#2}{\setx{\1#1}{\2 says \!1}}
+\lambda{foo}{bar}
+\foo{moo}

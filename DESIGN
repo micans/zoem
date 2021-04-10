@@ -1,0 +1,65 @@
+
+
+Varargs
+
+   Scopes may be separated by whitespace; any other character is treated
+   as end-of-vararg. For some unknown reason, the occurrence of such
+   hickup-characters is not yet treated as an error.
+
+
+XML syntactic sugar
+
+   \<foo>{stuff}
+   is *different*, because of immediate digest and delay until output time.
+   In fact,
+
+   \<foo>{\!{\PI}} will work because of extra digest in evalXtag2.
+
+   I am not yet aware of an example where the inserted delay scope throws
+   a surprise.
+
+
+Segment continuation, so to speak
+
+   In case of error, ops should always use yamSegPush(seg, txt)
+   so that partial content is treated correctly. Use mcxTingEmpty if necessary,
+   or just pass partial content, or use yamSegPushEmpty(seg)
+
+   yamSegPush(NULL, ..) should only be issued by yamStackPush
+   in segment.c, nowhere else. This is not yet enforced/checked;
+   stuff needs to be reglued a bit for this.
+
+   yamSegPush never returns NULL, but may set SEGMENT_ERROR or SEGMENT_THROWN,
+   which should be checked.
+
+   yamExpandKey and yamDoKey may return NULL, these must be checked.
+
+   yamStackPush / yamStackFree are not symmetric.
+   the freeing is usualy done from a higher level (in case of error)
+   or implicitly by totally rewinding and using yamSegFree.
+
+   yamStackPushTmp / yamStackFreeTmp *must* be symmetric.  This is not yet
+   checked (e.g. one might erroneously use yamSegFree to free the stack
+   obtained by yamStackPushTmp).  One way would be to set a special flag that
+   is checked e.g. by yamSegNew, but alas apply2 issues yamSegNew after
+   yamStackPushTmp.
+
+   yamDigest returns 2 statuses, FAIL and OK.
+   yamOutput returns 3 statuses, BOUNCE, FAIL, and OK.
+   (yamDigest writes info in baseseg [what happens when baseseg ==
+   NULL?])  this is either not entirely satisfactory or needs to have
+   clear exposition.
+
+
+Tracing
+
+   Tracing should mainly serve the zoem user, not the developer.
+   So don't put too many debugging-type tracing levels in.
+
+
+Allocation errors
+
+   memalloc errors are not caught. Zoem should be compiled
+   to exit on error.
+
+
