@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash
 
 # $Id: bootstrap,v 1.9 2003/07/17 08:45:50 flux Exp $
 
@@ -24,12 +24,10 @@
 #    make install
 #
 
+set -euo pipefail
 set -x
 
-if test ! -f VERSION
-then
-    ./setversion
-fi
+[[ ! -f VERSION ]] && echo "Need file VERSION (cf setversion)" && false
 
 aclocal \
     && autoheader \
