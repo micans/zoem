@@ -13,7 +13,7 @@
       {}
       {\def{level}{10}}
 
-   \inform{Using\` `level=\level}
+   \inform{Using\`{ }level=\level}
 
    \def{double#1}{
       \switch{\level}{
