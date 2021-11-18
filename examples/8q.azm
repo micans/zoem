@@ -72,8 +72,7 @@
 
       \if{\let{
             \%{positions}{\c}==\row
-         || \%{positions}{\c}-\row==\col-\c
-         || \%{positions}{\c}-\row==\c-\col
+         || abs(\%{positions}{\c}-\row) == abs(\col-\c)
          }
        }{\setx{''n_backtrack}{\let{\''n_backtrack+1}}
          \throw{towel}{}

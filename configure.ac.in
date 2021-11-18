@@ -106,5 +106,6 @@ AC_OUTPUT([
   doc/Makefile
   examples/Makefile
   src/Makefile
+  shed/Makefile
 ])
 

@@ -3078,9 +3078,11 @@ yamSeg* expandLet1
          return yamSegPush(seg, mcxTingDouble(NULL, fval, 15))
    ;  }
       else     /* huh ?? what, how, whence ?? */
-      return yamSegPush(seg, mcxTingInteger(NULL, 0))
+      { mcxErr("\\let#1", "weirdness happened in [%s]", seg->txt->str)
+      ; return yamSegPush(seg, mcxTingInteger(NULL, 0))
+   ;  }
 
-   ;  return NULL    /* unreachcode */
+      return NULL    /* unreachcode */
 ;  }
 
 

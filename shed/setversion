@@ -29,7 +29,7 @@ echo '#endif' >> $vsh
 
 vsc='src/version.c'
 echo -n '' > $vsc
-echo 'char *zoemDateTag = "'`date +%Y-%j`'";' >> $vsc
+echo 'char *zoemDateTag = "'`date +%y-%j`'";' >> $vsc
 
 date '+%y-%j'  >  doc/stamp.stamp
 date '+%e'     >  doc/stamp.day

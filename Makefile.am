@@ -13,7 +13,7 @@
 maintainer-clean-local:
 	-rm -f $(top_srcdir)/util/*.h $(top_srcdir)/util/*.c
 
-SUBDIRS = . src doc examples
+SUBDIRS = . src doc examples shed
 
 VERSION = @VERSION@
 
@@ -21,8 +21,8 @@ VERSION = @VERSION@
 AM_LDFLAGS = -lm
 
 configure.ac: configure.ac.in VERSION
-	./setversion
+	shed/setversion
 
-EXTRA_DIST = configure.ac.in bootstrap setversion VERSION LICENSE TODO_DESIGN\
+EXTRA_DIST = configure.ac.in VERSION LICENSE TODO_DESIGN\
    DESIGN
 
