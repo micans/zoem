@@ -9,7 +9,7 @@
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.50)
-AC_INIT([zoem], 21-101)
+AC_INIT([zoem], 21-322)
 
 PACKAGE=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION
@@ -108,5 +108,6 @@ AC_OUTPUT([
   doc/Makefile
   examples/Makefile
   src/Makefile
+  shed/Makefile
 ])
 
