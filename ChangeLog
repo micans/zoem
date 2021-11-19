@@ -1,5 +1,16 @@
 
 
+   *  Zoem is still as stable as it has been for the last ten years,
+      that is bug fixes only with currently no development or features planned.
+
+   *  Zoem source is now hosted on github.com/micans/zoem .
+      Compiling zoem now requires installation of cimfomfa, a C utility library.
+      Cimfomfa is hosted on github.com/mican/cimfomfa .
+
+      Previously cimfomfa was imported in the zoem source tree, but this
+      practice has stopped. The zoem source tree contains a script that
+      will download both cimfomfa and zoem tar archives and compile both.
+
    *  Fixed bug in let#1; it would think that 'abs(2) == abs(1)' is true.
       The cause was a combination of two things: failure to maintain
       float/integer correspondence by abs and other functions, and a

@@ -1,80 +1,87 @@
 regularia implementatia projectia
 
-like m4, template language, a macro language or a preprocessor language.
+0  reduce this ridiculous TODO
 
--  product of array leads to integer overflow; should however
-   change to double. (let library).
-
--  fixed layout for manual, index.html
-
-
-At some point wholesale updating of ting library.
-Ting library is fine, but 0-terminated strings are just grating.
-requires scrutiny of every call into <string.h>.
-
-revisit system implementation.
-
-ascii-layout: utilise external programs such as fmt; simple stacking of boxes.
-fmt break level:
-0  no breaks
-1  word boundary breaks
-2  breaks anywhere
-
+FF far future (thinking)
+cc corner case
+R  robustness
+N  note
+j  jot down a thought
+j? jot down a thought, but when would it be useful/needed?
+u  useful feature (needs eg: example)
+?  huh? what was I thinking?
+w  documentation
 
 
     ________________________________________some mainlines
    |                                        |
- $$$  import file1 -> finsert file2 does not work, finserted stuff is still under import restriction.
-      -> came up in zpresenter macros?
- www  zinsert/finsert different rules for file inclusion (do not use directory stack), different fail modes. 
-   !  aephea unit framework. Not in zoem.
+   -  better fixed/adaptable layout for manual, index.html (aephea)
+   -  import file1 -> finsert file2 does not work, finserted stuff is still under import restriction.
+      -> (came up in zpresenter macros)
+   -  \begin{}{{#2}{a}} *silently* overwrites primitive.
+  FF  Inhume 0-terminated strings in tingea/ting
+   -  provision for string/input validation (e.g. fib example, number)
+   -  product of array leads to integer overflow; should however change to double. (let library).
+   w  zinsert/finsert different rules for file inclusion (do not use directory stack), different fail modes. 
+  cc  interactive \| and \~ etc are ignored?
   FF  preparse macro definitions?
-   ?  split,join,iterate
-   ?  begin: a way to check whether user set a key.
-   ?  'export' and documentation mode for def for tight coupling with documentation. 
+   j  begin: a way to check whether user set a key.
+   j  'export' and documentation mode for def for tight coupling with documentation. 
       -> {doc}{doc-string} in set#3, would register documentation, accessible as \%{__doc__}{par#1}
-   ?  length: strip leading, trailing white space.
+      \register#2{name}{descr} to find all macro's supported by a package.
+      -> zoem -r man.zmm could list all registered macro's in man.zmm
+   j  length: strip leading, trailing white space.
    ?  writepush, writepop that remember last stream?
-   ?  a \__xxxx__ unique global tag for the current dictionary (concat of names)
-   ?  allow \''$foo syntax ?
-   -  should failed set be fatal? (yes; probably refers to named dictionary)
-   -  \$__xargs__ is expanded; may lead to double expansion?
-   ?  syntax to set special level to previous value.
+   j  allow \''$foo syntax ?
+   j  should failed set be fatal? (yes; probably refers to named dictionary: needs-eg)
+   j  \$__xargs__ is expanded; may lead to double expansion?
+   j? syntax to set special level to previous value.
    w  document io/sink/filter framework
    w  \write{bar}{device}{\inform{zut}} overwrites __fnwrite__ (ok warning)
-   $  further organize the filter code      |
-   $$ zoem should only enter interactive if isatty(stdout, stdin)
+   -? further organize the filter code      |
+   -  zoem should only enter interactive if isatty(stdout, stdin)
    ?  ability to create/access (by prefix) new stacks?
-   $  traverse-tree is easy to write: now generalize tree data?
-   d  enter_interactive vs sourceStdia      |
+   N  apply creates all the key invocations and concatenates them (rather than iterating) -- useful when it is needed, if wasteful.
+   ?  traverse-tree is easy to write: now generalize tree data?
+   w  enter_interactive vs sourceStdia      |
+   w  document ctr.zmm somewhere.
    w  vararg parsing: unary argument {} delimited argument requires {{}}.
-   $#?/ document/consider what happens with \write{foo}{device}{\eval{\zinsert{tim}}}
+   j  filter.[ch], espcially at ' ' and '\n' stuff.
+      -> fixmefixmefixme -> indent is printed after newline regardless of what follows.
+      -> note n_spaces means 'number of stacked spaces'. We do not know the number of *printed* spaces.
+   N  precision_g: currently relative to absolute value.
+      -> Now 0.00000009 == 0.00000001.  (it's currently meant for *basic* stuff).
+   N  \system{perl}{{-e}{'print "hi\\n";'}} fails
+      \system{perl}{{-e}{print "hi\\n";}}
+   FF xml sugar:
+      make '<' and '>' yamSpecial tokens (259 and 260), so that the
+      functionality can be supported for other formats too.
+      this requires some additional rules which are not yet clear.
+   R  - document/consider what happens with \write{foo}{device}{\eval{\zinsert{tim}}}
       where the file tim issues \include.   |
-   $  document/resolve why finsert does not take inline files.
-   $? a mode where the funky zoem primitives are turned off
-      ->-> while, system, let, textmap-repeat etc
-   $  something to push special definitions and then pop the exact same set (possibly useful for format#2).
+      - document/resolve why finsert does not take inline files.
+      - generally research nested inclusions and prevent/catch/alert weirdness
+   j  something to push special definitions and then pop the exact same set (possibly useful for format#2).
       ->-> translate constant definitions at interpretation to at sequences?
-   $  length#1 etc                          |
-   $  something to strip device scope from copy filter: should see content?
-   ->-> for \*{} sequences take key rather than value.
-   F  for extensibility: a facility to match an argument against a certain block structure.
-   $$ have f and fv supplied by util/let.h. OR DROP THEM COMPLETELY.
-   $  \while{\inspect{}} will only work in boolean mode.
-   $  code-doc SEGMENT_CONSTANT SEGMENT_DIGEST
-   $  improve/document filter interface/framework
-   $  format#2: explicit control over phase of padding.
+  FF  something to strip device scope from copy filter: should see just (semantic) content?
+      ->-> for \*{} sequences take key rather than value.
+   ?  for extensibility: a facility to match an argument against a certain block structure.
+   -  have f and fv supplied by util/let.h. OR DROP THEM COMPLETELY.
+      -> document let/f/fv precision behaviour.
+   -  \while{\inspect{}} will only work in boolean mode.
+   w  code-doc SEGMENT_CONSTANT SEGMENT_DIGEST
+   ?  format#2: explicit control over phase of padding.
    ->-> with more arguments: cycle through padding strings. mcxTingRoll().
-   $  format#2: temporary mapping of character set!?
-   $  format#2: left-padding and right padding
-   $? format#2: typeset in a box.           |
-   $! format#2: ability to store/reuse parsed format strings (clmformat)
-   ?? format#2 or roff: column support      |
-   $  unprotecting-tr-protecting '\foo\@{\N}' should do what exactly?
-   /  let precision, -0.0, 10**100          |
-   -  \begin{}{{#2}{a}} *silently* overwrites primitive.
+   ?  format#2: temporary mapping of character set!?
+   ?  format#2: left-padding and right padding
+   ?  format#2: typeset in a box.           |
+   j  investigate pipes with system
+   ?  format#2: ability to store/reuse parsed format strings (clmformat)
+   ?  format#2 or roff: column support      |
+  cc  unprotecting-tr-protecting '\foo\@{\N}' should do what exactly?
+   -  let precision, -0.0, 10**100          |
    -  formatted specifier to remove ^\s*    |
-   !? \set{{diag}{NOOOOO}}{foo}{bar} (customized diagnostic)
+ ? !  \set{{diag}{NOOOOO}}{foo}{bar} (customized diagnostic)
    /  audit format implementation for mcxTingKAppend
    $  audit all mini and special syntax parsers. inspect#2, formatted#1.
    -  let portability of isnan, isfinite.   |
@@ -86,6 +93,7 @@ fmt break level:
    $? implement \%free in \undef or \set{{free}{data,tree,node}}{%{foo}}{}
    $? implement character filtering by finite state machine driver
    $? implement grep.                       |
+   ?  a \__xxxx__ unique global tag for the current dictionary (concat of names)
  ------                                     |
    $  comprehensively analyze/categorize '\\' '{' and '}' encoding issues
    $  silent overflow with overly long %{1}{2}..{} sequences
@@ -149,86 +157,17 @@ fmt break level:
    |________________________________________|
 
 
-
-KV dofile; scope for more control as well as abolishing old interface.
-
-KV write
--  would diversions be useful?  this is perhaps just
-      \write{key}{signature}{filter}{data}
-   or better
-      \write{{type}{key}{ident}{signature}{filter}{name}}{data}
-
-KV tildex/protect/vanish/"" are candidates.
-
-#  why is zsd.doc.css not imported from doc.zmm ?
-   because .. it is invoked in \begin{simple::document}, which is the normal document.
-   so nothing is on the stack.
-   \reset{$itemcount}{}
-   \resetx{$itemcount}{}
-
--  improve filter.c : alter filter routines should support+document
-   all plain/at scope features (e.g. filterTxt and constants).
-
-   (  implement filterStrip
-   (  document ZOEM_FILTER_NONE, raison d'etre etc
-   (  improve {sourceAscend, default filter, yamOutput, sink} filter interfaces.
-   (  more debugging control over filters.
-   (  Support/document full {filter} x {constant, andscope, ...} grid.
-   (  what does filterTxt do? why does it not do constants -> it should
-      probably just output the key.
-   ))))))
-
-
-#  apply creates all the key invocations and concatenates them
-   (rather than iterating) -- useful when it is needed, if wasteful.
-
-
--  \list{
-      {join}{:}
-      {apply}{_#1{}}
-      {split}{-}
-      {grep}{_#1{}}     \: inspect ?
-   }{data}
-
-
-#
-   ---->8------>8------->8------>8------->8------>8---
-   huhuhu
-   \write{\__fnout__}{copy}{testtesttest}
-   hahaha
-      concatenates testtesttesthahaha; device filter does not.
-   ---->8------>8------->8------>8------->8------>8---
-   -  The copy filter does not update the state to
-      be no longer BOL.
-   -  Note that this is funny given \__fnout__.
-
-
-   \apply{_#2{\!{\1=\2\@{\N}}}}{
-      \inspect{{mods}{posix,discard-nmp}}{([^-])}{_#1{{\1}}}{a-b-c-d}
-   }
-   .
-   ----------------------------------------
-   {a}{b}{c}{d}
-
-
-
--  by default do not do ws squashing - it's more pud than zoem.
-
--  document let/f/fv precision behaviour.
-
-$? precision_g: currently relative to absolute value.
-   Now 0.00000009 == 0.00000001.
-   (it's currently meant for *basic* stuff).
-
--  let: when does -0.0 occur? \let{0.99999999 -1 }
-
--  document ctr.zmm somewhere.
--  allow '>' in \<\foo>; somehow manage to map it to &gt;.
-?  \%#3 as callback
+---->8------>8------->8------>8------->8------>8---
+huhuhu
+\write{\__fnout__}{copy}{testtesttest}
+hahaha
+  concatenates testtesttesthahaha; device filter does not.
+---->8------>8------->8------>8------->8------>8---
+-  Note that this is weird given \__fnout__ is the current output stream
+*  The copy filter does not update the state to be no longer BOL; general
+   issue of filter processing + output stream interactions.
 
 -  mod_initialize composites as tings (so no need to create/delete them)
-
--  how to do pipes with system: invoke shell !?
 
 #  it is currently possible to translate \\ and \{ and \} ? #yes
 #  tr translates \@{} as well, e.g. \tr{{from}{@}{to}{F}}{\@{a}}
@@ -387,10 +326,6 @@ at_scope
 -  \inspect{{mods}{posix}}{(([a-z])*)}{_#2{\!textmap{{word}{ucase}}{\1}}}{ab234}
    does not work: no atom warning. is this a posix feature?
 
-#  \system{perl}{{-e}{'print "hi\\n";'}} fails
-   \system{perl}{{-e}{print "hi\\n";}} works. shell quote hell.
-   \system{exec}{{date}} fails; (shell builtin, not a system binary)
-
 !  more primitives could act like '%': being able to take variable
    number of arguments.
    it would be an additional property of a primitive.
@@ -408,293 +343,13 @@ at_scope
    this is so that the macro location mechanism need not be adapted.
    (we can simply search for %#1)
 
--  xml sugar:
-   make '<' and '>' yamSpecial tokens (259 and 260), so that the
-   functionality can be supported for other formats too.
-   this requires some additional rules which are not yet clear.
-
--  interactive:
-   \| and \~ etc are ignored ??
-
 !  how does nested \zinsert{stdia} work?
    it actually seems to work, but what is happening with fp's meanwhile?
-
-mqmq
-
 
 ?  at directive: don't write newlines (shorthand for cumbersome
    translate expression)?
 
-apply-keys
--  what when i want to apply different keys to the same data?
-   currently difficult wrt backslash i believe.
-
-   \def{foo#1}{[\1]}
-   \def{bar#1}{{\1}}
-   \def{zut#1}{<\1>}
-   \apply{_#1{\!\1{a}\|}}{{foo}{bar}{zut}}
-   does not work because after expansion apply uses
-   anon key containing '\\1'
-
- ! \apply{_#1{\1{a}\|}}{{\!foo}}
- ! *does* work
-
-   \def{$foo#1}{[\1]}
-   \def{$bar#1}{{\1}}
-   \def{$zut#1}{<\1>}
-   \apply{_#1{\!$\1{a}\|}}{{foo}{bar}{zut}}
-   works; apply uses
-   \$\1
-
-   \def{foo#1}{[\1]}
-   \def{far#1}{{\1}}
-   \def{fut#1}{<\1>}
-   \apply{_#1{\!f\1{a}\|}}{{oo}{ar}{ut}}
-   works also.
-
-   dotfoo
-   A conceivable feature 
-   is that during parsing
-   \.foo is simply interpreted as \foo
-   this would enable callbacks, e.g. for shipping typeface information:
-   bf, it, tt etc.
-   \apply{_#1{\!.\1{a}\|}}{{foo}{bar}{zut}}
-   but it is seems too special purpose to be good.
-   \def{bf#1}{bf[\1]}
-   \def{it#1}{it[\1]}
-   \def{st#2}{\apply{_#1{\!{}\1{\2}\|}}{{foo}{bar}{zut}}}
-
-   nuther solution is to make cb_bf, cb_it, cb_tt keys that map
-   to bf, it, tt.
-
 -  can it be useful to keep track in yamfilterdata, the state in
    which the last character was output (at or plain)?
    This pertains also to the squashing problems and to the \S\| issue.
-
--  how about a '\register#2{name}{descr}' command, so that it's easy
-   to find all macro's supported by a package.
-   .zmm files are not parsed by -i flag. perhaps
-
-   zoem -r man.zmm
-   should list all registered macro's in man.zmm
-
-
-###
-   WORKS    \def{foo}{bar}
-            \write{ttt}{device}{
-            \eval{\zinsert{foobar}}
-            }
-            \={foobar}
-            \foo
-            \==
--->
-   FAILS    \def{foo}{bar}
-            \write{ttt}{device}{
-            \input{foobar}
-            }
-            \={foobar}
-            \foo
-            \==
-In the sense that stacks are not correctly tied.  there is a misassociation of
-xml stacks (and possibly other stacks) with output sink.
-However, this is probably a feature.
-\input#1 is not supposed to be called from write#3 in this way.
-
-
-
-}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{
-
-   -  A very OOOLD todo. nobody knows what it means anymore,
-      but it is pretty deep.
-   \(@array)
-   \(%hash)
-         evaluating expressions will require splicing into the string
-         in the previous segment, which is equivalent with inserting
-         a segment below and fiddling with ofsets.
-
-}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{_}~{
-
-
-
-
-
-have a look at filter.[ch], espcially at ' ' and '\n' stuff.
-also at fixmefixmefixme -> indent is printed after newline regardless of what follows.
-try to get the code cleaner.
-Note that n_spaces means 'number of stacked spaces'. We do not know
-the number of *printed* spaces.
-
-
-Create test file with lots of \W \w \N \S \n \s at beginning and end of line
-etc, also with special definitions.
-\+{0}: does it work or is it bugged?
-filterLinefeed is very weird.
-
-So ... are stacked spaces/newlines always saved until non-blank?
-
-
-
-               incoming nl
-               incoming sp
-stacked sp     incoming sp at   format:yes    result: output     special{10}
-stacked nl     incoming nl at   format: no           stacked     special{32}
-no stacked     incoming \S
-               incoming \s
-               incoming \n
-               incoming \N
-               incoming #
-
-
-\parse or \expect primitive.
-
-some ideas:
-   expect fixed keys abitrary value -> act on value
-   expect fixed keys and fixed value structure
-   expect arbitrary keys -> 
-
-   expect exactly/atleast/atmost N arguments
-
-\1 is problematic.  feature to specify level at which interpolation can take
-place -> warty?
-
-\__value__ -> might work as long as things are evaluated in the right order.
-
-expect should be able to provide recursive parsing.
-
-
-\def{foo#2}{
-   \expect{\1}{\inform{expect ..}}{
-      {*key}{ \__value__ now set }
-      {*key}{ \__value__ now set }
-      {*key}{
-         \switch{\nargs{\__value__}}{
-         }{
-            {2}{_#2{foo \1 bar \2}\__value}
-            {3}{_#3{foo \1 bar \2 zut \3 }\__value}
-
-            This needs more work:
-            easier multiplexing argument count
-            or supplying default arguments.
-         }
-      }
-      {key}{\write{stderr}{device}{have \1}}{
-      }
-      {key}{\write{stderr}{device}{have \1}}{
-         \expect{\__value_}{have \__value}{
-            {key}{ have second \__value__}
-            {key}{ have second \__value__}
-         }
-      }
-      {  trailing \1
-      }
-   }
-}
-
-
-
-\expect{
-
-   {delimit}{     \:  set \__nargs__, \__value__
-
-      \branch{
-         {\let{\__nargs__ == 1}}{
-            \"1" \"2" \"3"
-         }
-         {\let{\"nargs" == 2}}{
-            \"1" \"2"
-         }
-         {\inform{HUH!?}}
-      }
-   }{ }
-   {border}{
-         \expect{\__value__}{
-            {key}{bar}
-            {foo}{zut}
-         }{
-         }
-   }{ }
-
-   {optional}{ }
-   {!required}{ }    # must be present
-   {optional#2}{ }   # if present, must have 2 arguments
-   {!required#2}{ }  # must be present with 2 arguments.
-   {!required#23}{ } # must be present with 23 arguments.
-   {!required#2-3}{ }# must be present with 2 or 3 arguments.
-   {optional##}      # will be parsed as a vararg (do not set \"1" etc)
-   {!required##}     # required, will be parsed as a vararg (do not set \"1" etc)
-   {{2,3}required#2}
-   {{2,}?required#2}
-
-   {p}{
-      {style}{{text-align}{left}{colour}{red}}
-      {inner}{
-      }
-   }
-
-   \expectkv
-
-   !                 1
-   ?                 0 or 1
-   *                 0 or more
-   +                 1 or more
-   +required
-   *required
-   present more than once?
-
-   \expect{ VALUE }{
-         \inform{no match}
-   }{
-      \SYNTAX
-   }
-
-\set{SYNTAX}{\!{
-   {*node}{
-      \expect{\__value__}{no match}{
-         \SYNTAX
-      }
-   }
-   {leaf}{
-      have leaf \__value__
-   }
-}}
-   
-   This action repeated for all other key-value pairs.
-   {  \inform{\__key__ \__value__ ignored}
-   }
-
-   But what about single arguments -- caller has to do that.
-   expect will issue a warning.
-}
-
-
--  for nested expect calls we want to push dictionaries.  however, we should not
-   set keys in those dictionaries ourselves.  This is a more general problem, at
-   an earlier occasion leading to proposal of named stacks.
-
--  expect: we have a choice of width-first or depth-first parsing.
-
--  expect2:
-   expect3: branch for the case where key is not specified
-
-\set{{stack}{expect}}{"1"}{bar}
-
-\''foo
-
-\'{stack}{foo}
-
-\'foo    <->   \'{zoem}{foo}{..}
-\''foo   <->   \'{user}{foo}{..}
-
-\set{{modes}{x}{stack}{zoem}}{foo}{bar}
-
-
-
--  add mode to -allow for allowing path parts as in \writeto{a/b}
--  finer control over get#2 ? (e.g. top level only) ...
-
-___ [zoem] error around input line <4080> in <zum.azm>
-___ last key seen is <<>#1>
-___ [\<>#1] tag </body> closes <div>
-___ [zoem] unwound on error/exception
-         store <div> line number.
 
