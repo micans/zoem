@@ -13,3 +13,4 @@
 config*
 srd/zoem
 doc/zum.prm
+**/Makefile.in

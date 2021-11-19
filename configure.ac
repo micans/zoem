@@ -9,10 +9,12 @@
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.50)
-AC_INIT([zoem], 21-322)
+AC_INIT([zoem], 21-323)
 
 PACKAGE=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION
+
+AC_CONFIG_AUX_DIR(autofoo)
 
 AC_CONFIG_SRCDIR([src/segment.c])
 AM_INIT_AUTOMAKE

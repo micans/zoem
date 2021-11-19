@@ -1,5 +1,12 @@
 
 
+   *  Fixed bug in let#1; it would think that 'abs(2) == abs(1)' is true.
+      The cause was a combination of two things: failure to maintain
+      float/integer correspondence by abs and other functions, and a
+      wrong ternary cascade that would check float (in)equality even if
+      the integer (in)equality test was already conclusive.
+
+
 Wed, Jun 15 2011
 
    *  zoem-11-166 released.
