@@ -11,6 +11,11 @@
 **/*.gz
 **/*.html
 config*
-srd/zoem
+aclocal.m4
+src/zoem
 doc/zum.prm
+doc/stamp.*
+slate
+autom4te.cache
+autofoo/compile
 **/Makefile.in
