@@ -9,7 +9,7 @@
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.50)
-AC_INIT([zoem], 21-323)
+AC_INIT([zoem], 21-324)
 
 PACKAGE=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION
