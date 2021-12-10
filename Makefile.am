@@ -23,6 +23,5 @@ AM_LDFLAGS = -lm
 configure.ac: configure.ac.in VERSION
 	shed/setversion
 
-EXTRA_DIST = configure.ac.in VERSION LICENSE TODO_DESIGN\
-   DESIGN
+EXTRA_DIST = configure.ac.in VERSION LICENSE TODO_DESIGN DESIGN install-this-zoem.sh
 

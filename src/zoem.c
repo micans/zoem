@@ -30,8 +30,8 @@
 const char *zoemVersion
 =
 "zoem %s\n"
-"(c) Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007 Stijn van Dongen.\n"
-"(c) Copyright 2008, 2009, 2010, 2011  Stijn van Dongen.\n"
+"(c) Copyright 2001 Stijn van Dongen.\n"
+"(c) Copyright 2021 Stijn van Dongen.\n"
 "zoem comes with NO WARRANTY to the extent permitted by law.\n"
 "You may redistribute copies of zoem under the terms\n"
 "of the GNU General Public License.\n"

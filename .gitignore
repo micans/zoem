@@ -19,3 +19,5 @@ slate
 autom4te.cache
 autofoo/compile
 **/Makefile.in
+VERSION
+mylist

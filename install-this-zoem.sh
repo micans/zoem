@@ -2,21 +2,30 @@
 
 set -euo pipefail
 
-# Change versions below if you have different versions.
-cff=21-322
-zum=21-322
+# This script is a simple script for downloading + compiling zoem.
+
+cff=21-341
+zum=21-341
 
 # Change if you want to install somewhere else
 INSTALL=$HOME/local
-
 
 # Now the rest of this script should have enough to run.
 
 zumtar=zoem-$zum.tar.gz
 cfftar=cimfomfa-$cff.tar.gz
 
-wget http://micans.org/phloobaz/$zumtar
-wget http://micans.org/phloobaz/$cfftar
+if command -v wget > /dev/null; then 
+   webbit=wget
+elif command -v curl > /dev/null; then 
+   webbit="curl -O"
+else
+   echo "Explain to me how to download stuff please"
+   false
+fi
+
+$webbit http://micans.org/zoem/src/$zumtar
+$webbit http://micans.org/cimfomfa/src/$cfftar
 
 if true; then
   thedir=./${cfftar%.tar.gz}
