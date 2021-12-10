@@ -55,8 +55,8 @@ zum: zum.html
 ZOEMSEARCHPATH=../mac:${ZOEMSEARCHPATH}
 
 zum.html: zum.azm ecosphere.azm
-	$(ZOEM) --allow=date:../src/zoem: --system-honor --d=html --i=zum --o=$@
-	$(ZOEM) --allow=date:../src/zoem: --system-honor --d=html --i=zum --o=$@
+	$(ZOEM) --allow=date:../src/zoem: --system-honor --d=html --i=$(VPATH)/zum --o=$@
+	$(ZOEM) --allow=date:../src/zoem: --system-honor --d=html --i=$(VPATH)/zum --o=$@
 	- $(TIDY) -e $@
 
 zoem: zoem.1 zoem.html zoem.ps

@@ -1,15 +1,28 @@
-#!/bin/sh -e
+#!/bin/bash
 
 # $Id: setversion,v 1.14 2006-03-21 11:10:01 flux Exp $
 # called in bootstrap
 
 # alias date='date -d "2007-11-29"'
 
-# be verbose
-set -x
+set -euo pipefail
 
+if (( $# == 0 )); then
+   echo need version - suggest $(date '+%y-%j')
+   false
+fi
 
-VERSION=`date '+%y-%j'`
+VERSION=$1
+IFS=- read THEYEAR THEDAY <<< $VERSION
+THEDAY0=$((THEDAY-1))
+THEDATE=$(date -d "20$THEYEAR-1-1 +$THEDAY0 days")
+echo "-- Using date $THEDATE"
+# todo should be derived from version.
+MONTHDAY=$(date '+%e' -d "$THEDATE")
+MONTH=$(date '+%b' -d "$THEDATE")
+YEAR=$(date '+%Y' -d "$THEDATE")
+echo "-- $MONTHDAY $MONTH $YEAR"
+
 echo $VERSION > VERSION
 
 cat > configure.ac <<EOT
@@ -29,10 +42,10 @@ echo '#endif' >> $vsh
 
 vsc='src/version.c'
 echo -n '' > $vsc
-echo 'char *zoemDateTag = "'`date +%y-%j`'";' >> $vsc
+echo 'char *zoemDateTag = "'"20$VERSION"'";' >> $vsc
 
-date '+%y-%j'  >  doc/stamp.stamp
-date '+%e'     >  doc/stamp.day
-date '+%b'     >  doc/stamp.month
-date '+%Y'     >  doc/stamp.year
+echo $VERSION   >  doc/stamp.stamp
+echo $MONTHDAY  >  doc/stamp.day
+echo $MONTH     >  doc/stamp.month
+echo $YEAR      >  doc/stamp.year
 
