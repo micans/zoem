@@ -851,7 +851,7 @@ void text_map_alpha
       {  r = x % base
       ;  x = x / base
       ;  mcxTingNAppend(data, "_abcdefghijklmnopqrstuvwxyz"+r, 1)
-   ;  }
+   ;  }                                                 /* ^ clangface */
       while (x)
 
    ;  l = data->len
