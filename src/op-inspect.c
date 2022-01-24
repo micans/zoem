@@ -70,7 +70,7 @@ mcxstatus do_rex
 
    ;  int match_so, match_eo, match_len, n_hits = 0
    ;  mcxbool match
-   ;  mcxbool status       =  STATUS_FAIL
+   ;  int status           =  REG_NOMATCH
 
    ;  mcxbool interpolate  =  opts & REX_INTERPOLATE
    ;  mcxbool knmp         =  opts & REX_KNMP
