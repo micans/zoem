@@ -4,6 +4,26 @@ Foundation, Inc.
    This file is free documentation; the Free Software Foundation gives
 unlimited permission to copy, distribute and modify it.
 
+
+Zoem specific Installation notes
+================================
+
+Zoem requires the tingea library provided by the cimfomfa (don't ask) project.
+
+Zoem can be installed by obtaining the right cimfomfa release
+from /micans.org/cimfomfa/src . A zoem release will generally
+indicate what cimfomfa version is suitable, and will also contain
+a script called 'install-this-zoem.sh'.
+
+Installation is a two-step process and looks like this:
+
+# cimfomfa/tingea installation, in unpacked cimfomfa source:
+./configure --prefix=$INSTALL
+
+# zoem installation in unpacked zoem source:
+./configure CFLAGS=-I$INSTALL/include LDFLAGS=-L$INSTALL/lib --prefix=$INSTALL
+
+
 Basic Installation
 ==================
 
