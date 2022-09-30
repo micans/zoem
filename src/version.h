@@ -1,4 +1,4 @@
 #ifndef zoem_version_h__
 #define zoem_version_h__
-char *zoemDateTag;
+extern const char *zoemDateTag;
 #endif

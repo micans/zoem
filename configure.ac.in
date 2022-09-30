@@ -80,8 +80,7 @@ AC_PROG_LN_S
 AC_PROG_RANLIB
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lm':
-AC_CHECK_LIB([m], [main])
+AC_CHECK_LIB([m], [ceil])
 AC_CHECK_LIB([tingea], [mcxHashNew], [], [echo "Need cimfomfa (please read INSTALL)" && exit 1])
 
 

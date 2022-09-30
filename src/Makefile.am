@@ -9,7 +9,7 @@ ops-env.c ops-constant.c curly.c digest.c entry.c \
 iface.c source.c sink.c filter.c key.c dict.c ops.c parse.c read.c \
 segment.c util.c zoem.c version.c
 
-zoem_LDFLAGS = -lm # -lunwind -ltcmalloc
+# zoem_LDFLAGS = -lm # -lunwind -ltcmalloc
 
 LDADD = -ltingea -lm
 

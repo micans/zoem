@@ -32,17 +32,9 @@ EOT
 
 sed "s/setversion_VERSION/$VERSION/" configure.ac.in >> configure.ac
 
-
-vsh='src/version.h'
-echo -n '' > $vsh
-echo '#ifndef zoem_version_h__' >> $vsh
-echo '#define zoem_version_h__' >> $vsh
-echo 'char *zoemDateTag;' >> $vsh
-echo '#endif' >> $vsh
-
 vsc='src/version.c'
 echo -n '' > $vsc
-echo 'char *zoemDateTag = "'"20$VERSION"'";' >> $vsc
+echo 'const char *zoemDateTag = "'"20$VERSION"'";' >> $vsc
 
 echo $VERSION   >  doc/stamp.stamp
 echo $MONTHDAY  >  doc/stamp.day

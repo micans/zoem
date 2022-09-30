@@ -18,7 +18,7 @@ SUBDIRS = . src doc examples shed
 VERSION = @VERSION@
 
 # AM_LDFLAGS = -lunwind -ltcmalloc
-AM_LDFLAGS = -lm
+# AM_LDFLAGS = -lm
 
 configure.ac: configure.ac.in VERSION
 	shed/setversion
