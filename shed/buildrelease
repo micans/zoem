@@ -8,7 +8,7 @@ place="slate/rel-$version"
 rm -rf $place
 mkdir -p $place
 
-shed/bootstrap
+# shed/bootstrap
 
 cd $place
 

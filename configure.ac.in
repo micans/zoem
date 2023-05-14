@@ -17,7 +17,7 @@ AC_CONFIG_AUX_DIR(autofoo)
 AC_CONFIG_SRCDIR([src/segment.c])
 AM_INIT_AUTOMAKE
 
-AC_CONFIG_HEADERS(config.h)
+AC_CONFIG_HEADER(config.h)
 # AC_CONFIG_HEADERS([config.h])
 
 # add a `--enable-maintainer-mode' option to `configure'; `maintainer-only' rules turned off by
@@ -81,7 +81,7 @@ AC_PROG_RANLIB
 
 # Checks for libraries.
 AC_CHECK_LIB([m], [ceil])
-AC_CHECK_LIB([tingea], [mcxHashNew], [], [echo "Need cimfomfa (please read INSTALL)" && exit 1])
+# AC_CHECK_LIB([tingea], [mcxHashNew], [], [echo "Need cimfomfa (please read INSTALL)" && exit 1])
 
 
 # Checks for header files.
